@@ -39,8 +39,8 @@
 0E30 1700E6           (         main.asm):00039                 lbsr printline ; Status line two
                       (         main.asm):00040         
                       (         main.asm):00041                 * Draw initial content of content area
-0E33 170147           (         main.asm):00042                 lbsr vlines
-0E36 170153           (         main.asm):00043                 lbsr hlines
+0E33 170156           (         main.asm):00042                 lbsr vlines
+0E36 170162           (         main.asm):00043                 lbsr hlines
                       (         main.asm):00044         
                       (         main.asm):00045                 * Idle loop
 0E39 17010A           (         main.asm):00046         loop@   lbsr keycheck
@@ -79,8 +79,8 @@
 0E96                  (         main.asm):00073         drawframe
 0E96 13               (         main.asm):00074                 sync
 0E97 17006F           (         main.asm):00075                 lbsr clrcontent
-0E9A 1700E0           (         main.asm):00076                 lbsr vlines
-0E9D 1700EC           (         main.asm):00077                 lbsr hlines
+0E9A 1700EF           (         main.asm):00076                 lbsr vlines
+0E9D 1700FB           (         main.asm):00077                 lbsr hlines
 0EA0 39               (         main.asm):00078                 rts
                       (         main.asm):00079         
                       (         main.asm):00080         * Initialize graphics
@@ -222,133 +222,118 @@
 0F60 0F71             (         main.asm):00216                 clr $0071
 0F62 6E9FFFFE         (         main.asm):00217                 jmp [$fffe]
                       (         main.asm):00218         
-                      (         main.asm):00219         * List of vertical lines
-0F66                  (         main.asm):00220         vlist
-0F66 4F               (         main.asm):00221                 fcb 79  ; x1
-0F67 1A               (         main.asm):00222                 fcb 26  ; y1
-0F68 0E               (         main.asm):00223                 fcb 14  ; length
-                      (         main.asm):00224         
-0F69 51               (         main.asm):00225                 fcb 81
-0F6A 19               (         main.asm):00226                 fcb 25
-0F6B 0E               (         main.asm):00227                 fcb 14
+                      (         main.asm):00219         * List of horizontal lines
+0F66                  (         main.asm):00220         hlist
+0F66 50142F           (         main.asm):00221          fcb 80,20,47
+0F69 501D1B           (         main.asm):00222          fcb 80,29,27
+0F6C 731D0C           (         main.asm):00223          fcb 115,29,12
+0F6F 60290B           (         main.asm):00224          fcb 96,41,11
+0F72 73290C           (         main.asm):00225          fcb 115,41,12
+0F75 60361F           (         main.asm):00226          fcb 96,54,31
+0F78 FF               (         main.asm):00227          fcb $ff
                       (         main.asm):00228         
-0F6C 53               (         main.asm):00229                 fcb 83
-0F6D 18               (         main.asm):00230                 fcb 24
-0F6E 0E               (         main.asm):00231                 fcb 14
-                      (         main.asm):00232         
-0F6F 55               (         main.asm):00233                 fcb 85
-0F70 17               (         main.asm):00234                 fcb 23
-0F71 0E               (         main.asm):00235                 fcb 14
-                      (         main.asm):00236         
-0F72 57               (         main.asm):00237                 fcb 87
-0F73 16               (         main.asm):00238                 fcb 22
-0F74 0E               (         main.asm):00239                 fcb 14
-                      (         main.asm):00240         
-0F75 59               (         main.asm):00241                 fcb 89
-0F76 28               (         main.asm):00242                 fcb 40
-0F77 0E               (         main.asm):00243                 fcb 14
-                      (         main.asm):00244         
-0F78 FF               (         main.asm):00245                 fcb $ff ; end of list
-                      (         main.asm):00246         
-                      (         main.asm):00247         * List of horizontal lines
-0F79                  (         main.asm):00248         hlist
-0F79 57               (         main.asm):00249                 fcb 87
-0F7A 19               (         main.asm):00250                 fcb 25
-0F7B 0C               (         main.asm):00251                 fcb 12
-0F7C FF               (         main.asm):00252                 fcb $ff ; end of list
-                      (         main.asm):00253         
-                      (         main.asm):00254         * Draw all vertical lines visible in viewport
-0F7D                  (         main.asm):00255         vlines
-0F7D 338CE6           (         main.asm):00256                 leau vlist,pcr
-0F80 170018           (         main.asm):00257         loop@   lbsr vline
-0F83 3343             (         main.asm):00258                 leau 3,u
-0F85 A6C4             (         main.asm):00259                 lda ,u
-0F87 81FF             (         main.asm):00260                 cmpa #$ff
-0F89 26F5             (         main.asm):00261                 bne loop@
-0F8B 39               (         main.asm):00262                 rts
-                      (         main.asm):00263         
-                      (         main.asm):00264         * Draw all horizontal lines visible in viewport
-0F8C                  (         main.asm):00265         hlines
-0F8C 338CEA           (         main.asm):00266                 leau hlist,pcr
-0F8F 170046           (         main.asm):00267         loop@   lbsr hline
-0F92 3343             (         main.asm):00268                 leau 3,u
-0F94 A6C4             (         main.asm):00269                 lda ,u
-0F96 81FF             (         main.asm):00270                 cmpa #$ff
-0F98 26F5             (         main.asm):00271                 bne loop@
-0F9A 39               (         main.asm):00272                 rts
-                      (         main.asm):00273         
-                      (         main.asm):00274         * Draw vertical line, clip to viewport
-0F9B                  (         main.asm):00275         vline
-0F9B ECC4             (         main.asm):00276                 ldd ,u
-0F9D 9004             (         main.asm):00277                 suba origin     ; map to viewport
-0F9F D005             (         main.asm):00278                 subb origin+1
-0FA1 DD06             (         main.asm):00279                 std coords      ; x1, y1
-0FA3 EB42             (         main.asm):00280                 addb 2,u        ; y2 = y1 + length
-0FA5 DD08             (         main.asm):00281                 std coords+2    ; x2, y2
-0FA7 17FF95           (         main.asm):00282                 lbsr isvisible  ; endpoint visible?
-0FAA 2507             (         main.asm):00283                 bcs okay@
-0FAC DC06             (         main.asm):00284                 ldd coords
-0FAE 17FF8E           (         main.asm):00285                 lbsr isvisible  ; endpoint visible?
-0FB1 2424             (         main.asm):00286                 bcc xvline      ; neither visible, forget it
-0FB3                  (         main.asm):00287         okay@
-0FB3 A642             (         main.asm):00288                 lda 2,u         ; length of line
-0FB5 970A             (         main.asm):00289                 sta coords+4
-0FB7                  (         main.asm):00290         loop@
-0FB7 DC06             (         main.asm):00291                 ldd coords      ; x1, y1
-0FB9 17FF83           (         main.asm):00292                 lbsr isvisible
-0FBC 2413             (         main.asm):00293                 bcc skip@       ; if point not visible, skip it
-0FBE 5C               (         main.asm):00294                 incb
-0FBF 5C               (         main.asm):00295                 incb
-0FC0 17FF6E           (         main.asm):00296                 lbsr curspos
-0FC3 9E00             (         main.asm):00297                 ldx textptr     ; where to put next point
-0FC5 867C             (         main.asm):00298                 lda #'|'
-0FC7 E684             (         main.asm):00299                 ldb ,x          ; is there a character there already?
-0FC9 C120             (         main.asm):00300                 cmpb #$20
-0FCB 2702             (         main.asm):00301                 beq setpoint@
-0FCD 862B             (         main.asm):00302                 lda #'+'        ; if so, put a + there instead of |
-0FCF                  (         main.asm):00303         setpoint@
-0FCF A784             (         main.asm):00304                 sta ,x          ; draw next point
-0FD1                  (         main.asm):00305         skip@
-0FD1 0C07             (         main.asm):00306                 inc coords+1    ; y1 += 1
-0FD3 0A0A             (         main.asm):00307                 dec coords+4    ; length--
-0FD5 26E0             (         main.asm):00308                 bne loop@
-0FD7 39               (         main.asm):00309         xvline  rts
-                      (         main.asm):00310         
-                      (         main.asm):00311         * Draw horizontal line, clip to viewport
-0FD8                  (         main.asm):00312         hline
-0FD8 ECC4             (         main.asm):00313                 ldd ,u
-0FDA 9004             (         main.asm):00314                 suba origin     ; map to viewport
-0FDC D005             (         main.asm):00315                 subb origin+1
-0FDE DD06             (         main.asm):00316                 std coords      ; x1, y1
-0FE0 AB42             (         main.asm):00317                 adda 2,u        ; x2 = x1 + length
-0FE2 DD08             (         main.asm):00318                 std coords+2    ; x2, y2
-0FE4 17FF58           (         main.asm):00319                 lbsr isvisible  ; endpoint visible?
-0FE7 2507             (         main.asm):00320                 bcs okay@
-0FE9 DC06             (         main.asm):00321                 ldd coords
-0FEB 17FF51           (         main.asm):00322                 lbsr isvisible  ; endpoint visible?
-0FEE 2424             (         main.asm):00323                 bcc xhline      ; neither visible, forget it
-0FF0                  (         main.asm):00324         okay@
-0FF0 A642             (         main.asm):00325                 lda 2,u         ; length of line
-0FF2 970A             (         main.asm):00326                 sta coords+4
-0FF4                  (         main.asm):00327         loop@
-0FF4 DC06             (         main.asm):00328                 ldd coords      ; x1, y1
-0FF6 17FF46           (         main.asm):00329                 lbsr isvisible
-0FF9 2413             (         main.asm):00330                 bcc skip@       ; if point not visible, skip it
-0FFB 5C               (         main.asm):00331                 incb
-0FFC 5C               (         main.asm):00332                 incb
-0FFD 17FF31           (         main.asm):00333                 lbsr curspos
-1000 9E00             (         main.asm):00334                 ldx textptr     ; where to put next point
-1002 862D             (         main.asm):00335                 lda #'-'
-1004 E684             (         main.asm):00336                 ldb ,x          ; is there a character there already?
-1006 C120             (         main.asm):00337                 cmpb #$20
-1008 2702             (         main.asm):00338                 beq setpoint@
-100A 862B             (         main.asm):00339                 lda #'+'        ; if so, put a + there instead of -
-100C                  (         main.asm):00340         setpoint@
-100C A784             (         main.asm):00341                 sta ,x          ; draw next point
-100E                  (         main.asm):00342         skip@
-100E 0C06             (         main.asm):00343                 inc coords      ; x1 += 1
-1010 0A0A             (         main.asm):00344                 dec coords+4    ; length--
-1012 26E0             (         main.asm):00345                 bne loop@
-1014 39               (         main.asm):00346         xhline  rts
-                      (         main.asm):00347         
-                      (         main.asm):00348                 end start
+                      (         main.asm):00229         * List of vertical lines
+0F79                  (         main.asm):00230         vlist
+0F79 50140A           (         main.asm):00231          fcb 80,20,10
+0F7C 60290E           (         main.asm):00232          fcb 96,41,14
+0F7F 6A1D0D           (         main.asm):00233          fcb 106,29,13
+0F82 731D0D           (         main.asm):00234          fcb 115,29,13
+0F85 7E140A           (         main.asm):00235          fcb 126,20,10
+0F88 7E290E           (         main.asm):00236          fcb 126,41,14
+0F8B FF               (         main.asm):00237          fcb $ff
+                      (         main.asm):00238         
+                      (         main.asm):00239         * Draw all vertical lines visible in viewport
+0F8C                  (         main.asm):00240         vlines
+0F8C 338CEA           (         main.asm):00241                 leau vlist,pcr
+0F8F 170018           (         main.asm):00242         loop@   lbsr vline
+0F92 3343             (         main.asm):00243                 leau 3,u
+0F94 A6C4             (         main.asm):00244                 lda ,u
+0F96 81FF             (         main.asm):00245                 cmpa #$ff
+0F98 26F5             (         main.asm):00246                 bne loop@
+0F9A 39               (         main.asm):00247                 rts
+                      (         main.asm):00248         
+                      (         main.asm):00249         * Draw all horizontal lines visible in viewport
+0F9B                  (         main.asm):00250         hlines
+0F9B 338CC8           (         main.asm):00251                 leau hlist,pcr
+0F9E 170046           (         main.asm):00252         loop@   lbsr hline
+0FA1 3343             (         main.asm):00253                 leau 3,u
+0FA3 A6C4             (         main.asm):00254                 lda ,u
+0FA5 81FF             (         main.asm):00255                 cmpa #$ff
+0FA7 26F5             (         main.asm):00256                 bne loop@
+0FA9 39               (         main.asm):00257                 rts
+                      (         main.asm):00258         
+                      (         main.asm):00259         * Draw vertical line, clip to viewport
+0FAA                  (         main.asm):00260         vline
+0FAA ECC4             (         main.asm):00261                 ldd ,u
+0FAC 9004             (         main.asm):00262                 suba origin     ; map to viewport
+0FAE D005             (         main.asm):00263                 subb origin+1
+0FB0 DD06             (         main.asm):00264                 std coords      ; x1, y1
+0FB2 EB42             (         main.asm):00265                 addb 2,u        ; y2 = y1 + length
+0FB4 DD08             (         main.asm):00266                 std coords+2    ; x2, y2
+0FB6 17FF86           (         main.asm):00267                 lbsr isvisible  ; endpoint visible?
+0FB9 2507             (         main.asm):00268                 bcs okay@
+0FBB DC06             (         main.asm):00269                 ldd coords
+0FBD 17FF7F           (         main.asm):00270                 lbsr isvisible  ; endpoint visible?
+0FC0 2424             (         main.asm):00271                 bcc xvline      ; neither visible, forget it
+0FC2                  (         main.asm):00272         okay@
+0FC2 A642             (         main.asm):00273                 lda 2,u         ; length of line
+0FC4 970A             (         main.asm):00274                 sta coords+4
+0FC6                  (         main.asm):00275         loop@
+0FC6 DC06             (         main.asm):00276                 ldd coords      ; x1, y1
+0FC8 17FF74           (         main.asm):00277                 lbsr isvisible
+0FCB 2413             (         main.asm):00278                 bcc skip@       ; if point not visible, skip it
+0FCD 5C               (         main.asm):00279                 incb
+0FCE 5C               (         main.asm):00280                 incb
+0FCF 17FF5F           (         main.asm):00281                 lbsr curspos
+0FD2 9E00             (         main.asm):00282                 ldx textptr     ; where to put next point
+0FD4 867C             (         main.asm):00283                 lda #'|'
+0FD6 E684             (         main.asm):00284                 ldb ,x          ; is there a character there already?
+0FD8 C120             (         main.asm):00285                 cmpb #$20
+0FDA 2702             (         main.asm):00286                 beq setpoint@
+0FDC 862B             (         main.asm):00287                 lda #'+'        ; if so, put a + there instead of |
+0FDE                  (         main.asm):00288         setpoint@
+0FDE A784             (         main.asm):00289                 sta ,x          ; draw next point
+0FE0                  (         main.asm):00290         skip@
+0FE0 0C07             (         main.asm):00291                 inc coords+1    ; y1 += 1
+0FE2 0A0A             (         main.asm):00292                 dec coords+4    ; length--
+0FE4 26E0             (         main.asm):00293                 bne loop@
+0FE6 39               (         main.asm):00294         xvline  rts
+                      (         main.asm):00295         
+                      (         main.asm):00296         * Draw horizontal line, clip to viewport
+0FE7                  (         main.asm):00297         hline
+0FE7 ECC4             (         main.asm):00298                 ldd ,u
+0FE9 9004             (         main.asm):00299                 suba origin     ; map to viewport
+0FEB D005             (         main.asm):00300                 subb origin+1
+0FED DD06             (         main.asm):00301                 std coords      ; x1, y1
+0FEF AB42             (         main.asm):00302                 adda 2,u        ; x2 = x1 + length
+0FF1 DD08             (         main.asm):00303                 std coords+2    ; x2, y2
+0FF3 17FF49           (         main.asm):00304                 lbsr isvisible  ; endpoint visible?
+0FF6 2507             (         main.asm):00305                 bcs okay@
+0FF8 DC06             (         main.asm):00306                 ldd coords
+0FFA 17FF42           (         main.asm):00307                 lbsr isvisible  ; endpoint visible?
+0FFD 2424             (         main.asm):00308                 bcc xhline      ; neither visible, forget it
+0FFF                  (         main.asm):00309         okay@
+0FFF A642             (         main.asm):00310                 lda 2,u         ; length of line
+1001 970A             (         main.asm):00311                 sta coords+4
+1003                  (         main.asm):00312         loop@
+1003 DC06             (         main.asm):00313                 ldd coords      ; x1, y1
+1005 17FF37           (         main.asm):00314                 lbsr isvisible
+1008 2413             (         main.asm):00315                 bcc skip@       ; if point not visible, skip it
+100A 5C               (         main.asm):00316                 incb
+100B 5C               (         main.asm):00317                 incb
+100C 17FF22           (         main.asm):00318                 lbsr curspos
+100F 9E00             (         main.asm):00319                 ldx textptr     ; where to put next point
+1011 862D             (         main.asm):00320                 lda #'-'
+1013 E684             (         main.asm):00321                 ldb ,x          ; is there a character there already?
+1015 C120             (         main.asm):00322                 cmpb #$20
+1017 2702             (         main.asm):00323                 beq setpoint@
+1019 862B             (         main.asm):00324                 lda #'+'        ; if so, put a + there instead of -
+101B                  (         main.asm):00325         setpoint@
+101B A784             (         main.asm):00326                 sta ,x          ; draw next point
+101D                  (         main.asm):00327         skip@
+101D 0C06             (         main.asm):00328                 inc coords      ; x1 += 1
+101F 0A0A             (         main.asm):00329                 dec coords+4    ; length--
+1021 26E0             (         main.asm):00330                 bne loop@
+1023 39               (         main.asm):00331         xhline  rts
+                      (         main.asm):00332         
+                      (         main.asm):00333                 end start

@@ -216,40 +216,25 @@ reset
 	clr $0071
 	jmp [$fffe]
 
-* List of vertical lines
-vlist
-	fcb 79	; x1
-	fcb 26  ; y1
-	fcb 14	; length
-
-	fcb 81
-	fcb 25
-	fcb 14
-
-	fcb 83
-	fcb 24
-	fcb 14
-
-	fcb 85
-	fcb 23
-	fcb 14
-
-	fcb 87
-	fcb 22
-	fcb 14
-
-	fcb 89
-	fcb 40
-	fcb 14
-
-	fcb $ff ; end of list
-
 * List of horizontal lines
 hlist
-	fcb 87
-	fcb 25
-	fcb 12
-	fcb $ff	; end of list
+ fcb 80,20,47
+ fcb 80,29,27
+ fcb 115,29,12
+ fcb 96,41,11
+ fcb 115,41,12
+ fcb 96,54,31
+ fcb $ff
+
+* List of vertical lines
+vlist
+ fcb 80,20,10
+ fcb 96,41,14
+ fcb 106,29,13
+ fcb 115,29,13
+ fcb 126,20,10
+ fcb 126,41,14
+ fcb $ff
 
 * Draw all vertical lines visible in viewport
 vlines
