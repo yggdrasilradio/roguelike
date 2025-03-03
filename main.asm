@@ -1,0 +1,348 @@
+
+SCREEN	equ $4000
+
+	org $0000
+
+textptr	rmb 2 
+cursor	rmb 2 ; x, y
+origin	rmb 2 ; xorigin, yorigin
+coords	rmb 5 ; x1, y1, x2, y2, length
+
+	org $E00
+start
+	* Fast CPU
+	clr $ffd9
+
+	* Initialize graphics and MMU
+	lbsr initgfx
+
+	* Init viewport
+	ldd #80*256+20
+	std origin
+	ldd #SCREEN
+	std textptr
+
+	* Put some sample text into the status areas
+	clra
+	clrb
+	lbsr curspos
+	ldu #line1
+	lbsr printline ; Status line one
+	lbsr printline ; Status line one
+	lbsr printline ; Status line one
+	clra
+	ldb #23
+	lbsr curspos
+	ldu #line2
+	lbsr printline ; Status line two
+	lbsr printline ; Status line two
+	lbsr printline ; Status line two
+
+	* Draw initial content of content area
+	lbsr vlines
+	lbsr hlines
+
+	* Idle loop
+loop@	lbsr keycheck
+	cmpa #8
+	bne notr@
+	dec origin
+	lbsr drawframe
+notr@
+	cmpa #9
+	bne notl@
+	inc origin
+	lbsr drawframe
+notl@
+	cmpa #10
+	bne notu@
+	inc origin+1
+	lbsr drawframe
+notu@
+	cmpa #94
+	bne notd@
+	dec origin+1
+	lbsr drawframe
+notd@
+	bra loop@
+
+line1	fcs /Status line one goes here /
+line2	fcs /Status line two goes here /
+
+* Draw frame
+drawframe
+	sync
+	lbsr clrcontent
+	lbsr vlines
+	lbsr hlines
+	rts
+
+* Initialize graphics
+initgfx
+	* Wait for VSYNC
+	sync
+
+	* Set all palettes to black
+	clra
+	clrb
+	std $ffb0
+	std $ffb2
+	std $ffb4
+	std $ffb6
+	std $ffb8
+	std $ffba
+	std $ffbc
+	std $ffbe
+
+	* Set graphics mode to 80 columns
+	clr $ff9c
+	lda #$4e
+	sta $ff90
+	ldd #$031f
+	std $ff98
+
+	* Set graphics memory
+	lda #$36
+	sta $ffa2
+	ldd #$d800
+	std $ff9d
+
+	* Clear the screen
+	lbsr clrstatus1
+	lbsr clrcontent
+	lbsr clrstatus2
+
+	* Set palettes for text
+	ldb #27		; cyan
+	stb $ffb8
+	ldb #54		; amber
+	stb $ffb9
+	rts
+
+* Clear status area one
+clrstatus1
+	ldx #SCREEN
+	ldd #$2008
+loop@	std ,x++
+	std ,x++
+	cmpx #SCREEN+2*160
+	bne loop@
+	rts
+
+* Clear status area two
+clrstatus2
+	ldx #SCREEN+23*160
+	ldd #$2008
+loop@	std ,x++
+	std ,x++
+	cmpx #SCREEN+24*160
+	bne loop@
+	rts
+
+* Clear just the content area
+clrcontent
+	ldx #SCREEN+2*160
+	ldd #$2000
+loop@	std ,x++
+	std ,x++
+	cmpx #SCREEN+22*160
+	bne loop@
+	rts
+
+* Display a line of text
+printline
+	pshs u
+	ldy textptr
+loop@	lda ,u+
+	sta ,y++
+	bpl loop@
+exit@	sty textptr
+	puls u,pc
+
+* Position cursor to next line
+crlf	ldd cursor
+	clra
+	incb
+	lbsr curspos
+	rts
+
+* Position cursor
+*
+* Entry:
+*	A is column 0 to 79
+*	B is row 0 to 23
+curspos
+	std cursor
+	lda #80
+	mul
+	addb cursor
+	adca #SCREEN/512
+	aslb
+	rola
+	std textptr
+	rts
+
+* Is point visible in viewport?
+*
+* Entry:
+*	A is column in viewport
+*	B is row in viewport
+* Calling sequence:
+*	lbsr isvisible
+*	bcc notvisible
+*	bcs visible
+isvisible
+	cmpa #79
+	bhi no@
+	cmpb #20
+no@	rts
+
+* Poll keyboard
+keycheck
+	jsr [$a000]
+	cmpa #3		; BREAK quit to BASIC
+	bne exit@
+	lbsr reset
+exit@	rts
+
+* Exit to BASIC
+reset
+	clra		; hard reset to RSDOS
+	tfr a,dp
+	lda #$88
+	sta $ff90	; turn off MMU
+	clr $ffd8	; slow CPU
+	sta $ffde	; turn on ROMs
+	clr $0071
+	jmp [$fffe]
+
+* List of vertical lines
+vlist
+	fcb 79	; x1
+	fcb 26  ; y1
+	fcb 14	; length
+
+	fcb 81
+	fcb 25
+	fcb 14
+
+	fcb 83
+	fcb 24
+	fcb 14
+
+	fcb 85
+	fcb 23
+	fcb 14
+
+	fcb 87
+	fcb 22
+	fcb 14
+
+	fcb 89
+	fcb 40
+	fcb 14
+
+	fcb $ff ; end of list
+
+* List of horizontal lines
+hlist
+	fcb 87
+	fcb 25
+	fcb 12
+	fcb $ff	; end of list
+
+* Draw all vertical lines visible in viewport
+vlines
+	leau vlist,pcr
+loop@	lbsr vline
+	leau 3,u
+	lda ,u
+	cmpa #$ff
+	bne loop@
+	rts
+
+* Draw all horizontal lines visible in viewport
+hlines
+	leau hlist,pcr
+loop@	lbsr hline
+	leau 3,u
+	lda ,u
+	cmpa #$ff
+	bne loop@
+	rts
+
+* Draw vertical line, clip to viewport
+vline
+	ldd ,u
+	suba origin	; map to viewport
+	subb origin+1
+	std coords	; x1, y1
+	addb 2,u	; y2 = y1 + length
+	std coords+2	; x2, y2
+	lbsr isvisible	; endpoint visible?
+	bcs okay@
+	ldd coords
+	lbsr isvisible	; endpoint visible?
+	bcc xvline	; neither visible, forget it
+okay@
+	lda 2,u		; length of line
+	sta coords+4
+loop@
+	ldd coords	; x1, y1
+	lbsr isvisible
+	bcc skip@	; if point not visible, skip it
+	incb
+	incb
+	lbsr curspos
+	ldx textptr	; where to put next point
+	lda #'|'
+	ldb ,x		; is there a character there already?
+	cmpb #$20
+	beq setpoint@
+	lda #'+'	; if so, put a + there instead of |
+setpoint@
+	sta ,x		; draw next point
+skip@
+	inc coords+1	; y1 += 1
+	dec coords+4	; length--
+	bne loop@
+xvline	rts
+
+* Draw horizontal line, clip to viewport
+hline
+	ldd ,u
+	suba origin	; map to viewport
+	subb origin+1
+	std coords	; x1, y1
+	adda 2,u	; x2 = x1 + length
+	std coords+2	; x2, y2
+	lbsr isvisible	; endpoint visible?
+	bcs okay@
+	ldd coords
+	lbsr isvisible	; endpoint visible?
+	bcc xhline	; neither visible, forget it
+okay@
+	lda 2,u		; length of line
+	sta coords+4
+loop@
+	ldd coords	; x1, y1
+	lbsr isvisible
+	bcc skip@	; if point not visible, skip it
+	incb
+	incb
+	lbsr curspos
+	ldx textptr	; where to put next point
+	lda #'-'
+	ldb ,x		; is there a character there already?
+	cmpb #$20
+	beq setpoint@
+	lda #'+'	; if so, put a + there instead of -
+setpoint@
+	sta ,x		; draw next point
+skip@
+	inc coords	; x1 += 1
+	dec coords+4	; length--
+	bne loop@
+xhline	rts
+
+	end start

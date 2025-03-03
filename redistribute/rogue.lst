@@ -1,0 +1,354 @@
+                      (         main.asm):00001         
+     4000             (         main.asm):00002         SCREEN  equ $4000
+                      (         main.asm):00003         
+                      (         main.asm):00004                 org $0000
+                      (         main.asm):00005         
+0000                  (         main.asm):00006         textptr rmb 2 
+0002                  (         main.asm):00007         cursor  rmb 2 ; x, y
+0004                  (         main.asm):00008         origin  rmb 2 ; xorigin, yorigin
+0006                  (         main.asm):00009         coords  rmb 5 ; x1, y1, x2, y2, length
+                      (         main.asm):00010         
+                      (         main.asm):00011                 org $E00
+0E00                  (         main.asm):00012         start
+                      (         main.asm):00013                 * Fast CPU
+0E00 7FFFD9           (         main.asm):00014                 clr $ffd9
+                      (         main.asm):00015         
+                      (         main.asm):00016                 * Initialize graphics and MMU
+0E03 17009B           (         main.asm):00017                 lbsr initgfx
+                      (         main.asm):00018         
+                      (         main.asm):00019                 * Init viewport
+0E06 CC5014           (         main.asm):00020                 ldd #80*256+20
+0E09 DD04             (         main.asm):00021                 std origin
+0E0B CC4000           (         main.asm):00022                 ldd #SCREEN
+0E0E DD00             (         main.asm):00023                 std textptr
+                      (         main.asm):00024         
+                      (         main.asm):00025                 * Put some sample text into the status areas
+0E10 4F               (         main.asm):00026                 clra
+0E11 5F               (         main.asm):00027                 clrb
+0E12 17011C           (         main.asm):00028                 lbsr curspos
+0E15 CE0E62           (         main.asm):00029                 ldu #line1
+0E18 1700FE           (         main.asm):00030                 lbsr printline ; Status line one
+0E1B 1700FB           (         main.asm):00031                 lbsr printline ; Status line one
+0E1E 1700F8           (         main.asm):00032                 lbsr printline ; Status line one
+0E21 4F               (         main.asm):00033                 clra
+0E22 C617             (         main.asm):00034                 ldb #23
+0E24 17010A           (         main.asm):00035                 lbsr curspos
+0E27 CE0E7C           (         main.asm):00036                 ldu #line2
+0E2A 1700EC           (         main.asm):00037                 lbsr printline ; Status line two
+0E2D 1700E9           (         main.asm):00038                 lbsr printline ; Status line two
+0E30 1700E6           (         main.asm):00039                 lbsr printline ; Status line two
+                      (         main.asm):00040         
+                      (         main.asm):00041                 * Draw initial content of content area
+0E33 170147           (         main.asm):00042                 lbsr vlines
+0E36 170153           (         main.asm):00043                 lbsr hlines
+                      (         main.asm):00044         
+                      (         main.asm):00045                 * Idle loop
+0E39 17010A           (         main.asm):00046         loop@   lbsr keycheck
+0E3C 8108             (         main.asm):00047                 cmpa #8
+0E3E 2605             (         main.asm):00048                 bne notr@
+0E40 0A04             (         main.asm):00049                 dec origin
+0E42 170051           (         main.asm):00050                 lbsr drawframe
+0E45                  (         main.asm):00051         notr@
+0E45 8109             (         main.asm):00052                 cmpa #9
+0E47 2605             (         main.asm):00053                 bne notl@
+0E49 0C04             (         main.asm):00054                 inc origin
+0E4B 170048           (         main.asm):00055                 lbsr drawframe
+0E4E                  (         main.asm):00056         notl@
+0E4E 810A             (         main.asm):00057                 cmpa #10
+0E50 2605             (         main.asm):00058                 bne notu@
+0E52 0C05             (         main.asm):00059                 inc origin+1
+0E54 17003F           (         main.asm):00060                 lbsr drawframe
+0E57                  (         main.asm):00061         notu@
+0E57 815E             (         main.asm):00062                 cmpa #94
+0E59 2605             (         main.asm):00063                 bne notd@
+0E5B 0A05             (         main.asm):00064                 dec origin+1
+0E5D 170036           (         main.asm):00065                 lbsr drawframe
+0E60                  (         main.asm):00066         notd@
+0E60 20D7             (         main.asm):00067                 bra loop@
+                      (         main.asm):00068         
+0E62 537461747573206C (         main.asm):00069         line1   fcs /Status line one goes here /
+     696E65206F6E6520
+     676F657320686572
+     65A0
+0E7C 537461747573206C (         main.asm):00070         line2   fcs /Status line two goes here /
+     696E652074776F20
+     676F657320686572
+     65A0
+                      (         main.asm):00071         
+                      (         main.asm):00072         * Draw frame
+0E96                  (         main.asm):00073         drawframe
+0E96 13               (         main.asm):00074                 sync
+0E97 17006F           (         main.asm):00075                 lbsr clrcontent
+0E9A 1700E0           (         main.asm):00076                 lbsr vlines
+0E9D 1700EC           (         main.asm):00077                 lbsr hlines
+0EA0 39               (         main.asm):00078                 rts
+                      (         main.asm):00079         
+                      (         main.asm):00080         * Initialize graphics
+0EA1                  (         main.asm):00081         initgfx
+                      (         main.asm):00082                 * Wait for VSYNC
+0EA1 13               (         main.asm):00083                 sync
+                      (         main.asm):00084         
+                      (         main.asm):00085                 * Set all palettes to black
+0EA2 4F               (         main.asm):00086                 clra
+0EA3 5F               (         main.asm):00087                 clrb
+0EA4 FDFFB0           (         main.asm):00088                 std $ffb0
+0EA7 FDFFB2           (         main.asm):00089                 std $ffb2
+0EAA FDFFB4           (         main.asm):00090                 std $ffb4
+0EAD FDFFB6           (         main.asm):00091                 std $ffb6
+0EB0 FDFFB8           (         main.asm):00092                 std $ffb8
+0EB3 FDFFBA           (         main.asm):00093                 std $ffba
+0EB6 FDFFBC           (         main.asm):00094                 std $ffbc
+0EB9 FDFFBE           (         main.asm):00095                 std $ffbe
+                      (         main.asm):00096         
+                      (         main.asm):00097                 * Set graphics mode to 80 columns
+0EBC 7FFF9C           (         main.asm):00098                 clr $ff9c
+0EBF 864E             (         main.asm):00099                 lda #$4e
+0EC1 B7FF90           (         main.asm):00100                 sta $ff90
+0EC4 CC031F           (         main.asm):00101                 ldd #$031f
+0EC7 FDFF98           (         main.asm):00102                 std $ff98
+                      (         main.asm):00103         
+                      (         main.asm):00104                 * Set graphics memory
+0ECA 8636             (         main.asm):00105                 lda #$36
+0ECC B7FFA2           (         main.asm):00106                 sta $ffa2
+0ECF CCD800           (         main.asm):00107                 ldd #$d800
+0ED2 FDFF9D           (         main.asm):00108                 std $ff9d
+                      (         main.asm):00109         
+                      (         main.asm):00110                 * Clear the screen
+0ED5 170011           (         main.asm):00111                 lbsr clrstatus1
+0ED8 17002E           (         main.asm):00112                 lbsr clrcontent
+0EDB 17001B           (         main.asm):00113                 lbsr clrstatus2
+                      (         main.asm):00114         
+                      (         main.asm):00115                 * Set palettes for text
+0EDE C61B             (         main.asm):00116                 ldb #27         ; cyan
+0EE0 F7FFB8           (         main.asm):00117                 stb $ffb8
+0EE3 C636             (         main.asm):00118                 ldb #54         ; amber
+0EE5 F7FFB9           (         main.asm):00119                 stb $ffb9
+0EE8 39               (         main.asm):00120                 rts
+                      (         main.asm):00121         
+                      (         main.asm):00122         * Clear status area one
+0EE9                  (         main.asm):00123         clrstatus1
+0EE9 8E4000           (         main.asm):00124                 ldx #SCREEN
+0EEC CC2008           (         main.asm):00125                 ldd #$2008
+0EEF ED81             (         main.asm):00126         loop@   std ,x++
+0EF1 ED81             (         main.asm):00127                 std ,x++
+0EF3 8C4140           (         main.asm):00128                 cmpx #SCREEN+2*160
+0EF6 26F7             (         main.asm):00129                 bne loop@
+0EF8 39               (         main.asm):00130                 rts
+                      (         main.asm):00131         
+                      (         main.asm):00132         * Clear status area two
+0EF9                  (         main.asm):00133         clrstatus2
+0EF9 8E4E60           (         main.asm):00134                 ldx #SCREEN+23*160
+0EFC CC2008           (         main.asm):00135                 ldd #$2008
+0EFF ED81             (         main.asm):00136         loop@   std ,x++
+0F01 ED81             (         main.asm):00137                 std ,x++
+0F03 8C4F00           (         main.asm):00138                 cmpx #SCREEN+24*160
+0F06 26F7             (         main.asm):00139                 bne loop@
+0F08 39               (         main.asm):00140                 rts
+                      (         main.asm):00141         
+                      (         main.asm):00142         * Clear just the content area
+0F09                  (         main.asm):00143         clrcontent
+0F09 8E4140           (         main.asm):00144                 ldx #SCREEN+2*160
+0F0C CC2000           (         main.asm):00145                 ldd #$2000
+0F0F ED81             (         main.asm):00146         loop@   std ,x++
+0F11 ED81             (         main.asm):00147                 std ,x++
+0F13 8C4DC0           (         main.asm):00148                 cmpx #SCREEN+22*160
+0F16 26F7             (         main.asm):00149                 bne loop@
+0F18 39               (         main.asm):00150                 rts
+                      (         main.asm):00151         
+                      (         main.asm):00152         * Display a line of text
+0F19                  (         main.asm):00153         printline
+0F19 3440             (         main.asm):00154                 pshs u
+0F1B 109E00           (         main.asm):00155                 ldy textptr
+0F1E A6C0             (         main.asm):00156         loop@   lda ,u+
+0F20 A7A1             (         main.asm):00157                 sta ,y++
+0F22 2AFA             (         main.asm):00158                 bpl loop@
+0F24 109F00           (         main.asm):00159         exit@   sty textptr
+0F27 35C0             (         main.asm):00160                 puls u,pc
+                      (         main.asm):00161         
+                      (         main.asm):00162         * Position cursor to next line
+0F29 DC02             (         main.asm):00163         crlf    ldd cursor
+0F2B 4F               (         main.asm):00164                 clra
+0F2C 5C               (         main.asm):00165                 incb
+0F2D 170001           (         main.asm):00166                 lbsr curspos
+0F30 39               (         main.asm):00167                 rts
+                      (         main.asm):00168         
+                      (         main.asm):00169         * Position cursor
+                      (         main.asm):00170         *
+                      (         main.asm):00171         * Entry:
+                      (         main.asm):00172         *       A is column 0 to 79
+                      (         main.asm):00173         *       B is row 0 to 23
+0F31                  (         main.asm):00174         curspos
+0F31 DD02             (         main.asm):00175                 std cursor
+0F33 8650             (         main.asm):00176                 lda #80
+0F35 3D               (         main.asm):00177                 mul
+0F36 DB02             (         main.asm):00178                 addb cursor
+0F38 8920             (         main.asm):00179                 adca #SCREEN/512
+0F3A 58               (         main.asm):00180                 aslb
+0F3B 49               (         main.asm):00181                 rola
+0F3C DD00             (         main.asm):00182                 std textptr
+0F3E 39               (         main.asm):00183                 rts
+                      (         main.asm):00184         
+                      (         main.asm):00185         * Is point visible in viewport?
+                      (         main.asm):00186         *
+                      (         main.asm):00187         * Entry:
+                      (         main.asm):00188         *       A is column in viewport
+                      (         main.asm):00189         *       B is row in viewport
+                      (         main.asm):00190         * Calling sequence:
+                      (         main.asm):00191         *       lbsr isvisible
+                      (         main.asm):00192         *       bcc notvisible
+                      (         main.asm):00193         *       bcs visible
+0F3F                  (         main.asm):00194         isvisible
+0F3F 814F             (         main.asm):00195                 cmpa #79
+0F41 2202             (         main.asm):00196                 bhi no@
+0F43 C114             (         main.asm):00197                 cmpb #20
+0F45 39               (         main.asm):00198         no@     rts
+                      (         main.asm):00199         
+                      (         main.asm):00200         * Poll keyboard
+0F46                  (         main.asm):00201         keycheck
+0F46 AD9FA000         (         main.asm):00202                 jsr [$a000]
+0F4A 8103             (         main.asm):00203                 cmpa #3         ; BREAK quit to BASIC
+0F4C 2603             (         main.asm):00204                 bne exit@
+0F4E 170001           (         main.asm):00205                 lbsr reset
+0F51 39               (         main.asm):00206         exit@   rts
+                      (         main.asm):00207         
+                      (         main.asm):00208         * Exit to BASIC
+0F52                  (         main.asm):00209         reset
+0F52 4F               (         main.asm):00210                 clra            ; hard reset to RSDOS
+0F53 1F8B             (         main.asm):00211                 tfr a,dp
+0F55 8688             (         main.asm):00212                 lda #$88
+0F57 B7FF90           (         main.asm):00213                 sta $ff90       ; turn off MMU
+0F5A 7FFFD8           (         main.asm):00214                 clr $ffd8       ; slow CPU
+0F5D B7FFDE           (         main.asm):00215                 sta $ffde       ; turn on ROMs
+0F60 0F71             (         main.asm):00216                 clr $0071
+0F62 6E9FFFFE         (         main.asm):00217                 jmp [$fffe]
+                      (         main.asm):00218         
+                      (         main.asm):00219         * List of vertical lines
+0F66                  (         main.asm):00220         vlist
+0F66 4F               (         main.asm):00221                 fcb 79  ; x1
+0F67 1A               (         main.asm):00222                 fcb 26  ; y1
+0F68 0E               (         main.asm):00223                 fcb 14  ; length
+                      (         main.asm):00224         
+0F69 51               (         main.asm):00225                 fcb 81
+0F6A 19               (         main.asm):00226                 fcb 25
+0F6B 0E               (         main.asm):00227                 fcb 14
+                      (         main.asm):00228         
+0F6C 53               (         main.asm):00229                 fcb 83
+0F6D 18               (         main.asm):00230                 fcb 24
+0F6E 0E               (         main.asm):00231                 fcb 14
+                      (         main.asm):00232         
+0F6F 55               (         main.asm):00233                 fcb 85
+0F70 17               (         main.asm):00234                 fcb 23
+0F71 0E               (         main.asm):00235                 fcb 14
+                      (         main.asm):00236         
+0F72 57               (         main.asm):00237                 fcb 87
+0F73 16               (         main.asm):00238                 fcb 22
+0F74 0E               (         main.asm):00239                 fcb 14
+                      (         main.asm):00240         
+0F75 59               (         main.asm):00241                 fcb 89
+0F76 28               (         main.asm):00242                 fcb 40
+0F77 0E               (         main.asm):00243                 fcb 14
+                      (         main.asm):00244         
+0F78 FF               (         main.asm):00245                 fcb $ff ; end of list
+                      (         main.asm):00246         
+                      (         main.asm):00247         * List of horizontal lines
+0F79                  (         main.asm):00248         hlist
+0F79 57               (         main.asm):00249                 fcb 87
+0F7A 19               (         main.asm):00250                 fcb 25
+0F7B 0C               (         main.asm):00251                 fcb 12
+0F7C FF               (         main.asm):00252                 fcb $ff ; end of list
+                      (         main.asm):00253         
+                      (         main.asm):00254         * Draw all vertical lines visible in viewport
+0F7D                  (         main.asm):00255         vlines
+0F7D 338CE6           (         main.asm):00256                 leau vlist,pcr
+0F80 170018           (         main.asm):00257         loop@   lbsr vline
+0F83 3343             (         main.asm):00258                 leau 3,u
+0F85 A6C4             (         main.asm):00259                 lda ,u
+0F87 81FF             (         main.asm):00260                 cmpa #$ff
+0F89 26F5             (         main.asm):00261                 bne loop@
+0F8B 39               (         main.asm):00262                 rts
+                      (         main.asm):00263         
+                      (         main.asm):00264         * Draw all horizontal lines visible in viewport
+0F8C                  (         main.asm):00265         hlines
+0F8C 338CEA           (         main.asm):00266                 leau hlist,pcr
+0F8F 170046           (         main.asm):00267         loop@   lbsr hline
+0F92 3343             (         main.asm):00268                 leau 3,u
+0F94 A6C4             (         main.asm):00269                 lda ,u
+0F96 81FF             (         main.asm):00270                 cmpa #$ff
+0F98 26F5             (         main.asm):00271                 bne loop@
+0F9A 39               (         main.asm):00272                 rts
+                      (         main.asm):00273         
+                      (         main.asm):00274         * Draw vertical line, clip to viewport
+0F9B                  (         main.asm):00275         vline
+0F9B ECC4             (         main.asm):00276                 ldd ,u
+0F9D 9004             (         main.asm):00277                 suba origin     ; map to viewport
+0F9F D005             (         main.asm):00278                 subb origin+1
+0FA1 DD06             (         main.asm):00279                 std coords      ; x1, y1
+0FA3 EB42             (         main.asm):00280                 addb 2,u        ; y2 = y1 + length
+0FA5 DD08             (         main.asm):00281                 std coords+2    ; x2, y2
+0FA7 17FF95           (         main.asm):00282                 lbsr isvisible  ; endpoint visible?
+0FAA 2507             (         main.asm):00283                 bcs okay@
+0FAC DC06             (         main.asm):00284                 ldd coords
+0FAE 17FF8E           (         main.asm):00285                 lbsr isvisible  ; endpoint visible?
+0FB1 2424             (         main.asm):00286                 bcc xvline      ; neither visible, forget it
+0FB3                  (         main.asm):00287         okay@
+0FB3 A642             (         main.asm):00288                 lda 2,u         ; length of line
+0FB5 970A             (         main.asm):00289                 sta coords+4
+0FB7                  (         main.asm):00290         loop@
+0FB7 DC06             (         main.asm):00291                 ldd coords      ; x1, y1
+0FB9 17FF83           (         main.asm):00292                 lbsr isvisible
+0FBC 2413             (         main.asm):00293                 bcc skip@       ; if point not visible, skip it
+0FBE 5C               (         main.asm):00294                 incb
+0FBF 5C               (         main.asm):00295                 incb
+0FC0 17FF6E           (         main.asm):00296                 lbsr curspos
+0FC3 9E00             (         main.asm):00297                 ldx textptr     ; where to put next point
+0FC5 867C             (         main.asm):00298                 lda #'|'
+0FC7 E684             (         main.asm):00299                 ldb ,x          ; is there a character there already?
+0FC9 C120             (         main.asm):00300                 cmpb #$20
+0FCB 2702             (         main.asm):00301                 beq setpoint@
+0FCD 862B             (         main.asm):00302                 lda #'+'        ; if so, put a + there instead of |
+0FCF                  (         main.asm):00303         setpoint@
+0FCF A784             (         main.asm):00304                 sta ,x          ; draw next point
+0FD1                  (         main.asm):00305         skip@
+0FD1 0C07             (         main.asm):00306                 inc coords+1    ; y1 += 1
+0FD3 0A0A             (         main.asm):00307                 dec coords+4    ; length--
+0FD5 26E0             (         main.asm):00308                 bne loop@
+0FD7 39               (         main.asm):00309         xvline  rts
+                      (         main.asm):00310         
+                      (         main.asm):00311         * Draw horizontal line, clip to viewport
+0FD8                  (         main.asm):00312         hline
+0FD8 ECC4             (         main.asm):00313                 ldd ,u
+0FDA 9004             (         main.asm):00314                 suba origin     ; map to viewport
+0FDC D005             (         main.asm):00315                 subb origin+1
+0FDE DD06             (         main.asm):00316                 std coords      ; x1, y1
+0FE0 AB42             (         main.asm):00317                 adda 2,u        ; x2 = x1 + length
+0FE2 DD08             (         main.asm):00318                 std coords+2    ; x2, y2
+0FE4 17FF58           (         main.asm):00319                 lbsr isvisible  ; endpoint visible?
+0FE7 2507             (         main.asm):00320                 bcs okay@
+0FE9 DC06             (         main.asm):00321                 ldd coords
+0FEB 17FF51           (         main.asm):00322                 lbsr isvisible  ; endpoint visible?
+0FEE 2424             (         main.asm):00323                 bcc xhline      ; neither visible, forget it
+0FF0                  (         main.asm):00324         okay@
+0FF0 A642             (         main.asm):00325                 lda 2,u         ; length of line
+0FF2 970A             (         main.asm):00326                 sta coords+4
+0FF4                  (         main.asm):00327         loop@
+0FF4 DC06             (         main.asm):00328                 ldd coords      ; x1, y1
+0FF6 17FF46           (         main.asm):00329                 lbsr isvisible
+0FF9 2413             (         main.asm):00330                 bcc skip@       ; if point not visible, skip it
+0FFB 5C               (         main.asm):00331                 incb
+0FFC 5C               (         main.asm):00332                 incb
+0FFD 17FF31           (         main.asm):00333                 lbsr curspos
+1000 9E00             (         main.asm):00334                 ldx textptr     ; where to put next point
+1002 862D             (         main.asm):00335                 lda #'-'
+1004 E684             (         main.asm):00336                 ldb ,x          ; is there a character there already?
+1006 C120             (         main.asm):00337                 cmpb #$20
+1008 2702             (         main.asm):00338                 beq setpoint@
+100A 862B             (         main.asm):00339                 lda #'+'        ; if so, put a + there instead of -
+100C                  (         main.asm):00340         setpoint@
+100C A784             (         main.asm):00341                 sta ,x          ; draw next point
+100E                  (         main.asm):00342         skip@
+100E 0C06             (         main.asm):00343                 inc coords      ; x1 += 1
+1010 0A0A             (         main.asm):00344                 dec coords+4    ; length--
+1012 26E0             (         main.asm):00345                 bne loop@
+1014 39               (         main.asm):00346         xhline  rts
+                      (         main.asm):00347         
+                      (         main.asm):00348                 end start
