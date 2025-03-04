@@ -216,26 +216,6 @@ reset
 	clr $0071
 	jmp [$fffe]
 
-* List of horizontal lines
-hlist
- fcb 80,20,47
- fcb 80,29,27
- fcb 115,29,12
- fcb 96,41,11
- fcb 115,41,12
- fcb 96,54,31
- fcb $ff
-
-* List of vertical lines
-vlist
- fcb 80,20,10
- fcb 96,41,14
- fcb 106,29,13
- fcb 115,29,13
- fcb 126,20,10
- fcb 126,41,14
- fcb $ff
-
 * Draw all vertical lines visible in viewport
 vlines
 	leau vlist,pcr
@@ -329,5 +309,7 @@ skip@
 	dec coords+4	; length--
 	bne loop@
 xhline	rts
+
+	incl lines.asm
 
 	end start
