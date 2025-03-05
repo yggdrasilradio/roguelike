@@ -16,8 +16,8 @@ start
 	* Initialize graphics and MMU
 	lbsr initgfx
 
-	* Init viewport
-	ldd #80*256+20
+	* Init viewport to center of map
+	ldd #80*256+111
 	std origin
 	ldd #SCREEN
 	std textptr
