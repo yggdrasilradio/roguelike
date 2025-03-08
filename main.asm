@@ -242,18 +242,19 @@ loop@	lbsr hline
 	bne loop@
 	rts
 
-* Draw vertical line, clip to viewport
+* Draw vertical line, clipped to viewport
 vline
 	ldd ,u
 	suba origin	; map to viewport
 	subb origin+1
 	std coords	; x1, y1
 	ldb 2,u		; y2
+	subb origin+1	; map to viewport
 	std coords+2	; x2, y2
-	lbsr isvisible	; endpoint visible?
+	lbsr isvisible	; second endpoint visible?
 	bcs okay@
 	ldd coords
-	lbsr isvisible	; endpoint visible?
+	lbsr isvisible	; first endpoint visible?
 	bcc xvline	; neither visible, forget it
 okay@
 	lda 2,u		; length = y2 - y1
@@ -276,13 +277,14 @@ skip@
 	bne loop@
 xvline	rts
 
-* Draw horizontal line, clip to viewport
+* Draw horizontal line, clipped to viewport
 hline
 	ldd ,u
 	suba origin	; map to viewport
 	subb origin+1
 	std coords	; x1, y1
 	lda 2,u		; x2
+	subb origin	; map to viewport
 	std coords+2	; x2, y2
 	lbsr isvisible	; endpoint visible?
 	bcs okay@
