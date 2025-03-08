@@ -10,6 +10,12 @@ coords	rmb 5 ; x1, y1, x2, y2, length
 
 	org $E00
 start
+
+	* Fix "Close File" hook and close file
+	ldd #$176
+	std $a42e
+	jsr $a42d
+
 	* Fast CPU
 	clr $ffd9
 
@@ -17,7 +23,8 @@ start
 	lbsr initgfx
 
 	* Init viewport to center of map
-	ldd #80*256+111
+	;ldd #80*256+111
+	ldd #(WIDTH/2-40)*256+(HEIGHT/2-10)
 	std origin
 	ldd #SCREEN
 	std textptr
@@ -311,5 +318,9 @@ skip@
 xhline	rts
 
 	incl lines.asm
+
+	* Intercept "Close File" hook to autostart program
+	org $a42e
+	fdb start
 
 	end start
