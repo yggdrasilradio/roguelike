@@ -23,7 +23,6 @@ start
 	lbsr initgfx
 
 	* Init viewport to center of map
-	;ldd #80*256+111
 	ldd #(WIDTH/2-40)*256+(HEIGHT/2-10)
 	std origin
 	ldd #SCREEN
@@ -268,10 +267,6 @@ loop@
 	lbsr curspos
 	ldx textptr	; where to put next point
 	lda #'|'
-	ldb ,x		; is there a character there already?
-	cmpb #$20
-	beq setpoint@
-	lda #'+'	; if so, put a + there instead of |
 setpoint@
 	sta ,x		; draw next point
 skip@
@@ -304,11 +299,11 @@ loop@
 	incb
 	lbsr curspos
 	ldx textptr	; where to put next point
-	lda #'-'
-	ldb ,x		; is there a character there already?
-	cmpb #$20
-	beq setpoint@
-	lda #'+'	; if so, put a + there instead of -
+	lda #'-'-$20
+	adda ,x
+	bpl ok@
+	lda #'+'
+ok@
 setpoint@
 	sta ,x		; draw next point
 skip@
