@@ -17,7 +17,7 @@ start
 	jsr $a42d
 
 	* Fast CPU
-	clr $ffd9
+	sta $ffd9
 
 	* Initialize graphics and MMU
 	lbsr initgfx
@@ -248,7 +248,7 @@ vline
 	suba origin	; map to viewport
 	subb origin+1
 	std coords	; x1, y1
-	addb 2,u	; y2 = y1 + length
+	ldb 2,u		; y2
 	std coords+2	; x2, y2
 	lbsr isvisible	; endpoint visible?
 	bcs okay@
@@ -256,7 +256,8 @@ vline
 	lbsr isvisible	; endpoint visible?
 	bcc xvline	; neither visible, forget it
 okay@
-	lda 2,u		; length of line
+	lda 2,u		; length = y2 - y1
+	suba 1,u
 	sta coords+4
 loop@
 	ldd coords	; x1, y1
@@ -281,7 +282,7 @@ hline
 	suba origin	; map to viewport
 	subb origin+1
 	std coords	; x1, y1
-	adda 2,u	; x2 = x1 + length
+	lda 2,u		; x2
 	std coords+2	; x2, y2
 	lbsr isvisible	; endpoint visible?
 	bcs okay@
@@ -289,7 +290,8 @@ hline
 	lbsr isvisible	; endpoint visible?
 	bcc xhline	; neither visible, forget it
 okay@
-	lda 2,u		; length of line
+	lda 2,u		; length = x2 - x1
+	suba ,u
 	sta coords+4
 loop@
 	ldd coords	; x1, y1
