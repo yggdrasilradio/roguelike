@@ -301,9 +301,8 @@ loop@
 	ldx textptr	; where to put next point
 	lda #'-'-$20
 	adda ,x
-	bpl ok@
+	bpl setpoint@
 	lda #'+'
-ok@
 setpoint@
 	sta ,x		; draw next point
 skip@
