@@ -5,7 +5,7 @@ SCREEN	equ $4000
 
 textptr	rmb 2 
 cursor	rmb 2 ; x, y
-origin	rmb 2 ; xorigin, yorigin
+origin	rmb 4 ; xorigin, yorigin, xorigin + 80, yorigin + 20
 coords	rmb 5 ; x1, y1, x2, y2, length
 
 	org $E00
@@ -45,8 +45,7 @@ start
 	lbsr printline ; Status line two
 
 	* Draw initial content of content area
-	lbsr vlines
-	lbsr hlines
+	lbsr drawframe
 
 	* Idle loop
 loop@	lbsr keycheck
@@ -78,6 +77,10 @@ line2	fcs /Status line two goes here /
 * Draw frame
 drawframe
 	sync
+	ldd origin
+	adda #80
+	addb #20
+	std origin+2
 	lbsr clrcontent
 	lbsr vlines
 	lbsr hlines
@@ -227,10 +230,10 @@ vlines
 	leau vlist,pcr
 loop@	lbsr vline
 	leau 3,u
-	lda ,u
-	cmpa #$ff
-	bne loop@
-	rts
+	lda 1,u
+	cmpa origin+3	; all subsequent lines beyond viewport?
+	blo loop@
+exit@	rts
 
 * Draw all horizontal lines visible in viewport
 hlines
@@ -238,9 +241,9 @@ hlines
 loop@	lbsr hline
 	leau 3,u
 	lda ,u
-	cmpa #$ff
-	bne loop@
-	rts
+	cmpa origin+2	; all subsequent lines beyond viewport?
+	blo loop@
+exit@	rts
 
 * Draw vertical line, clipped to viewport
 vline
@@ -286,10 +289,10 @@ hline
 	lda 2,u		; x2
 	subb origin	; map to viewport
 	std coords+2	; x2, y2
-	lbsr isvisible	; endpoint visible?
+	lbsr isvisible	; second endpoint visible?
 	bcs okay@
 	ldd coords
-	lbsr isvisible	; endpoint visible?
+	lbsr isvisible	; first endpoint visible?
 	bcc xhline	; neither visible, forget it
 okay@
 	lda 2,u		; length = x2 - x1
