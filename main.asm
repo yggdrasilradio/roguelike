@@ -256,6 +256,19 @@ reset
 * Draw all vertical lines visible in viewport
 vlines
 	leau vlist,pcr
+* BEGIN
+	*ldb origin+1	; segment = yorigin / 32
+	*lsrb
+	*lsrb
+	*lsrb
+	*lsrb
+	*lsrb
+	*leax vsegments,pcr ; get displacement into vlist from vsegments
+	*aslb
+	*abx
+	*ldd ,x
+	*leau d,u	; add displacement to vlist pointer
+* END
 loop0@
 	lda 2,u		; y2
 	cmpa origin+1	; above viewport?
@@ -266,7 +279,7 @@ loop@	lbsr vline	; draw this line
 loop2@	leau 3,u	; skip to next line
 	lda 1,u		; look at y1 for that line
 	cmpa origin+3	; that line and all subsequent lines below viewport?
-	blo loop@
+	blo loop@	; if so, we're all done
 	rts
 
 * Draw all horizontal lines visible in viewport
@@ -282,7 +295,7 @@ loop@	lbsr hline	; draw this line
 loop2@	leau 3,u	; skip to next line
 	lda ,u		; look at x1 for that line
 	cmpa origin+2	; that line and all subsequent lines to the right of viewport?
-	blo loop@
+	blo loop@	; if so, we're all done
 exit@	rts
 
 * Draw vertical line, clipped to viewport
@@ -327,7 +340,7 @@ hline
 	subb origin+1
 	std coords	; x1, y1
 	lda 2,u		; x2
-	subb origin	; map to viewport
+	suba origin	; map to viewport
 	std coords+2	; x2, y2
 	lbsr isvisible	; second endpoint visible?
 	bcs okay@
