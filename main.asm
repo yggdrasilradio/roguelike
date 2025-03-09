@@ -256,26 +256,32 @@ reset
 * Draw all vertical lines visible in viewport
 vlines
 	leau vlist,pcr
-loop@	lbsr vline
-loop2@	leau 3,u
-	lda 2,u		; y2 above viewport?
-	cmpa origin+1
-	blo loop2@	; skip this line
-	lda 1,u
-	cmpa origin+3	; all subsequent lines beyond viewport?
+loop0@
+	lda 2,u		; y2
+	cmpa origin+1	; above viewport?
+	bhs loop@	; no, so get started
+	leau 3,u	; skip to the next line
+	bra loop0@	; keep looking
+loop@	lbsr vline	; draw this line
+loop2@	leau 3,u	; skip to next line
+	lda 1,u		; look at y1 for that line
+	cmpa origin+3	; that line and all subsequent lines below viewport?
 	blo loop@
 	rts
 
 * Draw all horizontal lines visible in viewport
 hlines
 	leau hlist,pcr
-loop@	lbsr hline
-loop2@	leau 3,u
-	lda 2,u		; x2 to the left of viewport?
-	cmpa origin
-	blo loop2@	; skip this line
-	lda ,u
-	cmpa origin+2	; all subsequent lines beyond viewport?
+loop0@
+	lda 2,u		; x2
+	cmpa origin	; to the left of viewport?
+	bhs loop@	; no, so get started
+	leau 3,u	; skip to the next line
+	bra loop0@	; keep looking
+loop@	lbsr hline	; draw this line
+loop2@	leau 3,u	; skip to next line
+	lda ,u		; look at x1 for that line
+	cmpa origin+2	; that line and all subsequent lines to the right of viewport?
 	blo loop@
 exit@	rts
 
