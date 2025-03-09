@@ -229,17 +229,27 @@ reset
 vlines
 	leau vlist,pcr
 loop@	lbsr vline
-	leau 3,u
+loop2@	leau 3,u
+* BEGIN
+	lda 2,u		; y2
+	cmpa origin+1	; below viewport?
+	blo loop2@	; skip it
+* END
 	lda 1,u
 	cmpa origin+3	; all subsequent lines beyond viewport?
 	blo loop@
-exit@	rts
+	rts
 
 * Draw all horizontal lines visible in viewport
 hlines
 	leau hlist,pcr
 loop@	lbsr hline
-	leau 3,u
+loop2@	leau 3,u
+* BEGIN
+	lda 2,u		; x2
+	cmpa origin	; to the left of viewport?
+	blo loop2@	; skip it
+* END
 	lda ,u
 	cmpa origin+2	; all subsequent lines beyond viewport?
 	blo loop@
