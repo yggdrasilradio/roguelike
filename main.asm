@@ -144,6 +144,20 @@ clrstatus2
 	ldd #$2008
 loop@	std ,x++
 	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
 	cmpx #SCREEN+24*160
 	bne loop@
 	rts
@@ -153,6 +167,20 @@ clrcontent
 	ldx #SCREEN+2*160
 	ldd #$2000
 loop@	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
 	std ,x++
 	cmpx #SCREEN+22*160
 	bne loop@
@@ -230,11 +258,9 @@ vlines
 	leau vlist,pcr
 loop@	lbsr vline
 loop2@	leau 3,u
-* BEGIN
-	lda 2,u		; y2
-	cmpa origin+1	; below viewport?
-	blo loop2@	; skip it
-* END
+	lda 2,u		; y2 above viewport?
+	cmpa origin+1
+	blo loop2@	; skip this line
 	lda 1,u
 	cmpa origin+3	; all subsequent lines beyond viewport?
 	blo loop@
@@ -245,11 +271,9 @@ hlines
 	leau hlist,pcr
 loop@	lbsr hline
 loop2@	leau 3,u
-* BEGIN
-	lda 2,u		; x2
-	cmpa origin	; to the left of viewport?
-	blo loop2@	; skip it
-* END
+	lda 2,u		; x2 to the left of viewport?
+	cmpa origin
+	blo loop2@	; skip this line
 	lda ,u
 	cmpa origin+2	; all subsequent lines beyond viewport?
 	blo loop@
