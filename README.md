@@ -9,6 +9,8 @@ Work in progress.  Not anywhere near playable yet.
 
 **Todo**
 
+- Constrain scrolling
+- Page flipping
 - Draw player and scroll him around
 - Number displaying routines to put values into the status areas
-- Reduce complexity of the maze to make it look less crowded and prettier
+- Reduce complexity of the maze to make it look prettier and less crowded
