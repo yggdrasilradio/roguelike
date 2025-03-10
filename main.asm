@@ -263,8 +263,8 @@ vlines
 	*lsrb
 	*lsrb
 	*lsrb
+	*decb
 	*leax vsegments,pcr ; get displacement into vlist from vsegments
-	*aslb
 	*abx
 	*ldd ,x
 	*leau d,u	; add displacement to vlist pointer
@@ -300,8 +300,11 @@ exit@	rts
 
 * Draw vertical line, clipped to viewport
 vline
-	ldd ,u
+	ldd ,u		; x1, y1
 	suba origin	; map to viewport
+	bcs xvline	; x1 to left of viewport, forget it
+	cmpa #80
+	bhs xvline	; x1 to right of viewport, forget it
 	subb origin+1
 	std coords	; x1, y1
 	ldb 2,u		; y2
@@ -338,6 +341,9 @@ hline
 	ldd ,u
 	suba origin	; map to viewport
 	subb origin+1
+	bcs xhline	; y1 above viewport, forget it
+	cmpb #20
+	bhs xhline	; y1 below viewport, forget it
 	std coords	; x1, y1
 	lda 2,u		; x2
 	suba origin	; map to viewport
