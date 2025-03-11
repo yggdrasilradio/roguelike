@@ -1,5 +1,6 @@
 
-SCREEN	equ $4000
+SCREEN1	equ $4000
+SCREEN2	equ $5000
 
 	org $0000
 
@@ -7,6 +8,7 @@ textptr	rmb 2
 cursor	rmb 2 ; x, y
 origin	rmb 4 ; xorigin, yorigin, xorigin + 80, yorigin + 20
 coords	rmb 5 ; x1, y1, x2, y2, length
+screen	rmb 2
 
 	org $E00
 start
@@ -25,24 +27,9 @@ start
 	* Init viewport to center of map
 	ldd #(WIDTH/2-40)*256+(HEIGHT/2-10)
 	std origin
-	ldd #SCREEN
+	ldd #SCREEN1
+	std screen
 	std textptr
-
-	* Put some sample text into the status areas
-	clra
-	clrb
-	lbsr curspos
-	ldu #line1
-	lbsr printline ; Status line one
-	lbsr printline ; Status line one
-	lbsr printline ; Status line one
-	clra
-	ldb #23
-	lbsr curspos
-	ldu #line2
-	lbsr printline ; Status line two
-	lbsr printline ; Status line two
-	lbsr printline ; Status line two
 
 	* Draw initial content of content area
 	lbsr drawframe
@@ -76,14 +63,31 @@ line2	fcs /Status line two goes here /
 
 * Draw frame
 drawframe
-	sync
 	ldd origin
 	adda #80
 	addb #20
 	std origin+2
-	lbsr clrcontent
+	sync
+	lbsr cls
+	lbsr status
 	lbsr vlines
 	lbsr hlines
+	lbsr flipscreen
+	rts
+
+flipscreen
+	ldd screen	; if screen is 4000
+	cmpd #SCREEN1
+	bne else@
+	ldd #SCREEN2	;	screen = 5000
+	std screen
+	ldd #$d800	;	display 4000
+	bra exit@
+else@			; else
+	ldd #SCREEN1	;	screen = 4000
+	std screen
+	ldd #$da00	;	display 5000
+exit@	std $ff9d
 	rts
 
 * Initialize graphics
@@ -111,15 +115,10 @@ initgfx
 	std $ff98
 
 	* Set graphics memory
-	lda #$36
+	lda #$36	; map MMU $6C000 to $4000
 	sta $ffa2
-	ldd #$d800
+	ldd #$d800	; gfx memory at $6C000 ($4000)
 	std $ff9d
-
-	* Clear the screen
-	lbsr clrstatus1
-	lbsr clrcontent
-	lbsr clrstatus2
 
 	* Set palettes for text
 	ldb #27		; cyan
@@ -128,21 +127,15 @@ initgfx
 	stb $ffb9
 	rts
 
-* Clear status area one
-clrstatus1
-	ldx #SCREEN
-	ldd #$2008
-loop@	std ,x++
-	std ,x++
-	cmpx #SCREEN+2*160
-	bne loop@
-	rts
+* Clear screen
+cls
+	ldx screen
 
-* Clear status area two
-clrstatus2
-	ldx #SCREEN+23*160
+	* Clear status area one
+	lda #5*2
+	pshs a
 	ldd #$2008
-loop@	std ,x++
+loop@	std ,x++ ; clear 32 bytes
 	std ,x++
 	std ,x++
 	std ,x++
@@ -158,15 +151,14 @@ loop@	std ,x++
 	std ,x++
 	std ,x++
 	std ,x++
-	cmpx #SCREEN+24*160
+	dec ,s
 	bne loop@
-	rts
 
-* Clear just the content area
-clrcontent
-	ldx #SCREEN+2*160
+	* Clear content area
+	lda #5*20
+	sta ,s
 	ldd #$2000
-loop@	std ,x++
+loop@	std ,x++ ; clear 32 bytes
 	std ,x++
 	std ,x++
 	std ,x++
@@ -182,9 +174,33 @@ loop@	std ,x++
 	std ,x++
 	std ,x++
 	std ,x++
-	cmpx #SCREEN+22*160
+	dec ,s
 	bne loop@
-	rts
+
+	* Clear status area two
+	lda #5*2
+	sta ,s
+	ldd #$2008
+loop@	std ,x++ ; clear 32 bytes
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	std ,x++
+	dec ,s
+	bne loop@
+	
+	puls a,pc
 
 * Display a line of text
 printline
@@ -213,9 +229,10 @@ curspos
 	lda #80
 	mul
 	addb cursor
-	adca #SCREEN/512
+	adca #0
 	aslb
 	rola
+	addd screen
 	std textptr
 	rts
 
@@ -376,6 +393,28 @@ skip@
 	dec coords+4	; length--
 	bne loop@
 xhline	rts
+
+* Put some sample text into the status areas
+status	clra
+	clrb
+	lbsr curspos
+	ldu #line1
+	lbsr printline ; Status line one
+	lbsr printline ; Status line one
+	lbsr printline ; Status line one
+	clra
+	ldb #23
+	lbsr curspos
+	ldu #line2
+	lbsr printline ; Status line two
+	lbsr printline ; Status line two
+	lbsr printline ; Status line two
+	rts
+
+debug	ldd #$2108
+	std SCREEN1
+	lbsr keycheck
+	bra debug
 
 	incl lines.asm
 
