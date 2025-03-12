@@ -9,11 +9,13 @@ cursor	rmb 2 ; x, y
 origin	rmb 4 ; xorigin, yorigin, xorigin + 80, yorigin + 20
 coords	rmb 5 ; x1, y1, x2, y2, length
 screen	rmb 2
+playerx	rmb 1
+playery	rmb 1
 
 	org $E00
 start
 
-	* Fix "Close File" hook and close file
+	* Restore "close file" hook and close file
 	ldd #$176
 	std $a42e
 	jsr $a42d
@@ -25,37 +27,48 @@ start
 	lbsr initgfx
 
 	* Init viewport to center of map
-	ldd #(WIDTH/2-40)*256+(HEIGHT/2-10)
+	ldd #(WIDTH/2-40-7)*256+(HEIGHT/2-9)
 	std origin
 	ldd #SCREEN1
 	std screen
 	std textptr
 
-	* Draw initial content of content area
+	* Initial player position
+	ldd #40*256+10
+	std playerx
+
+	* Draw initial frame
 	lbsr drawframe
 
 	* Idle loop
 loop@	lbsr keycheck
 	cmpa #8
-	bne notr@
-	dec origin
-	lbsr drawframe
-notr@
-	cmpa #9
 	bne notl@
-	inc origin
+	ldd #$ff00 ; move player left
+	lbsr moveplayer
 	lbsr drawframe
+	bra loop@
 notl@
+	cmpa #9
+	bne notr@
+	ldd #$0100 ; move player right
+	lbsr moveplayer
+	lbsr drawframe
+	bra loop@
+notr@
 	cmpa #10
+	bne notd@
+	ldd #$0001
+	lbsr moveplayer ; move player down
+	lbsr drawframe
+	bra loop@
+notd@
+	cmpa #94
 	bne notu@
-	inc origin+1
+	ldd #$00ff ; move player up
+	lbsr moveplayer
 	lbsr drawframe
 notu@
-	cmpa #94
-	bne notd@
-	dec origin+1
-	lbsr drawframe
-notd@
 	bra loop@
 
 line1	fcs /Status line one goes here /
@@ -72,7 +85,8 @@ drawframe
 	lbsr status
 	lbsr vlines
 	lbsr hlines
-	lbsr flipscreen
+	lbsr drawplayer
+	bsr flipscreen
 	rts
 
 flipscreen
@@ -409,6 +423,45 @@ status	clra
 	lbsr printline ; Status line two
 	lbsr printline ; Status line two
 	lbsr printline ; Status line two
+	rts
+
+drawplayer
+	ldd playerx
+	lbsr curspos
+	lda #'O'
+	ldx textptr
+	sta ,x
+	rts
+
+moveplayer
+	leas -2,s
+	adda playerx	; position to new location
+	addb playery
+	std ,s		; save new position
+	lbsr curspos
+	ldx textptr
+	lda ,x
+	cmpa #' '	; is the new position clear?
+	bne exit@	; if not, don't move player
+	ldd ,s		; get new location again
+	cmpa #3		; too far left?
+	bhs xminok@
+	dec origin	; scroll right
+	bra exit@	; don't alter player position
+xminok@	cmpb #3		; too far up?
+	bhi yminok@
+	dec origin+1	; scroll down
+	bra exit@	; don't alter player position
+yminok@ cmpa #80-3	; too far right?
+	blo xmaxok@
+	inc origin	; scroll left
+	bra exit@	; don't alter player position
+xmaxok@ cmpb #20	; too far down?
+	blo ymaxok@
+	inc origin+1	; scroll up
+	bra exit@	; don't alter player position
+ymaxok@ std playerx	; save new position
+exit@	leas 2,s
 	rts
 
 debug	ldd #$2108
