@@ -42,28 +42,28 @@
                       (         main.asm):00042         
                       (         main.asm):00043                 * Idle loop
 0E23 17019C           (         main.asm):00044         loop@   lbsr keycheck
-0E26 8108             (         main.asm):00045                 cmpa #8
+0E26 8108             (         main.asm):00045                 cmpa #8    ; left arrow
 0E28 260B             (         main.asm):00046                 bne notl@
 0E2A CCFF00           (         main.asm):00047                 ldd #$ff00 ; move player left
 0E2D 17029A           (         main.asm):00048                 lbsr moveplayer
 0E30 170063           (         main.asm):00049                 lbsr drawframe
 0E33 20EE             (         main.asm):00050                 bra loop@
 0E35                  (         main.asm):00051         notl@
-0E35 8109             (         main.asm):00052                 cmpa #9
+0E35 8109             (         main.asm):00052                 cmpa #9    ; right arrow
 0E37 260B             (         main.asm):00053                 bne notr@
 0E39 CC0100           (         main.asm):00054                 ldd #$0100 ; move player right
 0E3C 17028B           (         main.asm):00055                 lbsr moveplayer
 0E3F 170054           (         main.asm):00056                 lbsr drawframe
 0E42 20DF             (         main.asm):00057                 bra loop@
 0E44                  (         main.asm):00058         notr@
-0E44 810A             (         main.asm):00059                 cmpa #10
+0E44 810A             (         main.asm):00059                 cmpa #10   ; down arrow
 0E46 260B             (         main.asm):00060                 bne notd@
 0E48 CC0001           (         main.asm):00061                 ldd #$0001
 0E4B 17027C           (         main.asm):00062                 lbsr moveplayer ; move player down
 0E4E 170045           (         main.asm):00063                 lbsr drawframe
 0E51 20D0             (         main.asm):00064                 bra loop@
 0E53                  (         main.asm):00065         notd@
-0E53 815E             (         main.asm):00066                 cmpa #94
+0E53 815E             (         main.asm):00066                 cmpa #94   ; up arrow
 0E55 2609             (         main.asm):00067                 bne notu@
 0E57 CC00FF           (         main.asm):00068                 ldd #$00ff ; move player up
 0E5A 17026D           (         main.asm):00069                 lbsr moveplayer
@@ -452,19 +452,19 @@
 10DD ECE4             (         main.asm):00446                 ldd ,s          ; get new location again
 10DF 8103             (         main.asm):00447                 cmpa #3         ; too far left?
 10E1 2404             (         main.asm):00448                 bhs xminok@
-10E3 0A04             (         main.asm):00449                 dec origin      ; scroll right
+10E3 0A04             (         main.asm):00449                 dec origin      ; scroll left
 10E5 201A             (         main.asm):00450                 bra exit@       ; don't alter player position
-10E7 C103             (         main.asm):00451         xminok@ cmpb #3         ; too far up?
+10E7 C105             (         main.asm):00451         xminok@ cmpb #5         ; too far up?
 10E9 2204             (         main.asm):00452                 bhi yminok@
-10EB 0A05             (         main.asm):00453                 dec origin+1    ; scroll down
+10EB 0A05             (         main.asm):00453                 dec origin+1    ; scroll up
 10ED 2012             (         main.asm):00454                 bra exit@       ; don't alter player position
 10EF 814D             (         main.asm):00455         yminok@ cmpa #80-3      ; too far right?
 10F1 2504             (         main.asm):00456                 blo xmaxok@
-10F3 0C04             (         main.asm):00457                 inc origin      ; scroll left
+10F3 0C04             (         main.asm):00457                 inc origin      ; scroll right
 10F5 200A             (         main.asm):00458                 bra exit@       ; don't alter player position
-10F7 C114             (         main.asm):00459         xmaxok@ cmpb #20        ; too far down?
+10F7 C113             (         main.asm):00459         xmaxok@ cmpb #24-5      ; too far down?
 10F9 2504             (         main.asm):00460                 blo ymaxok@
-10FB 0C05             (         main.asm):00461                 inc origin+1    ; scroll up
+10FB 0C05             (         main.asm):00461                 inc origin+1    ; scroll down
 10FD 2002             (         main.asm):00462                 bra exit@       ; don't alter player position
 10FF DD0F             (         main.asm):00463         ymaxok@ std playerx     ; save new position
 1101 3262             (         main.asm):00464         exit@   leas 2,s

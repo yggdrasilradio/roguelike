@@ -42,28 +42,28 @@ start
 
 	* Idle loop
 loop@	lbsr keycheck
-	cmpa #8
+	cmpa #8	   ; left arrow
 	bne notl@
 	ldd #$ff00 ; move player left
 	lbsr moveplayer
 	lbsr drawframe
 	bra loop@
 notl@
-	cmpa #9
+	cmpa #9    ; right arrow
 	bne notr@
 	ldd #$0100 ; move player right
 	lbsr moveplayer
 	lbsr drawframe
 	bra loop@
 notr@
-	cmpa #10
+	cmpa #10   ; down arrow
 	bne notd@
 	ldd #$0001
 	lbsr moveplayer ; move player down
 	lbsr drawframe
 	bra loop@
 notd@
-	cmpa #94
+	cmpa #94   ; up arrow
 	bne notu@
 	ldd #$00ff ; move player up
 	lbsr moveplayer
@@ -446,19 +446,19 @@ moveplayer
 	ldd ,s		; get new location again
 	cmpa #3		; too far left?
 	bhs xminok@
-	dec origin	; scroll right
+	dec origin	; scroll left
 	bra exit@	; don't alter player position
-xminok@	cmpb #3		; too far up?
+xminok@	cmpb #5		; too far up?
 	bhi yminok@
-	dec origin+1	; scroll down
+	dec origin+1	; scroll up
 	bra exit@	; don't alter player position
 yminok@ cmpa #80-3	; too far right?
 	blo xmaxok@
-	inc origin	; scroll left
+	inc origin	; scroll right
 	bra exit@	; don't alter player position
-xmaxok@ cmpb #20	; too far down?
+xmaxok@ cmpb #24-5	; too far down?
 	blo ymaxok@
-	inc origin+1	; scroll up
+	inc origin+1	; scroll down
 	bra exit@	; don't alter player position
 ymaxok@ std playerx	; save new position
 exit@	leas 2,s
