@@ -11,6 +11,8 @@ coords	rmb 5 ; x1, y1, x2, y2, length
 screen	rmb 2
 playerx	rmb 1
 playery	rmb 1
+number	rmb 2
+buffer	rmb 3
 
 	org $E00
 start
@@ -446,18 +448,30 @@ moveplayer
 	ldd ,s		; get new location again
 	cmpa #3		; too far left?
 	bhs xminok@
+	lda -2,x	; would scrolling cause collision?
+	cmpa #' '
+	bne exit@	; don't scroll or move player
 	dec origin	; scroll left
 	bra exit@	; don't alter player position
 xminok@	cmpb #5		; too far up?
 	bhi yminok@
+	lda -160,x	; would scrolling cause collision?
+	cmpa #' '
+	bne exit@	; don't scroll or move player
 	dec origin+1	; scroll up
 	bra exit@	; don't alter player position
 yminok@ cmpa #80-3	; too far right?
 	blo xmaxok@
+	lda 2,x		; would scrolling cause collision?
+	cmpa #' '
+	bne exit@	; don't scroll or move player
 	inc origin	; scroll right
 	bra exit@	; don't alter player position
 xmaxok@ cmpb #24-5	; too far down?
 	blo ymaxok@
+	lda 160,x	; would scrolling cause collision?
+	cmpa #' '
+	bne exit@	; don't scroll or move player
 	inc origin+1	; scroll down
 	bra exit@	; don't alter player position
 ymaxok@ std playerx	; save new position
@@ -470,6 +484,7 @@ debug	ldd #$2108
 	bra debug
 
 	incl lines.asm
+	incl prnum.asm
 
 	* Intercept "Close File" hook to autostart program
 	org $a42e
