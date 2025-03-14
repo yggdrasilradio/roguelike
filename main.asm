@@ -262,8 +262,8 @@ curspos
 *	bcc notvisible
 *	bcs visible
 isvisible
-	cmpa #79
-	bhi no@
+	cmpa #80
+	bhs no@
 	cmpb #20
 no@	rts
 
@@ -289,19 +289,6 @@ reset
 * Draw all vertical lines visible in viewport
 vlines
 	leau vlist,pcr
-* BEGIN
-	*ldb origin+1	; segment = yorigin / 32
-	*lsrb
-	*lsrb
-	*lsrb
-	*lsrb
-	*lsrb
-	*decb
-	*leax vsegments,pcr ; get displacement into vlist from vsegments
-	*abx
-	*ldd ,x
-	*leau d,u	; add displacement to vlist pointer
-* END
 loop0@
 	lda 2,u		; y2
 	cmpa origin+1	; above viewport?
@@ -351,19 +338,26 @@ vline
 okay@
 	lda 2,u		; length = y2 - y1
 	suba 1,u
+	ldb coords+1
+	bpl y1okay@
+	adda coords+1 ; negative amount already so add, not sub
+	beq xvline
+	clr coords+1
+y1okay@
 	sta coords+4
+	ldd coords
+	incb
+	incb
+	lbsr curspos
+	ldx textptr
 loop@
 	ldd coords	; x1, y1
 	lbsr isvisible
 	bcc skip@	; if point not visible, skip it
-	incb
-	incb
-	lbsr curspos
-	ldx textptr	; where to put next point
 	lda #'|'
-setpoint@
 	sta ,x		; draw next point
 skip@
+	leax 160,x
 	inc coords+1	; y1 += 1
 	dec coords+4	; length--
 	bne loop@
