@@ -346,7 +346,7 @@ okay@
 y1okay@
 	sta coords+4
 	ldd coords
-	incb
+	incb		; skip past status area
 	incb
 	lbsr curspos
 	ldx textptr
@@ -383,15 +383,22 @@ hline
 okay@
 	lda 2,u		; length = x2 - x1
 	suba ,u
+	ldb coords
+	bpl x1okay@
+	adda coords	; negative amount already so add, not sub
+	beq xhline
+	clr coords
+x1okay@
 	sta coords+4
+	ldd coords
+	incb		; skip past status area
+	incb
+	lbsr curspos
+	ldx textptr	; where to put next point
 loop@
 	ldd coords	; x1, y1
 	lbsr isvisible
 	bcc skip@	; if point not visible, skip it
-	incb
-	incb
-	lbsr curspos
-	ldx textptr	; where to put next point
 	lda #'-'-$20
 	adda ,x
 	bpl setpoint@
@@ -399,6 +406,7 @@ loop@
 setpoint@
 	sta ,x		; draw next point
 skip@
+	leax 2,x
 	inc coords	; x1 += 1
 	dec coords+4	; length--
 	bne loop@
