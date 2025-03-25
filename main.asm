@@ -73,9 +73,6 @@ notd@
 notu@
 	bra loop@
 
-line1	fcs /Status line one goes here /
-line2	fcs /Status line two goes here /
-
 * Draw frame
 drawframe
 	ldd origin
@@ -87,7 +84,8 @@ drawframe
 	lbsr vlines
 	lbsr hlines
 	lbsr drawplayer
-	lbsr debug
+	lbsr status1
+	lbsr status2
 	lbsr status
 	bsr flipscreen
 	rts
@@ -413,26 +411,24 @@ skip@
 	bne loop@
 xhline	rts
 
-* Put some sample text into the status areas
+* Put text into the status areas
 status	clra
 	clrb
 	lbsr curspos
-	ldu #line
-	lbsr printline ; Status line one DEBUG
+	leau line1,pcr
+	lbsr printline ; Status line one
 	clra
 	ldb #23
 	lbsr curspos
-	ldu #line2
-	lbsr printline ; Status line two
-	lbsr printline ; Status line two
+	leau line2,pcr
 	lbsr printline ; Status line two
 	rts
 
 drawplayer
 	ldd playerx
 	lbsr curspos
-	lda #'O'
 	ldx textptr
+	lda #'O'
 	sta ,x
 	rts
 
@@ -484,24 +480,26 @@ ymaxok@ std playerx	; save new position
 exit@	leas 2,s
 	rts
 
-line	fcs /PX 000 PY 000 OX 000 OY 000 CH 000 /
-
-debug
+* Format status line one
+*
+line1	fcs /PX 000 PY 000 OX 000 OY 000 CH 000 /
+status1
+	leau line1,pcr
 	* Player X
 	ldb playerx
-	ldx #line+3
+	leax 3,u
 	lbsr prnum
 	* Player Y
 	ldb playery
-	ldx #line+10
+	leax 10,u
 	lbsr prnum
 	* Origin X
 	ldb origin
-	ldx #line+17
+	leax 17,u
 	lbsr prnum
 	* Origin Y
 	ldb origin+1
-	ldx #line+24
+	leax 24,u
 	lbsr prnum
 	* Character above
 	ldd playerx
@@ -509,7 +507,38 @@ debug
 	ldx textptr
 	leax -160,x
 	ldb ,x
-	ldx #line+31
+	leax 31,u
+	lbsr prnum
+	rts
+
+* Format status line two
+*
+line2	fcs /PX 000 PY 000 OX 000 OY 000 CH 000 /
+status2
+	leau line2,pcr
+	* Player X
+	ldb playerx
+	leax 3,u
+	lbsr prnum
+	* Player Y
+	ldb playery
+	leax 10,u
+	lbsr prnum
+	* Origin X
+	ldb origin
+	leax 17,u
+	lbsr prnum
+	* Origin Y
+	ldb origin+1
+	leax 24,u
+	lbsr prnum
+	* Character above
+	ldd playerx
+	lbsr curspos
+	ldx textptr
+	leax -160,x
+	ldb ,x
+	leax 31,u
 	lbsr prnum
 	rts
 
