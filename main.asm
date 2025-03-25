@@ -8,7 +8,8 @@ textptr	rmb 2
 cursor	rmb 2 ; x, y
 origin	rmb 4 ; xorigin, yorigin, xorigin + 80, yorigin + 20
 coords	rmb 5 ; x1, y1, x2, y2, length
-screen	rmb 2
+screen	rmb 2 ; current screen
+pscreen	rmb 2 ; previous screen
 playerx	rmb 1
 playery	rmb 1
 number	rmb 2
@@ -83,10 +84,10 @@ drawframe
 	lbsr cls
 	lbsr vlines
 	lbsr hlines
-	lbsr drawplayer
 	lbsr status1
 	lbsr status2
 	lbsr status
+	lbsr drawplayer
 	bsr flipscreen
 	rts
 
@@ -94,11 +95,15 @@ flipscreen
 	ldd screen	; if screen is 4000
 	cmpd #SCREEN1
 	bne else@
+	ldd #SCREEN1	;	previous screen = 4000
+	std pscreen
 	ldd #SCREEN2	;	screen = 5000
 	std screen
 	ldd #$d800	;	display 4000
 	bra exit@
 else@			; else
+	ldd #SCREEN2	;	previous screen = 5000
+	std pscreen
 	ldd #SCREEN1	;	screen = 4000
 	std screen
 	ldd #$da00	;	display 5000
@@ -248,6 +253,23 @@ curspos
 	aslb
 	rola
 	addd screen
+	std textptr
+	rts
+
+* Position cursor on previous screen
+*
+* Entry:
+*	A is column 0 to 79
+*	B is row 0 to 23
+pcurspos
+	std cursor
+	lda #80
+	mul
+	addb cursor
+	adca #0
+	aslb
+	rola
+	addd pscreen
 	std textptr
 	rts
 
@@ -432,13 +454,19 @@ drawplayer
 	sta ,x
 	rts
 
+* Move player
+*
+* A: deltax
+* B: deltay
 moveplayer
 	leas -2,s
 	adda playerx	; position to new location
 	addb playery
 	std ,s		; save new position
-	lbsr curspos
+	lbsr pcurspos
 	ldx textptr
+	ldd textptr
+	subd screen
 	lda ,x
 	cmpa #' '	; is the new position clear?
 	bne exit@	; if not, don't move player
@@ -446,33 +474,21 @@ moveplayer
 * LEFT
 	cmpa #3		; too far left?
 	bhs xminok@
-	lda -2,x	; would scrolling cause collision?
-	cmpa #' '
-	bne exit@	; don't scroll or move player
 	dec origin	; scroll left
 	bra exit@	; don't alter player position
 * UP
 xminok@	cmpb #5		; too far up?
 	bhi yminok@
-	lda -160,x	; would scrolling cause collision?
-	cmpa #' '
-	bne exit@	; don't scroll or move player
 	dec origin+1	; scroll up
 	bra exit@	; don't alter player position
 * RIGHT
 yminok@ cmpa #80-3	; too far right?
 	blo xmaxok@
-	lda 2,x		; would scrolling cause collision?
-	cmpa #' '
-	bne exit@	; don't scroll or move player
 	inc origin	; scroll right
 	bra exit@	; don't alter player position
 * DOWN
 xmaxok@ cmpb #24-5	; too far down?
 	blo ymaxok@
-	lda 160,x	; would scrolling cause collision?
-	cmpa #' '
-	bne exit@	; don't scroll or move player
 	inc origin+1	; scroll down
 	bra exit@	; don't alter player position
 *
@@ -482,64 +498,16 @@ exit@	leas 2,s
 
 * Format status line one
 *
-line1	fcs /PX 000 PY 000 OX 000 OY 000 CH 000 /
+line1	fcs /Status line one /
 status1
 	leau line1,pcr
-	* Player X
-	ldb playerx
-	leax 3,u
-	lbsr prnum
-	* Player Y
-	ldb playery
-	leax 10,u
-	lbsr prnum
-	* Origin X
-	ldb origin
-	leax 17,u
-	lbsr prnum
-	* Origin Y
-	ldb origin+1
-	leax 24,u
-	lbsr prnum
-	* Character above
-	ldd playerx
-	lbsr curspos
-	ldx textptr
-	leax -160,x
-	ldb ,x
-	leax 31,u
-	lbsr prnum
 	rts
 
 * Format status line two
 *
-line2	fcs /PX 000 PY 000 OX 000 OY 000 CH 000 /
+line2	fcs /Status line two /
 status2
 	leau line2,pcr
-	* Player X
-	ldb playerx
-	leax 3,u
-	lbsr prnum
-	* Player Y
-	ldb playery
-	leax 10,u
-	lbsr prnum
-	* Origin X
-	ldb origin
-	leax 17,u
-	lbsr prnum
-	* Origin Y
-	ldb origin+1
-	leax 24,u
-	lbsr prnum
-	* Character above
-	ldd playerx
-	lbsr curspos
-	ldx textptr
-	leax -160,x
-	ldb ,x
-	leax 31,u
-	lbsr prnum
 	rts
 
 	incl lines.asm
