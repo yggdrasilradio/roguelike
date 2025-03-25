@@ -12,11 +12,10 @@ screen	rmb 2
 playerx	rmb 1
 playery	rmb 1
 number	rmb 2
-line	fcs /PX 000 PY 000 OX 000 OY 000 CH 000 /
 
 	org $E00
-
 start
+	orcc #$50		; make sure interrupts are disabled
 
 	* Restore "close file" hook and close file
 	ldd #$176
@@ -484,6 +483,8 @@ xmaxok@ cmpb #24-5	; too far down?
 ymaxok@ std playerx	; save new position
 exit@	leas 2,s
 	rts
+
+line	fcs /PX 000 PY 000 OX 000 OY 000 CH 000 /
 
 debug
 	* Player X
