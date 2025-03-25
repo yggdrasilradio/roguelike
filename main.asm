@@ -12,9 +12,10 @@ screen	rmb 2
 playerx	rmb 1
 playery	rmb 1
 number	rmb 2
-buffer	rmb 3
+line	fcs /PX 000 PY 000 OX 000 OY 000 CH 000 /
 
 	org $E00
+
 start
 
 	* Restore "close file" hook and close file
@@ -84,10 +85,11 @@ drawframe
 	std origin+2
 	sync
 	lbsr cls
-	lbsr status
 	lbsr vlines
 	lbsr hlines
 	lbsr drawplayer
+	lbsr debug
+	lbsr status
 	bsr flipscreen
 	rts
 
@@ -416,10 +418,8 @@ xhline	rts
 status	clra
 	clrb
 	lbsr curspos
-	ldu #line1
-	lbsr printline ; Status line one
-	lbsr printline ; Status line one
-	lbsr printline ; Status line one
+	ldu #line
+	lbsr printline ; Status line one DEBUG
 	clra
 	ldb #23
 	lbsr curspos
@@ -448,6 +448,7 @@ moveplayer
 	cmpa #' '	; is the new position clear?
 	bne exit@	; if not, don't move player
 	ldd ,s		; get new location again
+* LEFT
 	cmpa #3		; too far left?
 	bhs xminok@
 	lda -2,x	; would scrolling cause collision?
@@ -455,6 +456,7 @@ moveplayer
 	bne exit@	; don't scroll or move player
 	dec origin	; scroll left
 	bra exit@	; don't alter player position
+* UP
 xminok@	cmpb #5		; too far up?
 	bhi yminok@
 	lda -160,x	; would scrolling cause collision?
@@ -462,6 +464,7 @@ xminok@	cmpb #5		; too far up?
 	bne exit@	; don't scroll or move player
 	dec origin+1	; scroll up
 	bra exit@	; don't alter player position
+* RIGHT
 yminok@ cmpa #80-3	; too far right?
 	blo xmaxok@
 	lda 2,x		; would scrolling cause collision?
@@ -469,6 +472,7 @@ yminok@ cmpa #80-3	; too far right?
 	bne exit@	; don't scroll or move player
 	inc origin	; scroll right
 	bra exit@	; don't alter player position
+* DOWN
 xmaxok@ cmpb #24-5	; too far down?
 	blo ymaxok@
 	lda 160,x	; would scrolling cause collision?
@@ -476,14 +480,37 @@ xmaxok@ cmpb #24-5	; too far down?
 	bne exit@	; don't scroll or move player
 	inc origin+1	; scroll down
 	bra exit@	; don't alter player position
+*
 ymaxok@ std playerx	; save new position
 exit@	leas 2,s
 	rts
 
-debug	ldd #$2108
-	std SCREEN1
-	lbsr keycheck
-	bra debug
+debug
+	* Player X
+	ldb playerx
+	ldx #line+3
+	lbsr prnum
+	* Player Y
+	ldb playery
+	ldx #line+10
+	lbsr prnum
+	* Origin X
+	ldb origin
+	ldx #line+17
+	lbsr prnum
+	* Origin Y
+	ldb origin+1
+	ldx #line+24
+	lbsr prnum
+	* Character above
+	ldd playerx
+	lbsr curspos
+	ldx textptr
+	leax -160,x
+	ldb ,x
+	ldx #line+31
+	lbsr prnum
+	rts
 
 	incl lines.asm
 	incl prnum.asm
