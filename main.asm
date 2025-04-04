@@ -13,10 +13,12 @@ pscreen	rmb 2 ; previous screen
 playerx	rmb 1
 playery	rmb 1
 number	rmb 2
+score	rmb 1
 
 	org $E00
 start
-	orcc #$50		; make sure interrupts are disabled
+	* Disable interrupts
+	orcc #$50
 
 	* Restore "close file" hook and close file
 	ldd #$176
@@ -39,6 +41,21 @@ start
 	* Initial player position
 	ldd #40*256+10
 	std playerx
+
+	* Clear score
+	clr score
+
+	* Initialize objects
+	leax objtable,pcr
+	leay objs,pcr
+loop@	ldd ,x++
+	std ,y++
+	cmpd #$ffff
+	beq exit@
+	lda ,x+
+	sta ,y+
+	bra loop@
+exit@
 
 	* Draw initial frame
 	lbsr drawframe
@@ -84,10 +101,11 @@ drawframe
 	lbsr cls
 	lbsr vlines
 	lbsr hlines
+	lbsr drawplayer
+	lbsr drawobjects
 	lbsr status1
 	lbsr status2
 	lbsr status
-	lbsr drawplayer
 	bsr flipscreen
 	rts
 
@@ -468,8 +486,12 @@ moveplayer
 	ldd textptr
 	subd screen
 	lda ,x
-	cmpa #' '	; is the new position clear?
-	bne exit@	; if not, don't move player
+	cmpa #'-'	; is the new position clear?
+	beq exit@	; if not, don't move player
+	cmpa #'|'	; is the new position clear?
+	beq exit@	; if not, don't move player
+	cmpa #'+'	; is the new position clear?
+	beq exit@	; if not, don't move player
 	ldd ,s		; get new location again
 * LEFT
 	cmpa #3		; too far left?
@@ -498,20 +520,55 @@ exit@	leas 2,s
 
 * Format status line one
 *
-line1	fcs /Status line one /
+line1	fcs /Score: 000 /
 status1
 	leau line1,pcr
+	leax 7,u
+	ldb score
+	lbsr prnum
 	rts
 
 * Format status line two
 *
-line2	fcs /Status line two /
+line2	fcs /Roguelike by Rick Adams /
 status2
 	leau line2,pcr
 	rts
 
+* Draw objects
+*
+drawobjects
+	leau objs,pcr
+loop@	ldd ,u
+	cmpd #$ffff
+	beq exit@
+	suba origin
+	subb origin+1
+	lbsr isvisible
+	bcc again@
+	incb
+	incb
+	lbsr curspos
+	ldx textptr
+	lda ,x		; is player there?
+	cmpa #'O'
+	bne draw@
+	clr ,u		; delete object
+	clr 1,u
+	inc score	; add to score
+	bra again@
+draw@	lda 2,u		; draw object
+	ldx textptr
+	sta ,x
+again@	leau 3,u
+	bra loop@
+exit@	rts
+
 	incl lines.asm
 	incl prnum.asm
+	incl objects.asm
+
+zprog
 
 	* Intercept "Close File" hook to autostart program
 	org $a42e
