@@ -10,12 +10,12 @@ Work in progress.  Not anywhere near playable yet.
 **Todo**
 
 - Keyboard repeat
-- Constrain scrolling
-- Draw player and scroll him around
-- Number displaying routines to put values into the status areas
 
 **Done**
 
 - Page flipping
 - Proper dungeon maze creation
 - Reduce complexity of the maze to make it look prettier and less crowded
+- Constrain scrolling
+- Draw player and scroll him around
+- Number displaying routines to put values into the status areas
