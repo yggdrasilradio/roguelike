@@ -9,7 +9,7 @@ Work in progress.  Not anywhere near playable yet.
 
 **Todo**
 
-- Keyboard repeat
+- Make this into some kind of reasonable game
 
 **Done**
 
@@ -19,3 +19,4 @@ Work in progress.  Not anywhere near playable yet.
 - Constrain scrolling
 - Draw player and scroll him around
 - Number displaying routines to put values into the status areas
+- Keyboard repeat

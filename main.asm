@@ -309,7 +309,6 @@ no@	rts
 
 * Poll keyboard
 keycheck
-	;jsr [$a000]	; HERE, HOLD MY BEER
 	lbsr keyin
 	cmpa #3		; BREAK quit to BASIC
 	bne exit@
