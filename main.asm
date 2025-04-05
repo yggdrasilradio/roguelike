@@ -14,6 +14,7 @@ playerx	rmb 1
 playery	rmb 1
 number	rmb 2
 score	rmb 1
+kbbusy	rmb 1
 
 	org $E00
 start
@@ -308,7 +309,8 @@ no@	rts
 
 * Poll keyboard
 keycheck
-	jsr [$a000]
+	;jsr [$a000]	; HERE, HOLD MY BEER
+	lbsr keyin
 	cmpa #3		; BREAK quit to BASIC
 	bne exit@
 	lbsr reset
@@ -563,6 +565,53 @@ draw@	lda 2,u		; draw object
 again@	leau 3,u
 	bra loop@
 exit@	rts
+
+* Read keyboard
+*
+* Exit: char in A
+*
+keyin
+	tst kbbusy	; key still down?
+	beq poll@
+	clra
+	bra key@	; ignore for a bit
+poll@
+	ldd #$5ef7	; UP 94
+	stb $ff02
+	ldb $ff00
+	andb #$7f
+	cmpb #$77
+	beq key@
+	ldd #$0aef	; DOWN 10
+	stb $ff02
+	ldb $ff00
+	andb #$7f
+	cmpb #$77
+	beq key@
+	ldd #$08df	; LEFT 8
+	stb $ff02
+	ldb $ff00
+	andb #$7f
+	cmpb #$77
+	beq key@
+	ldd #$09bf	; RIGHT 9
+	stb $ff02
+	ldb $ff00
+	andb #$7f
+	cmpb #$77
+	beq key@
+	ldd #$03fb	; BREAK 3
+	stb $ff02
+	ldb $ff00
+	andb #$7f
+	cmpb #$3f
+	beq key@
+	clra		; no key pressed
+	clr kbbusy
+	rts
+key@
+	inc kbbusy	; going to ignore keys for a while
+	rts
 
 	incl lines.asm
 	incl prnum.asm
