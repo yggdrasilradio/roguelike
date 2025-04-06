@@ -2,8 +2,8 @@
 all:	rogue
 
 rogue: main.asm
-	map/lines.py map/lines.gif > lines.asm
-	map/objects.py map/objects.gif > objects.asm
+	map/lines.py map/map.gif > lines.asm
+	map/objects.py map/map.gif > objects.asm
 	lwasm -9 -b -o -l redistribute/rogue.bin main.asm > redistribute/rogue.lst
 ifneq ($(wildcard /media/share1/COCO/drive0.dsk),)
 	decb kill /media/share1/COCO/drive0.dsk,ROGUE.BIN
