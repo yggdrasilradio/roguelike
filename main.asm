@@ -164,6 +164,8 @@ initgfx
 	stb $ffb8
 	ldb #54		; amber
 	stb $ffb9
+	ldb #63		; white
+	stb $ffba
 	rts
 
 * Clear screen
@@ -173,7 +175,7 @@ cls
 	* Clear status area one
 	lda #5*2
 	pshs a
-	ldd #$2008
+	ldd #$2008 ; space, amber
 loop@	std ,x++ ; clear 32 bytes
 	std ,x++
 	std ,x++
@@ -219,7 +221,7 @@ loop@	std ,x++ ; clear 32 bytes
 	* Clear status area two
 	lda #5*2
 	sta ,s
-	ldd #$2008
+	ldd #$2008 ; space, amber
 loop@	std ,x++ ; clear 32 bytes
 	std ,x++
 	std ,x++
@@ -469,14 +471,15 @@ drawplayer
 	ldd playerx
 	lbsr curspos
 	ldx textptr
-	lda #'O'
-	sta ,x
+	ldd #'O'*256+16 ; white
+	std ,x
 	rts
 
 * Move player
 *
 * A: deltax
 * B: deltay
+*
 moveplayer
 	leas -2,s
 	adda playerx	; position to new location
@@ -559,8 +562,9 @@ loop@	ldd ,u
 	inc score	; add to score
 	bra again@
 draw@	lda 2,u		; draw object
+	ldb #16		; white
 	ldx textptr
-	sta ,x
+	std ,x
 again@	leau 3,u
 	bra loop@
 exit@	rts
