@@ -521,7 +521,7 @@ exit@	leas 2,s
 
 * Format status line one
 *
-line1	fcs /Score: 000 /
+line1	fcs /Score: 000                                                      Work in progress /
 status1
 	leau line1,pcr
 	leax 7,u
@@ -531,7 +531,7 @@ status1
 
 * Format status line two
 *
-line2	fcs /Roguelike by Rick Adams /
+line2	fcs /Temple of Rogue                                                    by Rick Adams /
 status2
 	leau line2,pcr
 	rts
@@ -610,11 +610,18 @@ poll@
 	rts
 key@
 	inc kbbusy	; going to ignore keys for a while
+	lbsr delay
 	rts
 
 	incl lines.asm
 	incl prnum.asm
 	incl objects.asm
+
+delay
+	ldb #80
+loop@	decb
+	bne loop@
+	rts
 
 zprog
 
