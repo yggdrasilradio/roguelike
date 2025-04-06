@@ -9,6 +9,8 @@ Work in progress.  Not anywhere near playable yet.
 
 **Todo**
 
+- zero suppress numbers
+- handle double precision numbers
 - Make this into some kind of reasonable game
 
 **Done**
