@@ -17,6 +17,8 @@ WHITE = pix[1, 0]
 BLUE = pix[2, 0]
 RED = pix[3, 0]
 GREEN = pix[4, 0]
+for x in range(1, 5):
+	pix[x, 0] = BLACK
 
 width = img.size[0]
 height = img.size[1]
@@ -27,7 +29,7 @@ print
 print "* List of objects"
 print "objtable"
 lines = []
-for y in range(1, height):
+for y in range(0, height):
     for x in range(0, width):
         color = pix[x, y]
         if color == BLUE:

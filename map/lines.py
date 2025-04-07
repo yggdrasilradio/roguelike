@@ -12,11 +12,14 @@ img = Image.open(filename)
 
 pix = img.load()
 
+# Color swatches
 BLACK = pix[0, 0]
 WHITE = pix[1, 0]
 BLUE = pix[2, 0]
 RED = pix[3, 0]
 GREEN = pix[4, 0]
+for x in range(1, 5):
+	pix[x, 0] = BLACK
 
 width = img.size[0]
 height = img.size[1]
@@ -29,7 +32,7 @@ print
 print "* List of horizontal lines"
 print "hlist "
 lines = []
-for y in range(1, height):
+for y in range(0, height):
     flag = 0
     for x in range(0, width):
         color = pix[x, y]
@@ -61,7 +64,7 @@ print "vlist"
 lines = []
 for x in range(0, width):
     flag = 0
-    for y in range(1, height):
+    for y in range(0, height):
         color = pix[x, y]
         if color == WHITE and flag == 0:
             # start of line
