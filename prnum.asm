@@ -25,3 +25,18 @@ loop@	subd ,s
 done@	leax 1,x
 	leas 2,s
 	rts
+
+* Entry:
+*	X buffer
+nozeroes
+	lda #3
+	pshs a
+	ldb #' '
+loop@	dec ,s
+	beq exit@
+	lda ,x
+	cmpa #'0'
+	bne exit@
+	stb ,x+
+	bra loop@
+exit@	puls a,pc

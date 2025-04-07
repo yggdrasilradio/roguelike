@@ -13,8 +13,9 @@ pscreen	rmb 2 ; previous screen
 playerx	rmb 1
 playery	rmb 1
 number	rmb 2
-score	rmb 1
+score	rmb 1 ; number of object found
 kbbusy	rmb 1
+nobjs	rmb 1 ; number of objects left to find
 
 	org $E00
 start
@@ -45,6 +46,10 @@ start
 
 	* Clear score
 	clr score
+
+	* Number of objects
+	lda #NOBJECTS
+	sta nobjs
 
 	* Initialize objects
 	leax objtable,pcr
@@ -524,12 +529,24 @@ exit@	leas 2,s
 
 * Format status line one
 *
-line1	fcs /Score: 000                                                      Work in progress /
+line1	fcs /Score: 000 out of 000                                           Work in progress /
 status1
 	leau line1,pcr
+
+	* Objects found
 	leax 7,u
 	ldb score
 	lbsr prnum
+	leax 7,u
+	lbsr nozeroes
+
+	* Objects left
+	leax 18,u
+	ldb nobjs
+	lbsr prnum
+	leax 18,u
+	lbsr nozeroes
+
 	rts
 
 * Format status line two
@@ -560,6 +577,7 @@ loop@	ldd ,u
 	clr ,u		; delete object
 	clr 1,u
 	inc score	; add to score
+	dec nobjs	; one less object
 	bra again@
 draw@	lda 2,u		; draw object
 	ldb #16		; white
