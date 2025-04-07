@@ -11,7 +11,7 @@ XSPACING = 17
 YSPACING = 12
 
 def CreateObject(x, y, xdelta, ydelta):
-    
+
     xchoices = []
     for xvalue in range(x - xdelta + 1, x + xdelta):
         if xvalue != x:
@@ -20,10 +20,13 @@ def CreateObject(x, y, xdelta, ydelta):
     for yvalue in range(y - ydelta + 1, y + ydelta):
         if yvalue != y:
             ychoices.append(yvalue)
-    if random.random() < 0.4:
+    while True:
         objx = random.choice(xchoices)
         objy = random.choice(ychoices)
-        draw.point((objx, objy), fill="blue")
+        color = image.getpixel((objx, objy))
+        if color == (0, 0, 0):
+            draw.point((objx, objy), fill="blue")
+            break
     return
 
 def GenerateMaze(x, y):
@@ -166,8 +169,14 @@ for x in range(10, WIDTH - XSPACING, XSPACING):
                 NorthExit(x, y)
 
 # Create objects
-for xcenter, ycenter, xdelta, ydelta in roomlist:
+nrooms = len(roomlist)
+print(str(nrooms) + " rooms generated")
+nobjects = int(nrooms / 2)
+for _ in range(0, nobjects):
+    xcenter, ycenter, xdelta, ydelta = random.choice(roomlist)
+    roomlist.remove((xcenter, ycenter, xdelta, ydelta))
     CreateObject(xcenter, ycenter, xdelta, ydelta)
+print(str(nobjects) + " objects generated")
 
 image.save(filename, "GIF")
 
