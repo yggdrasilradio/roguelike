@@ -622,7 +622,7 @@ key@
 	incl objects.asm
 
 delay
-	ldb #80
+	ldb #70
 loop@	decb
 	bne loop@
 	rts
