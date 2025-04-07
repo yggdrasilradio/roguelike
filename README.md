@@ -9,8 +9,6 @@ Work in progress.  Not anywhere near playable yet.
 
 **Todo**
 
-- Zero suppress numbers
-- Indicate total number of objects
 - Handle double precision numbers
 - Make this into some kind of reasonable game
 
@@ -25,3 +23,5 @@ Work in progress.  Not anywhere near playable yet.
 - Keyboard repeat
 - Draw player and objects in white
 - Map creation
+- Zero suppress numbers
+- Indicate total number of objects
