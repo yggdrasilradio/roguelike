@@ -529,7 +529,7 @@ exit@	leas 2,s
 
 * Format status line one
 *
-line1	fcs /Score: 000 out of 000                                           Work in progress /
+line1	fcs /Score: 000 (000 remaining)                                      Work in progress /
 status1
 	leau line1,pcr
 
@@ -541,10 +541,10 @@ status1
 	lbsr nozeroes
 
 	* Objects left
-	leax 18,u
+	leax 12,u
 	ldb nobjs
 	lbsr prnum
-	leax 18,u
+	leax 12,u
 	lbsr nozeroes
 
 	rts
