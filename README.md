@@ -12,7 +12,6 @@ Work in progress.  Not anywhere near playable yet.
 - Zero suppress numbers
 - Handle double precision numbers
 - Make this into some kind of reasonable game
-- HJKL?
 
 **Done**
 
@@ -24,3 +23,4 @@ Work in progress.  Not anywhere near playable yet.
 - Number displaying routines to put values into the status areas
 - Keyboard repeat
 - Draw player and objects in white
+- Map creation
