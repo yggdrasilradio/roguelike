@@ -1,165 +1,179 @@
 
 * List of objects
 objtable
- fcb 3,1
+ fcb 7,45
  fcc /$/
- fcb 8,144
+ fcb 8,181
  fcc /$/
- fcb 9,130
+ fcb 10,96
  fcc /$/
- fcb 9,216
+ fcb 10,120
  fcc /$/
- fcb 10,36
+ fcb 10,165
  fcc /$/
- fcb 10,84
+ fcb 10,229
  fcc /$/
- fcb 12,74
+ fcb 15,22
  fcc /$/
- fcb 13,178
+ fcb 16,156
  fcc /$/
- fcb 25,190
+ fcb 23,36
  fcc /$/
- fcb 26,57
+ fcb 26,117
  fcc /$/
- fcb 29,144
+ fcb 27,214
  fcc /$/
- fcb 31,10
+ fcb 29,96
  fcc /$/
- fcb 31,34
+ fcb 29,228
  fcc /$/
- fcb 43,166
+ fcb 30,190
  fcc /$/
- fcb 44,132
+ fcb 31,156
  fcc /$/
- fcb 46,96
+ fcb 33,132
  fcc /$/
- fcb 47,200
+ fcb 43,12
  fcc /$/
- fcb 60,145
+ fcb 46,132
  fcc /$/
- fcb 61,118
+ fcb 47,202
  fcc /$/
- fcb 61,202
+ fcb 47,217
  fcc /$/
- fcb 63,94
+ fcb 50,180
+ fcc /$/
+ fcb 61,201
  fcc /$/
  fcb 63,228
  fcc /$/
- fcb 76,69
+ fcb 64,10
  fcc /$/
- fcb 76,141
+ fcb 64,24
  fcc /$/
- fcb 77,80
+ fcb 64,82
  fcc /$/
- fcb 82,189
+ fcb 64,190
  fcc /$/
- fcb 94,48
+ fcb 66,134
  fcc /$/
- fcb 95,96
+ fcb 77,48
  fcc /$/
- fcb 97,118
+ fcb 77,202
  fcc /$/
- fcb 98,156
+ fcb 78,84
  fcc /$/
- fcb 110,74
+ fcb 78,157
  fcc /$/
- fcb 110,120
+ fcb 80,168
  fcc /$/
- fcb 110,193
+ fcb 83,145
  fcc /$/
- fcb 114,80
+ fcb 93,134
  fcc /$/
- fcb 114,130
+ fcb 94,108
  fcc /$/
- fcb 114,226
+ fcb 94,205
  fcc /$/
- fcb 116,13
+ fcb 94,224
  fcc /$/
- fcb 116,20
+ fcb 97,20
  fcc /$/
- fcb 116,56
+ fcb 98,96
  fcc /$/
- fcb 116,96
+ fcb 99,60
  fcc /$/
- fcb 117,146
+ fcb 100,168
  fcc /$/
- fcb 128,165
+ fcb 110,20
  fcc /$/
- fcb 129,82
+ fcb 112,72
  fcc /$/
- fcb 131,93
+ fcb 114,36
  fcc /$/
- fcb 132,57
+ fcb 114,105
  fcc /$/
- fcb 133,193
+ fcb 115,13
  fcc /$/
- fcb 133,201
+ fcb 115,226
  fcc /$/
- fcb 142,21
+ fcb 126,92
  fcc /$/
- fcb 143,117
+ fcb 127,85
  fcc /$/
- fcb 144,72
+ fcb 131,144
  fcc /$/
- fcb 144,86
+ fcb 132,22
  fcc /$/
- fcb 145,157
+ fcb 132,166
  fcc /$/
- fcb 145,181
+ fcb 132,229
  fcc /$/
- fcb 148,165
+ fcb 144,204
  fcc /$/
- fcb 148,218
+ fcb 145,69
  fcc /$/
- fcb 160,14
+ fcb 145,130
  fcc /$/
- fcb 162,205
+ fcb 148,46
  fcc /$/
- fcb 165,69
+ fcb 148,156
  fcc /$/
- fcb 165,181
+ fcb 149,96
  fcc /$/
- fcb 166,61
+ fcb 149,165
  fcc /$/
- fcb 166,109
+ fcb 160,10
  fcc /$/
- fcb 177,157
+ fcb 161,106
  fcc /$/
- fcb 179,10
+ fcb 162,153
  fcc /$/
- fcb 179,132
+ fcb 162,202
  fcc /$/
- fcb 179,168
+ fcb 162,226
  fcc /$/
- fcb 179,192
+ fcb 165,212
  fcc /$/
- fcb 180,146
+ fcb 177,93
  fcc /$/
- fcb 182,120
+ fcb 179,24
  fcc /$/
- fcb 196,192
+ fcb 179,106
  fcc /$/
- fcb 197,24
+ fcb 179,164
  fcc /$/
- fcb 197,106
+ fcb 180,72
  fcc /$/
- fcb 197,213
+ fcb 182,156
  fcc /$/
- fcb 199,225
+ fcb 183,181
  fcc /$/
- fcb 202,60
+ fcb 184,193
  fcc /$/
- fcb 202,141
+ fcb 184,213
  fcc /$/
- fcb 203,70
+ fcb 197,192
  fcc /$/
- fcb 212,104
+ fcb 199,104
  fcc /$/
- fcb 213,117
+ fcb 201,94
  fcc /$/
- fcb 217,72
+ fcb 212,178
+ fcc /$/
+ fcb 214,133
+ fcc /$/
+ fcb 214,154
+ fcc /$/
+ fcb 214,216
+ fcc /$/
+ fcb 216,117
+ fcc /$/
+ fcb 217,94
+ fcc /$/
+ fcb 219,228
  fcc /$/
  fdb $ffff
 
 objs
- rmb 239
+ rmb 260
