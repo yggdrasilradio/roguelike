@@ -29,7 +29,7 @@ print
 print "* List of horizontal lines"
 print "hlist "
 lines = []
-for y in range(0, height):
+for y in range(1, height):
     flag = 0
     for x in range(0, width):
         color = pix[x, y]
@@ -61,7 +61,7 @@ print "vlist"
 lines = []
 for x in range(0, width):
     flag = 0
-    for y in range(0, height):
+    for y in range(1, height):
         color = pix[x, y]
         if color == WHITE and flag == 0:
             # start of line

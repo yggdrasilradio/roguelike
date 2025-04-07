@@ -1,7 +1,7 @@
 
 all:	rogue
 
-rogue: main.asm
+rogue:
 	map/lines.py map/map.gif > lines.asm
 	map/objects.py map/map.gif > objects.asm
 	lwasm -9 -b -o -l redistribute/rogue.bin main.asm > redistribute/rogue.lst
@@ -12,3 +12,6 @@ endif
 	rm -f redistribute/rogue.dsk
 	decb dskini redistribute/rogue.dsk
 	decb copy -r -2 -b redistribute/rogue.bin redistribute/rogue.dsk,ROGUE.BIN
+
+create:
+	map/create.py map/map.gif

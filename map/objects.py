@@ -27,7 +27,7 @@ print
 print "* List of objects"
 print "objtable"
 lines = []
-for y in range(0, height):
+for y in range(1, height):
     for x in range(0, width):
         color = pix[x, y]
         if color == BLUE:
