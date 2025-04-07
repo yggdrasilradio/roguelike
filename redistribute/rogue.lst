@@ -2542,7 +2542,7 @@
 2764                  (      objects.asm):00179          rmb 260
                       (         main.asm):00623         
 2868                  (         main.asm):00624         delay
-2868 C650             (         main.asm):00625                 ldb #80
+2868 C646             (         main.asm):00625                 ldb #70
 286A 5A               (         main.asm):00626         loop@   decb
 286B 26FD             (         main.asm):00627                 bne loop@
 286D 39               (         main.asm):00628                 rts
