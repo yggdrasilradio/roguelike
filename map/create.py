@@ -88,13 +88,16 @@ def DrawRoom(xcenter, ycenter):
     xdelta = random.choice(xdeltas)
     ydelta = random.choice(ydeltas)
     draw.rectangle((xcenter - xdelta, ycenter - ydelta, xcenter + xdelta, ycenter + ydelta), fill="black", outline="white")
-    CreateObject(xcenter, ycenter, xdelta, ydelta)
+    roomlist.append((xcenter, ycenter, xdelta, ydelta))
     return;
 
 if len(sys.argv) == 1:
 	filename = "map.gif"
 else:
 	filename = sys.argv[1]
+
+# Room list
+roomlist = []
 
 # Initialize image
 image = Image.new("RGB", (HEIGHT, WIDTH), "black")
@@ -161,6 +164,10 @@ for x in range(10, WIDTH - XSPACING, XSPACING):
                 EastExit(x, y)
             if maze[row - 1][column] != "#":
                 NorthExit(x, y)
+
+# Create objects
+for xcenter, ycenter, xdelta, ydelta in roomlist:
+    CreateObject(xcenter, ycenter, xdelta, ydelta)
 
 image.save(filename, "GIF")
 
