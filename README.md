@@ -9,7 +9,6 @@ Work in progress.  Not anywhere near playable yet.
 
 **Todo**
 
-- Format the status lines a bit more reasonably
 - Make this into some kind of reasonable game
 
 **Done**
@@ -26,3 +25,5 @@ Work in progress.  Not anywhere near playable yet.
 - Zero suppress numbers
 - Indicate total number of objects
 - Handle double precision numbers
+- Show transient status messages
+- Format the status lines a bit more sensibly
