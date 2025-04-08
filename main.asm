@@ -1,4 +1,3 @@
-
 SCREEN1	equ $4000
 SCREEN2	equ $5000
 
@@ -16,6 +15,7 @@ number	rmb 2
 score	rmb 2
 kbbusy	rmb 1
 nobjs	rmb 1 ; number of objects left to find
+value	rmb 5
 
 	org $E00
 start
@@ -69,7 +69,8 @@ exit@
 	lbsr drawframe
 
 	* Idle loop
-loop@	lbsr keycheck
+loop@
+	lbsr keycheck
 	cmpa #8	   ; left arrow
 	bne notl@
 	ldd #$ff00 ; move player left
@@ -111,8 +112,6 @@ drawframe
 	lbsr hlines
 	lbsr drawplayer
 	lbsr drawobjects
-	lbsr status1
-	lbsr status2
 	lbsr status
 	bsr flipscreen
 	rts
@@ -461,19 +460,6 @@ skip@
 	bne loop@
 xhline	rts
 
-* Put text into the status areas
-status	clra
-	clrb
-	lbsr curspos
-	leau line1,pcr
-	lbsr printline ; Status line one
-	clra
-	ldb #23
-	lbsr curspos
-	leau line2,pcr
-	lbsr printline ; Status line two
-	rts
-
 drawplayer
 	ldd playerx
 	lbsr curspos
@@ -529,34 +515,49 @@ ymaxok@ std playerx	; save new position
 exit@	leas 2,s
 	rts
 
-* Format status line one
-*
-line1	fcs /Score: 0000 (0000 remaining)                                    Work in progress/
-status1
-	leau line1,pcr
+* Put text into the status areas
+;line1a	fcs /Score: 0000 (0000 remaining)/
+line1a	fcs /Score: /
+line1b	fcs / (/
+line1c	fcs / remaining)/
+line1d	fcs /Work in progress/
+line2	fcs /Temple of Rogue                                                    by Rick Adams/
+status	
 
-	* Objects found
-	leax 7,u
-	ldd score
-	lbsr prnum
-	leax 7,u
-	lbsr nozeroes
-
-	* Objects left
-	leax 13,u
+	* Status line one
 	clra
+	clrb
+	lbsr curspos
+	leau line1a,pcr ; "Score: "
+	lbsr printline
+
+	ldd score	; {score}
+	lbsr prnum
+	lbsr printline
+
+	leau line1b,pcr	; (
+	lbsr printline
+
+	clra		; {nobjs}
 	ldb nobjs
 	lbsr prnum
-	leax 13,u
-	lbsr nozeroes
+	lbsr printline
 
-	rts
+	leau line1c,pcr	; " remaining)"
+	lbsr printline
+	
+	lda #64
+	clrb
+	lbsr curspos
+	leau line1d,pcr
+	lbsr printline ; "Work in progress"
 
-* Format status line two
-*
-line2	fcs /Temple of Rogue                                                    by Rick Adams/
-status2
+	* Status line two
+	clra
+	ldb #23
+	lbsr curspos
 	leau line2,pcr
+	lbsr printline ; Status line two
 	rts
 
 * Draw objects
@@ -583,6 +584,12 @@ loop@	ldd ,u
 	addd #50
 	std score
 	dec nobjs	; one less object
+*
+	pshs u
+	leau addscore,pcr
+	lbsr prstatus	; "+50 gold"
+	puls u
+*
 	bra again@
 draw@	lda 2,u		; draw object
 	ldb #16		; white
@@ -591,6 +598,8 @@ draw@	lda 2,u		; draw object
 again@	leau 3,u
 	bra loop@
 exit@	rts
+
+addscore fcs /+50 gold/
 
 * Read keyboard
 *
@@ -648,6 +657,30 @@ delay
 	ldb #70
 loop@	decb
 	bne loop@
+	rts
+
+* Print status message
+*
+* leau msg,pcr
+* lbsr prstatus
+*
+* msg  fcs /This is a test/
+*
+prstatus
+	tfr u,x
+	clrb
+loop@	incb		; how many chars?
+	tst ,x+
+	bpl loop@
+	lsrb
+	negb
+	addb #40
+	aslb
+	ldx screen	; center on line
+	abx
+loop2@	lda ,u+
+	sta ,x++
+	bpl loop2@
 	rts
 
 zprog

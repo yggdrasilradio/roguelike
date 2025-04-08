@@ -1,8 +1,12 @@
 * Entry:
-*	X buffer
 *	D number
+* Exit:
+*	U pointer to string
 *
-prnum	std number
+prnum	ldu #value
+	std number
+	ldd #10000
+	bsr digit
 	ldd #1000
 	bsr digit
 	ldd #100
@@ -11,32 +15,28 @@ prnum	std number
 	bsr digit
 	ldd #1
 	bsr digit
-	rts
+	ldb #$80	; set bit on last digit
+	orb -1,u
+	stb -1,u
+	ldu #value	; return pointer to value
+	ldb #5
+loop@	lda ,u
+	cmpa #'0'	; suppress zeroes
+	bne exit@
+	leau 1,u
+	decb
+	bgt loop@
+exit@	rts
 
 digit	pshs d
 	lda #'0'
-	sta ,x
+	sta ,u
 	ldd number
 loop@	subd ,s
 	blt done@
 	std number
-	inc ,x
+	inc ,u
 	bra loop@
-done@	leax 1,x
+done@	leau 1,u
 	leas 2,s
 	rts
-
-* Entry:
-*	X buffer
-nozeroes
-	lda #4
-	pshs a
-	ldb #' '
-loop@	dec ,s
-	beq exit@
-	lda ,x
-	cmpa #'0'
-	bne exit@
-	stb ,x+
-	bra loop@
-exit@	puls a,pc
