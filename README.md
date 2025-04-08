@@ -9,7 +9,6 @@ Work in progress.  Not anywhere near playable yet.
 
 **Todo**
 
-- Handle double precision numbers
 - Make this into some kind of reasonable game
 
 **Done**
@@ -25,3 +24,4 @@ Work in progress.  Not anywhere near playable yet.
 - Map creation
 - Zero suppress numbers
 - Indicate total number of objects
+- Handle double precision numbers
