@@ -1,21 +1,21 @@
 * Entry:
 *	X buffer
-*	B number
+*	D number
 *
-prnum	clra
-	std number
-	ldb #100
+prnum	std number
+	ldd #1000
 	bsr digit
-	ldb  #10
+	ldd #100
 	bsr digit
-	ldb #1
+	ldd #10
+	bsr digit
+	ldd #1
 	bsr digit
 	rts
 
-digit	lda #'0'
+digit	pshs d
+	lda #'0'
 	sta ,x
-	clra
-	pshs d
 	ldd number
 loop@	subd ,s
 	blt done@
@@ -29,7 +29,7 @@ done@	leax 1,x
 * Entry:
 *	X buffer
 nozeroes
-	lda #3
+	lda #4
 	pshs a
 	ldb #' '
 loop@	dec ,s

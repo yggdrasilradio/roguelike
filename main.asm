@@ -13,7 +13,7 @@ pscreen	rmb 2 ; previous screen
 playerx	rmb 1
 playery	rmb 1
 number	rmb 2
-score	rmb 1 ; number of object found
+score	rmb 2
 kbbusy	rmb 1
 nobjs	rmb 1 ; number of objects left to find
 
@@ -45,7 +45,9 @@ start
 	std playerx
 
 	* Clear score
-	clr score
+	clra
+	clrb
+	std score
 
 	* Number of objects
 	lda #NOBJECTS
@@ -529,29 +531,30 @@ exit@	leas 2,s
 
 * Format status line one
 *
-line1	fcs /Score: 000 (000 remaining)                                      Work in progress /
+line1	fcs /Score: 0000 (0000 remaining)                                    Work in progress/
 status1
 	leau line1,pcr
 
 	* Objects found
 	leax 7,u
-	ldb score
+	ldd score
 	lbsr prnum
 	leax 7,u
 	lbsr nozeroes
 
 	* Objects left
-	leax 12,u
+	leax 13,u
+	clra
 	ldb nobjs
 	lbsr prnum
-	leax 12,u
+	leax 13,u
 	lbsr nozeroes
 
 	rts
 
 * Format status line two
 *
-line2	fcs /Temple of Rogue                                                    by Rick Adams /
+line2	fcs /Temple of Rogue                                                    by Rick Adams/
 status2
 	leau line2,pcr
 	rts
@@ -576,7 +579,9 @@ loop@	ldd ,u
 	bne draw@
 	clr ,u		; delete object
 	clr 1,u
-	inc score	; add to score
+	ldd score	; add 50 to score
+	addd #50
+	std score
 	dec nobjs	; one less object
 	bra again@
 draw@	lda 2,u		; draw object
