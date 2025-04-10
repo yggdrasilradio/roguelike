@@ -18,6 +18,9 @@ score	rmb 2
 kbbusy	rmb 1
 nobjs	rmb 1 ; number of objects left to find
 value	rmb 5
+key1	rmb 1
+key2	rmb 1
+key3	rmb 1
 
 	org $E00
 start
@@ -50,6 +53,11 @@ start
 	clra
 	clrb
 	std score
+
+	* Clear key flags
+	clr key1
+	clr key2
+	clr key3
 
 	* Number of objects
 	lda #NOBJECTS
@@ -624,6 +632,16 @@ key@
 	leau gotkey,pcr
 	lbsr prstatus	; "Found a key!"
 	puls u
+	lda 3,u		; key type (KEY1, KEY2, KEY3)
+	cmpa #KEY1
+	bne key2@
+	inc key1
+key2@	cmpa #KEY2
+	bne key3@
+	inc key2
+key3@	cmpa #KEY3
+	bne next@
+	inc key3
 	bra next@
 gold@
 	ldd score	; add 50 to score
