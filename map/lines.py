@@ -15,10 +15,17 @@ pix = img.load()
 # Color swatches
 BLACK = pix[0, 0]
 WHITE = pix[1, 0]
-BLUE = pix[2, 0]
-RED = pix[3, 0]
-GREEN = pix[4, 0]
-for x in range(1, 5):
+RED = pix[2, 0]
+GREEN = pix[3, 0]
+BLUE = pix[4, 0]
+CYAN = pix[5, 0]
+MAGENTA = pix[6, 0]
+YELLOW = pix[7, 0]
+ORANGE = pix[8, 0]
+GRAY = pix[9, 0]
+
+# Remove color swatches
+for x in range(1, 10):
 	pix[x, 0] = BLACK
 
 width = img.size[0]

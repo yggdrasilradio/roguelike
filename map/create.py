@@ -10,7 +10,7 @@ WIDTH = 240
 XSPACING = 17
 YSPACING = 12
 
-def CreateObject(x, y, xdelta, ydelta):
+def CreateObject(x, y, xdelta, ydelta, objcolor):
 
     xchoices = []
     for xvalue in range(x - xdelta + 1, x + xdelta):
@@ -25,13 +25,13 @@ def CreateObject(x, y, xdelta, ydelta):
         objy = random.choice(ychoices)
         color = image.getpixel((objx, objy))
         if color == (0, 0, 0):
-            draw.point((objx, objy), fill="blue")
+            draw.point((objx, objy), fill=objcolor)
             break
     return
 
 def GenerateMaze(x, y):
 
-    # Mark the current cell as a path
+    # Mark the current cell as visited
     maze[y][x] = " "
     random.shuffle(directions)  # Randomize directions for the maze
 
@@ -40,7 +40,10 @@ def GenerateMaze(x, y):
 
         # Check if the new position is within bounds and unvisited
         if 1 <= nx < 2 * ncolumns and 1 <= ny < 2 * nrows and maze[ny][nx] == "#":
-            maze[y + dy][x + dx] = " "  # Carve a path to the next cell
+            maze[y + dy][x + dx] = " "  # Visit the next cell
+	    xcenter = 10 + (int(nx / 2)) * XSPACING
+	    ycenter = 10 + (int(ny / 2)) * YSPACING
+	    pathlist.append((nx, ny, xcenter, ycenter))
             GenerateMaze(nx, ny)  # Recurse to generate the maze from the next cell
 
 def EastExit(xcenter, ycenter):
@@ -56,7 +59,7 @@ def EastExit(xcenter, ycenter):
                 for xwall2 in range(xwall1 + 1, min(xwall1 + XSPACING, WIDTH)):
                     if image.getpixel((xwall2, ycenter - 1)) != (0, 0, 0):
                         # Next room found, now draw the exit
-                        draw.point((xwall1, ycenter), fill="black") # break through wall
+                        draw.point((xwall1, ycenter), fill="black") # Break through wall
                         draw.line((xwall1, ycenter - 1, xwall2, ycenter - 1), fill="white")
                         draw.line((xwall1, ycenter + 1, xwall2, ycenter + 1), fill="white")
                         draw.point((xwall2, ycenter), fill="black") # break through wall
@@ -90,7 +93,7 @@ def DrawRoom(xcenter, ycenter):
     ydeltas = [2, 3, 4]
     xdelta = random.choice(xdeltas)
     ydelta = random.choice(ydeltas)
-    draw.rectangle((xcenter - xdelta, ycenter - ydelta, xcenter + xdelta, ycenter + ydelta), fill="black", outline="white")
+    draw.rectangle((xcenter - xdelta, ycenter - ydelta, xcenter + xdelta, ycenter + ydelta), outline="white")
     roomlist.append((xcenter, ycenter, xdelta, ydelta))
     return;
 
@@ -102,6 +105,9 @@ else:
 # Room list
 roomlist = []
 
+# Path list
+pathlist = []
+
 # Initialize image
 image = Image.new("RGB", (HEIGHT, WIDTH), "black")
 draw = ImageDraw.Draw(image)
@@ -109,9 +115,14 @@ draw = ImageDraw.Draw(image)
 # Color swatches
 draw.point((0, 0), fill="black")
 draw.point((1, 0), fill="white")
-draw.point((2, 0), fill="blue")
-draw.point((3, 0), fill="red")
-draw.point((4, 0), fill="green")
+draw.point((2, 0), fill="red")
+draw.point((3, 0), fill="green")
+draw.point((4, 0), fill="blue")
+draw.point((5, 0), fill="cyan")
+draw.point((6, 0), fill="magenta")
+draw.point((7, 0), fill="yellow")
+draw.point((8, 0), fill="orange")
+draw.point((9, 0), fill="gray")
 
 # How many rooms will fit?
 ncolumns = 0
@@ -128,8 +139,8 @@ directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 # Suppress some rooms randomly
 centerx = int(ncolumns / 2)
 centery = int(nrows / 2)
-homex = centerx * 2 - 1
-homey = centery * 2 - 1
+homex = centerx * 2 + 1
+homey = centery * 2 + 1
 for i in range(1, 40):
     row = random.choice(range(1, len(maze), 2))
     column = random.choice(range(1, len(maze[0]), 2))
@@ -175,7 +186,7 @@ nobjects = int(nrooms / 2)
 for _ in range(0, nobjects):
     xcenter, ycenter, xdelta, ydelta = random.choice(roomlist)
     roomlist.remove((xcenter, ycenter, xdelta, ydelta))
-    CreateObject(xcenter, ycenter, xdelta, ydelta)
+    CreateObject(xcenter, ycenter, xdelta, ydelta, "yellow")
 print(str(nobjects) + " objects generated")
 
 image.save(filename, "GIF")

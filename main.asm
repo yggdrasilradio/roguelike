@@ -1,5 +1,7 @@
 SCREEN1	equ $4000
 SCREEN2	equ $5000
+DOORS	equ $6000
+OBJS	equ $6100
 
 	org $0000
 
@@ -55,13 +57,13 @@ start
 
 	* Initialize objects
 	leax objtable,pcr
-	leay objs,pcr
+	leay OBJS,pcr
 loop@	ldd ,x++
 	std ,y++
 	cmpd #$ffff
 	beq exit@
-	lda ,x+
-	sta ,y+
+	ldd ,x++
+	std ,y++
 	bra loop@
 exit@
 
@@ -166,13 +168,36 @@ initgfx
 	std $ff9d
 
 	* Set palettes for text
-	ldb #27		; cyan
+	ldb #27		; $00 cyan	walls
 	stb $ffb8
-	ldb #54		; amber
+	ldb #54		; $08 amber	status
 	stb $ffb9
-	ldb #63		; white
+	ldb #63		; $10 white	player
 	stb $ffba
+	ldb #63		; $18 white	gold
+	stb $ffbb
+	ldb #17		; $20 green	key1, door1
+	stb $ffbc
+	ldb #9		; $28 blue	key2, door2
+	stb $ffbd
+	ldb #44		; $30 magenta	key3, door3
+	stb $ffbd
+	ldb #44		; $38 gray	unused
+	stb $ffbd
 	rts
+
+* Text color attributes
+WALLS equ $00
+STATUS equ $08
+PLAYER equ $10
+GOLD equ $18
+KEY1 equ $20
+DOOR1 equ $20
+KEY2 equ $28
+DOOR2 equ $28
+KEY3 equ $30
+DOOR3 equ $30
+UNUSED equ $38
 
 * Clear screen
 cls
@@ -181,7 +206,7 @@ cls
 	* Clear status area one
 	lda #5*2
 	pshs a
-	ldd #$2008 ; space, amber
+	ldd #' '*256+STATUS ; space, amber
 loop@	std ,x++ ; clear 32 bytes
 	std ,x++
 	std ,x++
@@ -204,7 +229,7 @@ loop@	std ,x++ ; clear 32 bytes
 	* Clear content area
 	lda #5*20
 	sta ,s
-	ldd #$2000
+	ldd #' '*256+WALLS
 loop@	std ,x++ ; clear 32 bytes
 	std ,x++
 	std ,x++
@@ -227,7 +252,7 @@ loop@	std ,x++ ; clear 32 bytes
 	* Clear status area two
 	lda #5*2
 	sta ,s
-	ldd #$2008 ; space, amber
+	ldd #' '*256+STATUS ; space, amber
 loop@	std ,x++ ; clear 32 bytes
 	std ,x++
 	std ,x++
@@ -464,7 +489,7 @@ drawplayer
 	ldd playerx
 	lbsr curspos
 	ldx textptr
-	ldd #'O'*256+16 ; white
+	ldd #'O'*256+PLAYER
 	std ,x
 	rts
 
@@ -535,7 +560,7 @@ status
 	lbsr prnum
 	lbsr printline
 
-	leau line1b,pcr	; (
+	leau line1b,pcr	; " ("
 	lbsr printline
 
 	clra		; {nobjs}
@@ -563,14 +588,14 @@ status
 * Draw objects
 *
 drawobjects
-	leau objs,pcr
+	leau OBJS,pcr
 loop@	ldd ,u
 	cmpd #$ffff
 	beq exit@
 	suba origin
 	subb origin+1
 	lbsr isvisible
-	bcc again@
+	bcc next@
 	incb
 	incb
 	lbsr curspos
@@ -580,26 +605,46 @@ loop@	ldd ,u
 	bne draw@
 	clr ,u		; delete object
 	clr 1,u
+	lda 2,u		; is it gold?
+	cmpa #'$'
+	beq gold@
+	cmpa #$5f	; is it a key?
+	beq key@
+	cmpa #'|'+$80	; is it an unlocked door?
+	beq door@
+	bne next@
+door@
+	pshs u
+	leau gotdoor,pcr
+	lbsr prstatus	; "Door unlocked!"
+	puls u
+	bra next@
+key@
+	pshs u
+	leau gotkey,pcr
+	lbsr prstatus	; "Found a key!"
+	puls u
+	bra next@
+gold@
 	ldd score	; add 50 to score
 	addd #50
 	std score
 	dec nobjs	; one less object
-*
 	pshs u
-	leau addscore,pcr
+	leau gotgold,pcr
 	lbsr prstatus	; "+50 gold"
 	puls u
-*
-	bra again@
-draw@	lda 2,u		; draw object
-	ldb #16		; white
+	bra next@
+draw@	ldd 2,u		; draw object
 	ldx textptr
 	std ,x
-again@	leau 3,u
+next@	leau 4,u
 	bra loop@
 exit@	rts
 
-addscore fcs /+50 gold/
+gotgold fcs /+50 gold/
+gotkey fcs /Found a key!/
+gotdoor fcs /Door unlocked!/
 
 * Read keyboard
 *
