@@ -686,7 +686,7 @@ keyin
 	tst kbbusy	; key still down?
 	beq poll@
 	clra
-	bra key@	; ignore for a bit
+	lbra key@	; ignore for a bit
 poll@
 	ldd #$5ef7	; UP 94
 	stb $ff02
@@ -711,6 +711,30 @@ poll@
 	ldb $ff00
 	andb #$7f
 	cmpb #$77
+	beq key@
+	ldd #$5ef7	; K UP 94
+	stb $ff02
+	ldb $ff00
+	andb #$7f
+	cmpb #$7d
+	beq key@
+	ldd #$0afb	; J DOWN 94
+	stb $ff02
+	ldb $ff00
+	andb #$7f
+	cmpb #$7d
+	beq key@
+	ldd #$08fe	; H LEFT 8
+	stb $ff02
+	ldb $ff00
+	andb #$7f
+	cmpb #$7d
+	beq key@
+	ldd #$09ef	; L RIGHT 9
+	stb $ff02
+	ldb $ff00
+	andb #$7f
+	cmpb #$7d
 	beq key@
 	ldd #$03fb	; BREAK 3
 	stb $ff02
