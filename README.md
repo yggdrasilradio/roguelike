@@ -9,7 +9,6 @@ Work in progress.  Not anywhere near playable yet.
 
 **Todo**
 
-- Introduce keys and gates
 - Make this into some kind of reasonable game
 
 **Done**
@@ -29,3 +28,4 @@ Work in progress.  Not anywhere near playable yet.
 - Show transient status messages
 - Format the status lines a bit more sensibly
 - Fix map creation bug
+- Implement keys and doors
