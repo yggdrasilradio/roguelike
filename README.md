@@ -29,3 +29,4 @@ Work in progress.  It's playable, but just barely.
 - Format the status lines a bit more sensibly
 - Fix map creation bug
 - Implement keys and doors
+- HJKL keyboard navigation
