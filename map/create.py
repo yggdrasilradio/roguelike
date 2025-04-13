@@ -10,6 +10,41 @@ WIDTH = 240
 XSPACING = 17
 YSPACING = 12
 
+def CreateBarrier(doorcolor, keycolor):
+
+	roomdeltas = {(xcenter, ycenter): (xdelta, ydelta) for xcenter, ycenter, xdelta, ydelta in roomlist}
+	border = random.randint(10, len(pathlist) - 10)
+	# Create door
+	for i in range(border, len(pathlist)):
+		x, y, xcenter1, ycenter = pathlist[i]
+		c1 = maze[y][x + 1]
+		c2 = maze[y][x - 1]
+		if c1 == ' ':
+			# Put a door in the corridor to the right
+			xdelta1, ydelta1 = roomdeltas.get((xcenter1, ycenter), None)
+			xcenter2 = xcenter1 + XSPACING
+			xdelta2, ydelta2 = roomdeltas.get((xcenter2, ycenter), None)
+			wall1x = xcenter1 + xdelta1
+			wall2x = xcenter2 - xdelta2
+			objx = xcenter1 + xdelta1 + (wall2x - wall1x) / 2
+			draw.point((objx, ycenter), fill=doorcolor)
+			break;
+		elif c2 == ' ':
+			# Put a door in the corridor to the left
+			xdelta1, ydelta1 = roomdeltas.get((xcenter1, ycenter), None)
+			xcenter2 = xcenter1 - XSPACING
+			xdelta2, ydelta2 = roomdeltas.get((xcenter2, ycenter), None)
+			wall1x = xcenter1 - xdelta1
+			wall2x = xcenter2 + xdelta2
+			objx = xcenter1 - xdelta1 - (wall1x - wall2x) / 2
+			draw.point((objx, ycenter), fill=doorcolor)
+			break;
+
+	# Create key for that door
+	x, y, xcenter, ycenter = random.choice(pathlist[:border])
+	xdelta, ydelta = roomdeltas.get((xcenter, ycenter), None)
+	CreateObject(xcenter, ycenter, xdelta, ydelta, keycolor)
+
 def CreateObject(x, y, xdelta, ydelta, objcolor):
 
     xchoices = []
@@ -113,16 +148,16 @@ image = Image.new("RGB", (HEIGHT, WIDTH), "black")
 draw = ImageDraw.Draw(image)
 
 # Color swatches
-draw.point((0, 0), fill="black")
-draw.point((1, 0), fill="white")
-draw.point((2, 0), fill="red")
-draw.point((3, 0), fill="green")
-draw.point((4, 0), fill="blue")
-draw.point((5, 0), fill="cyan")
-draw.point((6, 0), fill="magenta")
-draw.point((7, 0), fill="yellow")
-draw.point((8, 0), fill="orange")
-draw.point((9, 0), fill="gray")
+draw.point((0, 0), fill="black")	# BACKGROUND
+draw.point((1, 0), fill="white")	# WALLS
+draw.point((2, 0), fill="red")		# DOOR1
+draw.point((3, 0), fill="green")	# KEY1
+draw.point((4, 0), fill="blue")		# DOOR2
+draw.point((5, 0), fill="cyan")		# KEY2
+draw.point((6, 0), fill="magenta")	# DOOR3
+draw.point((7, 0), fill="yellow")	# GOLD
+draw.point((8, 0), fill="orange")	# KEY3
+draw.point((9, 0), fill="gray")		# UNUSED
 
 # How many rooms will fit?
 ncolumns = 0
@@ -179,6 +214,11 @@ for x in range(10, WIDTH - XSPACING, XSPACING):
             if maze[row - 1][column] != "#":
                 NorthExit(x, y)
 
+# Create doors and keys
+CreateBarrier("red", "green")
+CreateBarrier("blue", "cyan")
+CreateBarrier("magenta", "orange")
+
 # Create objects
 nrooms = len(roomlist)
 print(str(nrooms) + " rooms generated")
@@ -189,5 +229,6 @@ for _ in range(0, nobjects):
     CreateObject(xcenter, ycenter, xdelta, ydelta, "yellow")
 print(str(nobjects) + " objects generated")
 
+# Save map
 image.save(filename, "GIF")
 

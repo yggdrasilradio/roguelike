@@ -63,9 +63,21 @@ start
 	lda #NOBJECTS
 	sta nobjs
 
-	* Initialize objects
+	* Initialize gold and key objects
 	leax objtable,pcr
-	leay OBJS,pcr
+	ldy #OBJS
+loop@	ldd ,x++
+	std ,y++
+	cmpd #$ffff
+	beq exit@
+	ldd ,x++
+	std ,y++
+	bra loop@
+exit@
+
+	* Initialize door objects
+	leax doortbl,pcr
+	ldy #DOORS
 loop@	ldd ,x++
 	std ,y++
 	cmpd #$ffff
@@ -120,6 +132,7 @@ drawframe
 	lbsr cls
 	lbsr vlines
 	lbsr hlines
+	lbsr drawdoors
 	lbsr drawplayer
 	lbsr drawobjects
 	lbsr status
@@ -176,22 +189,22 @@ initgfx
 	std $ff9d
 
 	* Set palettes for text
-	ldb #27		; $00 cyan	walls
+	ldb #27		; cyan	$00	walls
 	stb $ffb8
-	ldb #54		; $08 amber	status
+	ldb #54		; amber	$08	status
 	stb $ffb9
-	ldb #63		; $10 white	player
+	ldb #63		; white	$10	player
 	stb $ffba
-	ldb #63		; $18 white	gold
+	ldb #54		; yellow $18	gold
 	stb $ffbb
-	ldb #17		; $20 green	key1, door1
+	ldb #52		; white $20	key1, door1
 	stb $ffbc
-	ldb #9		; $28 blue	key2, door2
+	ldb #25		; blue $28	key2, door2
 	stb $ffbd
-	ldb #44		; $30 magenta	key3, door3
-	stb $ffbd
-	ldb #44		; $38 gray	unused
-	stb $ffbd
+	ldb #54		; yellow $30	key3, door3
+	stb $ffbe
+	ldb #7		; gray	$38	unused
+	stb $ffbf
 	rts
 
 * Text color attributes
@@ -497,9 +510,20 @@ drawplayer
 	ldd playerx
 	lbsr curspos
 	ldx textptr
+	lda ,x		; anything there already?
+	cmpa #'|'+$80	; is it an unlocked door?
+	bne draw@
+door@
+	pshs x
+	leau gotdoor,pcr
+	lbsr prstatus	; "Door unlocked!"
+	puls x
+draw@
 	ldd #'O'*256+PLAYER
 	std ,x
 	rts
+
+gotdoor	fcs /Door unlocked!/
 
 * Move player
 *
@@ -596,7 +620,7 @@ status
 * Draw objects
 *
 drawobjects
-	leau OBJS,pcr
+	ldu #OBJS
 loop@	ldd ,u
 	cmpd #$ffff
 	beq exit@
@@ -617,16 +641,7 @@ loop@	ldd ,u
 	cmpa #'$'
 	beq gold@
 	cmpa #$5f	; is it a key?
-	beq key@
-	cmpa #'|'+$80	; is it an unlocked door?
-	beq door@
 	bne next@
-door@
-	pshs u
-	leau gotdoor,pcr
-	lbsr prstatus	; "Door unlocked!"
-	puls u
-	bra next@
 key@
 	pshs u
 	leau gotkey,pcr
@@ -662,7 +677,6 @@ exit@	rts
 
 gotgold fcs /+50 gold/
 gotkey fcs /Found a key!/
-gotdoor fcs /Door unlocked!/
 
 * Read keyboard
 *
@@ -745,6 +759,39 @@ loop2@	lda ,u+
 	sta ,x++
 	bpl loop2@
 	rts
+
+	rts
+
+* Draw doors
+*
+drawdoors
+	ldu #DOORS
+loop@	ldd ,u
+	cmpd #$ffff
+	beq exit@
+	suba origin
+	subb origin+1
+	lbsr isvisible
+	bcc next@
+	incb
+	incb
+	lbsr curspos
+	ldx textptr
+	ldy #key3
+	ldd 2,u
+	cmpb #DOOR1
+	bne door2@
+	ldy #key1
+door2@	cmpb #DOOR2
+	bne unlock@
+	ldy #key2
+unlock@	tst ,y		; do we have the key for this door?
+	beq draw@
+	ora #$80	; unlock door
+draw@	std ,x
+next@	leau 4,u
+	bra loop@
+exit@	rts
 
 zprog
 
