@@ -104,7 +104,7 @@ def EastExit(xcenter, ycenter):
 
 def NorthExit(xcenter, ycenter):
 
-    # Search for the rightmost wall of this room
+    # Search for the highest wall of this room
     for ywall1 in range(ycenter - 1, 0, -1):
         if image.getpixel((xcenter - 2, ywall1)) != (0, 0, 0):
             # ywall1 now points to upper wall
@@ -157,7 +157,8 @@ draw.point((5, 0), fill="cyan")		# KEY2
 draw.point((6, 0), fill="magenta")	# DOOR3
 draw.point((7, 0), fill="yellow")	# GOLD
 draw.point((8, 0), fill="orange")	# KEY3
-draw.point((9, 0), fill="gray")		# UNUSED
+draw.point((9, 0), fill="gray")		# DOOR4
+draw.point((10, 0), fill="maroon")	# KEY4
 
 # How many rooms will fit?
 ncolumns = 0
@@ -218,6 +219,7 @@ for x in range(10, WIDTH - XSPACING, XSPACING):
 CreateBarrier("red", "green")
 CreateBarrier("blue", "cyan")
 CreateBarrier("magenta", "orange")
+CreateBarrier("gray", "maroon")
 
 # Create objects
 nrooms = len(roomlist)

@@ -21,7 +21,8 @@ KEY2 = pix[5, 0]	# cyan
 DOOR3 = pix[6, 0]	# magenta
 GOLD = pix[7, 0]	# yellow
 KEY3 = pix[8, 0]	# orange
-UNUSED = pix[9, 0]	# gray
+DOOR4 = pix[9, 0]	# gray
+KEY4 = pix[10, 0]	# maroon
 
 # Text color attributes
 TWALLS = 0x00
@@ -34,10 +35,11 @@ TKEY2 = 0x28
 TDOOR2 = 0x28
 TKEY3 = 0x30
 TDOOR3 = 0x30
-TUNUSED = 0x38
+TKEY4 = 0x38
+TDOOR4 = 0x38
 
 # Remove color swatches
-for x in range(1, 10):
+for x in range(1, 11):
 	pix[x, 0] = BACKGROUND
 
 width = img.size[0]
@@ -61,6 +63,8 @@ for y in range(0, height):
 	    objects.append({"x": x, "y": y, "objtype": 0x5f*256+TKEY2})
         elif objtype == KEY3:
 	    objects.append({"x": x, "y": y, "objtype": 0x5f*256+TKEY3})
+        elif objtype == KEY4:
+	    objects.append({"x": x, "y": y, "objtype": 0x5f*256+TKEY4})
 for obj in sorted(objects, key=lambda obj: (obj["x"], obj["y"])):
     x = obj["x"]
     y = obj["y"]
@@ -90,6 +94,9 @@ for y in range(0, height):
 	    ndoors += 1
         elif objtype == DOOR3:
 	    doors.append({"x": x, "y": y, "objtype": ord('|')*256+TDOOR3})
+	    ndoors += 1
+        elif objtype == DOOR4:
+	    doors.append({"x": x, "y": y, "objtype": ord('|')*256+TDOOR4})
 	    ndoors += 1
 for obj in sorted(doors, key=lambda obj: (obj["x"], obj["y"])):
     x = obj["x"]
