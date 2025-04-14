@@ -21,6 +21,7 @@ value	rmb 5
 key1	rmb 1
 key2	rmb 1
 key3	rmb 1
+key4	rmb 1
 
 	org $E00
 start
@@ -58,6 +59,7 @@ start
 	clr key1
 	clr key2
 	clr key3
+	clr key4
 
 	* Number of objects
 	lda #NOBJECTS
@@ -203,7 +205,7 @@ initgfx
 	stb $ffbd
 	ldb #54		; yellow $30	key3, door3
 	stb $ffbe
-	ldb #7		; gray	$38	unused
+	ldb #45		; magenta $38	key4, door4
 	stb $ffbf
 	rts
 
@@ -218,7 +220,8 @@ KEY2 equ $28
 DOOR2 equ $28
 KEY3 equ $30
 DOOR3 equ $30
-UNUSED equ $38
+KEY4 equ $38
+DOOR4 equ $38
 
 * Clear screen
 cls
@@ -647,7 +650,7 @@ key@
 	leau gotkey,pcr
 	lbsr prstatus	; "Found a key!"
 	puls u
-	lda 3,u		; key type (KEY1, KEY2, KEY3)
+	lda 3,u		; key type (KEY1, KEY2, KEY3, KEY4)
 	cmpa #KEY1
 	bne key2@
 	inc key1
@@ -655,8 +658,11 @@ key2@	cmpa #KEY2
 	bne key3@
 	inc key2
 key3@	cmpa #KEY3
-	bne next@
+	bne key4@
 	inc key3
+key4@	cmpa #KEY4
+	bne next@
+	inc key4
 	bra next@
 gold@
 	ldd score	; add 50 to score
@@ -807,8 +813,11 @@ loop@	ldd ,u
 	bne door2@
 	ldy #key1
 door2@	cmpb #DOOR2
-	bne unlock@
+	bne door4@
 	ldy #key2
+door4@	cmpb #DOOR4
+	bne unlock@
+	ldy #key4
 unlock@	tst ,y		; do we have the key for this door?
 	beq draw@
 	ora #$80	; unlock door
