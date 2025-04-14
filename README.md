@@ -30,3 +30,4 @@ Work in progress.  It's playable, but just barely.
 - Fix map creation bug
 - Implement keys and doors
 - HJKL keyboard navigation
+- Add a fourth key and door
