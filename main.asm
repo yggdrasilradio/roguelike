@@ -22,6 +22,7 @@ key1	rmb 1
 key2	rmb 1
 key3	rmb 1
 key4	rmb 1
+nkeys	rmb 1
 
 	org $E00
 start
@@ -197,7 +198,7 @@ initgfx
 	stb $ffb9
 	ldb #63		; white	$10	player
 	stb $ffba
-	ldb #54		; yellow $18	gold
+	ldb #63		; white $18	gold
 	stb $ffbb
 	ldb #52		; white $20	key1, door1
 	stb $ffbc
@@ -519,7 +520,7 @@ drawplayer
 door@
 	pshs x
 	leau gotdoor,pcr
-	lbsr prstatus	; "Door unlocked!"
+	lbsr prstatus1	; "Door unlocked!"
 	puls x
 draw@
 	ldd #'O'*256+PLAYER
@@ -576,14 +577,16 @@ exit@	leas 2,s
 	rts
 
 * Put text into the status areas
-;line1a	fcs /Score: 0000 (0000 remaining)/
 line1a	fcs /Score: /
-line1b	fcs / (/
-line1c	fcs / remaining)/
-line1d	fcs /Work in progress/
-line2	fcs /Temple of Rogue                                                    by Rick Adams/
-status	
+;line1b	fcs / (/
+;line1c	fcs / remaining)/
+line1d	fcs /Keys found: /
+line1e	fcs /none/
+line2a	fcs /Temple of Rogue/
+line2b	fcs /by Rick Adams/
+youwon	fcs /You won!/
 
+status	
 	* Status line one
 	clra
 	clrb
@@ -595,29 +598,86 @@ status
 	lbsr prnum
 	lbsr printline
 
-	leau line1b,pcr	; " ("
-	lbsr printline
+	;leau line1b,pcr	; " ("
+	;lbsr printline
 
-	clra		; {nobjs}
-	ldb nobjs
-	lbsr prnum
-	lbsr printline
+	;clra		; {nobjs}
+	;ldb nobjs
+	;lbsr prnum
+	;lbsr printline
 
-	leau line1c,pcr	; " remaining)"
-	lbsr printline
+	;leau line1c,pcr	; " remaining)"
+	;lbsr printline
 	
-	lda #64
-	clrb
+	clra
+	sta nkeys
+	tst key1
+	beq nokey1@
+	inc nkeys
+nokey1@	tst key2
+	beq nokey2@
+	inc nkeys
+nokey2@	tst key3
+	beq nokey3@
+	inc nkeys
+nokey3@	tst key4
+	beq nokey4@
+	inc nkeys
+nokey4@ lda #80-12
+	suba nkeys
+	tst nkeys
+	bne keys@
+	suba #4
+keys@	clrb
 	lbsr curspos
 	leau line1d,pcr
-	lbsr printline ; "Work in progress"
+	lbsr printline ; "Keys found: "
+	tst nkeys
+	bne prkeys@
+	leau line1e,pcr
+	lbsr printline ; "none"
+	bra done@
+prkeys@ ldx textptr
+	lda #$5f
+	* Show key1
+	ldb key1
+	beq no1@
+	std ,x++
+	* Show key2
+no1@	ldb key2
+	beq no2@
+	std ,x++
+	* Show key3
+no2@	ldb key3
+	beq no3@
+	std ,x++
+	* Show key4
+no3@	ldb key4
+	beq done@
+	std ,x++
+done@
 
 	* Status line two
 	clra
 	ldb #23
 	lbsr curspos
-	leau line2,pcr
-	lbsr printline ; Status line two
+	leau line2a,pcr
+	lbsr printline ; "Temple of Rogue"
+	tst nobjs
+	bne notdone@
+*
+	leau youwon,pcr ; "You won!"
+	lbsr prstatus2
+	bra credits@
+notdone@
+	; "N items remaining"
+	lbsr pritems
+credits@
+	lda #80-13
+	ldb #23
+	lbsr curspos
+	leau line2b,pcr
+	lbsr printline ; "by Rick Adams"
 	rts
 
 * Draw objects
@@ -648,21 +708,21 @@ loop@	ldd ,u
 key@
 	pshs u
 	leau gotkey,pcr
-	lbsr prstatus	; "Found a key!"
+	lbsr prstatus1	; "Found a key!"
 	puls u
 	lda 3,u		; key type (KEY1, KEY2, KEY3, KEY4)
 	cmpa #KEY1
 	bne key2@
-	inc key1
+	sta key1
 key2@	cmpa #KEY2
 	bne key3@
-	inc key2
+	sta key2
 key3@	cmpa #KEY3
 	bne key4@
-	inc key3
+	sta key3
 key4@	cmpa #KEY4
 	bne next@
-	inc key4
+	sta key4
 	bra next@
 gold@
 	ldd score	; add 50 to score
@@ -671,7 +731,7 @@ gold@
 	dec nobjs	; one less object
 	pshs u
 	leau gotgold,pcr
-	lbsr prstatus	; "+50 gold"
+	lbsr prstatus1	; "+50 gold"
 	puls u
 	bra next@
 draw@	ldd 2,u		; draw object
@@ -766,30 +826,91 @@ loop@	decb
 	bne loop@
 	rts
 
-* Print status message
+* Length of string
 *
-* leau msg,pcr
-* lbsr prstatus
+* Entry:
+*	X string
 *
-* msg  fcs /This is a test/
+* Exit:
+*	B length
 *
-prstatus
-	tfr u,x
+strlen
 	clrb
 loop@	incb		; how many chars?
 	tst ,x+
 	bpl loop@
+	rts
+
+* Print status message on status line 1
+*
+* leau msg,pcr
+* lbsr prstatus1
+*
+* msg  fcs /This is a test/
+*
+prstatus1
+	tfr u,x
+	bsr strlen
 	lsrb
 	negb
 	addb #40
 	aslb
 	ldx screen	; center on line
 	abx
-loop2@	lda ,u+
+loop@	lda ,u+
 	sta ,x++
-	bpl loop2@
+	bpl loop@
 	rts
 
+remain	fcs / items remaining/ ; 16 chars
+
+* Print remaining items
+*
+pritems
+	ldb #16
+	lda nobjs
+	cmpa #100
+	bls lt100@
+	incb
+lt100@	cmpa #10
+	bls lt10@
+	incb
+lt10@	lsrb
+	negb
+	addb #40
+	aslb
+	ldx screen	; center on line
+	abx
+	leax 160*23,x
+	stx textptr
+	ldb nobjs
+	clra
+	lbsr prnum
+	lbsr printline
+	leau remain,pcr
+	lbsr printline
+	rts
+
+* Print status message on status line 2
+*
+* leau msg,pcr
+* lbsr prstatus2
+*
+* msg  fcs /This is a test/
+*
+prstatus2
+	tfr u,x
+	bsr strlen
+	lsrb
+	negb
+	addb #40
+	aslb
+	ldx screen	; center on line
+	abx
+	leax 160*23,x
+loop@	lda ,u+
+	sta ,x++
+	bpl loop@
 	rts
 
 * Draw doors
