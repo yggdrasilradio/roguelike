@@ -31,3 +31,5 @@ Work in progress.  It's playable, but just barely.
 - Implement keys and doors
 - HJKL keyboard navigation
 - Add a fourth key and door
+- Add "You won!" message
+- Add a better count of remaining items
