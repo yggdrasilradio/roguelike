@@ -33,3 +33,4 @@ Work in progress.  It's playable, but just barely.
 - Add a fourth key and door
 - Add "You won!" message
 - Add a better count of remaining items
+- Count keys as items also
