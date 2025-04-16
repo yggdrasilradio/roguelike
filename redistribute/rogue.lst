@@ -63,7 +63,7 @@
 0E2C 0F21             (         main.asm):00063                 clr key4
                       (         main.asm):00064         
                       (         main.asm):00065                 * Number of objects
-0E2E 8668             (         main.asm):00066                 lda #NOBJECTS
+0E2E 866C             (         main.asm):00066                 lda #NOBJECTS
 0E30 9718             (         main.asm):00067                 sta nobjs
                       (         main.asm):00068         
                       (         main.asm):00069                 * Initialize gold and key objects
@@ -704,124 +704,125 @@
 1265 264B             (         main.asm):00700                 bne draw@
 1267 6FC4             (         main.asm):00701                 clr ,u          ; delete object
 1269 6F41             (         main.asm):00702                 clr 1,u
-126B A642             (         main.asm):00703                 lda 2,u         ; is it gold?
-126D 8124             (         main.asm):00704                 cmpa #'$'
-126F 272B             (         main.asm):00705                 beq gold@
-1271 815F             (         main.asm):00706                 cmpa #$5f       ; is it a key?
-1273 2643             (         main.asm):00707                 bne next@
-1275                  (         main.asm):00708         key@
-1275 3440             (         main.asm):00709                 pshs u
-1277 338D004A         (         main.asm):00710                 leau gotkey,pcr
-127B 171699           (         main.asm):00711                 lbsr prstatus1  ; "Found a key!"
-127E 3540             (         main.asm):00712                 puls u
-1280 A643             (         main.asm):00713                 lda 3,u         ; key type (KEY1, KEY2, KEY3, KEY4)
-1282 8120             (         main.asm):00714                 cmpa #KEY1
-1284 2602             (         main.asm):00715                 bne key2@
-1286 971E             (         main.asm):00716                 sta key1
-1288 8128             (         main.asm):00717         key2@   cmpa #KEY2
-128A 2602             (         main.asm):00718                 bne key3@
-128C 971F             (         main.asm):00719                 sta key2
-128E 8130             (         main.asm):00720         key3@   cmpa #KEY3
-1290 2602             (         main.asm):00721                 bne key4@
-1292 9720             (         main.asm):00722                 sta key3
-1294 8138             (         main.asm):00723         key4@   cmpa #KEY4
-1296 2620             (         main.asm):00724                 bne next@
-1298 9721             (         main.asm):00725                 sta key4
-129A 201C             (         main.asm):00726                 bra next@
-129C                  (         main.asm):00727         gold@
-129C DC15             (         main.asm):00728                 ldd score       ; add 50 to score
-129E C30032           (         main.asm):00729                 addd #50
-12A1 DD15             (         main.asm):00730                 std score
-12A3 0A18             (         main.asm):00731                 dec nobjs       ; one less object
-12A5 3440             (         main.asm):00732                 pshs u
-12A7 338D0012         (         main.asm):00733                 leau gotgold,pcr
-12AB 171669           (         main.asm):00734                 lbsr prstatus1  ; "+50 gold"
-12AE 3540             (         main.asm):00735                 puls u
-12B0 2006             (         main.asm):00736                 bra next@
-12B2 EC42             (         main.asm):00737         draw@   ldd 2,u         ; draw object
-12B4 9E00             (         main.asm):00738                 ldx textptr
-12B6 ED84             (         main.asm):00739                 std ,x
-12B8 3344             (         main.asm):00740         next@   leau 4,u
-12BA 208D             (         main.asm):00741                 bra loop@
-12BC 39               (         main.asm):00742         exit@   rts
-                      (         main.asm):00743         
-12BD 2B353020676F6CE4 (         main.asm):00744         gotgold fcs /+50 gold/
-12C5 466F756E64206120 (         main.asm):00745         gotkey fcs /Found a key!/
+126B 0A18             (         main.asm):00703                 dec nobjs       ; one less object
+126D A642             (         main.asm):00704                 lda 2,u         ; is it gold?
+126F 8124             (         main.asm):00705                 cmpa #'$'
+1271 272B             (         main.asm):00706                 beq gold@
+1273 815F             (         main.asm):00707                 cmpa #$5f       ; is it a key?
+1275 2641             (         main.asm):00708                 bne next@
+1277                  (         main.asm):00709         key@
+1277 3440             (         main.asm):00710                 pshs u
+1279 338D0048         (         main.asm):00711                 leau gotkey,pcr
+127D 171697           (         main.asm):00712                 lbsr prstatus1  ; "Found a key!"
+1280 3540             (         main.asm):00713                 puls u
+1282 A643             (         main.asm):00714                 lda 3,u         ; key type (KEY1, KEY2, KEY3, KEY4)
+1284 8120             (         main.asm):00715                 cmpa #KEY1
+1286 2602             (         main.asm):00716                 bne key2@
+1288 971E             (         main.asm):00717                 sta key1
+128A 8128             (         main.asm):00718         key2@   cmpa #KEY2
+128C 2602             (         main.asm):00719                 bne key3@
+128E 971F             (         main.asm):00720                 sta key2
+1290 8130             (         main.asm):00721         key3@   cmpa #KEY3
+1292 2602             (         main.asm):00722                 bne key4@
+1294 9720             (         main.asm):00723                 sta key3
+1296 8138             (         main.asm):00724         key4@   cmpa #KEY4
+1298 261E             (         main.asm):00725                 bne next@
+129A 9721             (         main.asm):00726                 sta key4
+129C 201A             (         main.asm):00727                 bra next@
+129E                  (         main.asm):00728         gold@
+129E DC15             (         main.asm):00729                 ldd score       ; add 50 to score
+12A0 C30032           (         main.asm):00730                 addd #50
+12A3 DD15             (         main.asm):00731                 std score
+                      (         main.asm):00732                 ;dec nobjs      ; one less object
+12A5 3440             (         main.asm):00733                 pshs u
+12A7 338D0012         (         main.asm):00734                 leau gotgold,pcr
+12AB 171669           (         main.asm):00735                 lbsr prstatus1  ; "+50 gold"
+12AE 3540             (         main.asm):00736                 puls u
+12B0 2006             (         main.asm):00737                 bra next@
+12B2 EC42             (         main.asm):00738         draw@   ldd 2,u         ; draw object
+12B4 9E00             (         main.asm):00739                 ldx textptr
+12B6 ED84             (         main.asm):00740                 std ,x
+12B8 3344             (         main.asm):00741         next@   leau 4,u
+12BA 208D             (         main.asm):00742                 bra loop@
+12BC 39               (         main.asm):00743         exit@   rts
+                      (         main.asm):00744         
+12BD 2B353020676F6CE4 (         main.asm):00745         gotgold fcs /+50 gold/
+12C5 466F756E64206120 (         main.asm):00746         gotkey fcs /Found a key!/
      6B6579A1
-                      (         main.asm):00746         
-                      (         main.asm):00747         * Read keyboard
-                      (         main.asm):00748         *
-                      (         main.asm):00749         * Exit: char in A
-                      (         main.asm):00750         *
-12D1                  (         main.asm):00751         keyin
-12D1 0D17             (         main.asm):00752                 tst kbbusy      ; key still down?
-12D3 2704             (         main.asm):00753                 beq poll@
-12D5 4F               (         main.asm):00754                 clra
-12D6 16008B           (         main.asm):00755                 lbra key@       ; ignore for a bit
-12D9                  (         main.asm):00756         poll@
-12D9 CC5EF7           (         main.asm):00757                 ldd #$5ef7      ; UP 94
-12DC F7FF02           (         main.asm):00758                 stb $ff02
-12DF F6FF00           (         main.asm):00759                 ldb $ff00
-12E2 C47F             (         main.asm):00760                 andb #$7f
-12E4 C177             (         main.asm):00761                 cmpb #$77
-12E6 277C             (         main.asm):00762                 beq key@
-12E8 CC0AEF           (         main.asm):00763                 ldd #$0aef      ; DOWN 10
-12EB F7FF02           (         main.asm):00764                 stb $ff02
-12EE F6FF00           (         main.asm):00765                 ldb $ff00
-12F1 C47F             (         main.asm):00766                 andb #$7f
-12F3 C177             (         main.asm):00767                 cmpb #$77
-12F5 276D             (         main.asm):00768                 beq key@
-12F7 CC08DF           (         main.asm):00769                 ldd #$08df      ; LEFT 8
-12FA F7FF02           (         main.asm):00770                 stb $ff02
-12FD F6FF00           (         main.asm):00771                 ldb $ff00
-1300 C47F             (         main.asm):00772                 andb #$7f
-1302 C177             (         main.asm):00773                 cmpb #$77
-1304 275E             (         main.asm):00774                 beq key@
-1306 CC09BF           (         main.asm):00775                 ldd #$09bf      ; RIGHT 9
-1309 F7FF02           (         main.asm):00776                 stb $ff02
-130C F6FF00           (         main.asm):00777                 ldb $ff00
-130F C47F             (         main.asm):00778                 andb #$7f
-1311 C177             (         main.asm):00779                 cmpb #$77
-1313 274F             (         main.asm):00780                 beq key@
-1315 CC5EF7           (         main.asm):00781                 ldd #$5ef7      ; K UP 94
-1318 F7FF02           (         main.asm):00782                 stb $ff02
-131B F6FF00           (         main.asm):00783                 ldb $ff00
-131E C47F             (         main.asm):00784                 andb #$7f
-1320 C17D             (         main.asm):00785                 cmpb #$7d
-1322 2740             (         main.asm):00786                 beq key@
-1324 CC0AFB           (         main.asm):00787                 ldd #$0afb      ; J DOWN 94
-1327 F7FF02           (         main.asm):00788                 stb $ff02
-132A F6FF00           (         main.asm):00789                 ldb $ff00
-132D C47F             (         main.asm):00790                 andb #$7f
-132F C17D             (         main.asm):00791                 cmpb #$7d
-1331 2731             (         main.asm):00792                 beq key@
-1333 CC08FE           (         main.asm):00793                 ldd #$08fe      ; H LEFT 8
-1336 F7FF02           (         main.asm):00794                 stb $ff02
-1339 F6FF00           (         main.asm):00795                 ldb $ff00
-133C C47F             (         main.asm):00796                 andb #$7f
-133E C17D             (         main.asm):00797                 cmpb #$7d
-1340 2722             (         main.asm):00798                 beq key@
-1342 CC09EF           (         main.asm):00799                 ldd #$09ef      ; L RIGHT 9
-1345 F7FF02           (         main.asm):00800                 stb $ff02
-1348 F6FF00           (         main.asm):00801                 ldb $ff00
-134B C47F             (         main.asm):00802                 andb #$7f
-134D C17D             (         main.asm):00803                 cmpb #$7d
-134F 2713             (         main.asm):00804                 beq key@
-1351 CC03FB           (         main.asm):00805                 ldd #$03fb      ; BREAK 3
-1354 F7FF02           (         main.asm):00806                 stb $ff02
-1357 F6FF00           (         main.asm):00807                 ldb $ff00
-135A C47F             (         main.asm):00808                 andb #$7f
-135C C13F             (         main.asm):00809                 cmpb #$3f
-135E 2704             (         main.asm):00810                 beq key@
-1360 4F               (         main.asm):00811                 clra            ; no key pressed
-1361 0F17             (         main.asm):00812                 clr kbbusy
-1363 39               (         main.asm):00813                 rts
-1364                  (         main.asm):00814         key@
-1364 0C17             (         main.asm):00815                 inc kbbusy      ; going to ignore keys for a while
-1366 1715A1           (         main.asm):00816                 lbsr delay
-1369 39               (         main.asm):00817                 rts
-                      (         main.asm):00818         
-                      (         main.asm):00819                 incl lines.asm
+                      (         main.asm):00747         
+                      (         main.asm):00748         * Read keyboard
+                      (         main.asm):00749         *
+                      (         main.asm):00750         * Exit: char in A
+                      (         main.asm):00751         *
+12D1                  (         main.asm):00752         keyin
+12D1 0D17             (         main.asm):00753                 tst kbbusy      ; key still down?
+12D3 2704             (         main.asm):00754                 beq poll@
+12D5 4F               (         main.asm):00755                 clra
+12D6 16008B           (         main.asm):00756                 lbra key@       ; ignore for a bit
+12D9                  (         main.asm):00757         poll@
+12D9 CC5EF7           (         main.asm):00758                 ldd #$5ef7      ; UP 94
+12DC F7FF02           (         main.asm):00759                 stb $ff02
+12DF F6FF00           (         main.asm):00760                 ldb $ff00
+12E2 C47F             (         main.asm):00761                 andb #$7f
+12E4 C177             (         main.asm):00762                 cmpb #$77
+12E6 277C             (         main.asm):00763                 beq key@
+12E8 CC0AEF           (         main.asm):00764                 ldd #$0aef      ; DOWN 10
+12EB F7FF02           (         main.asm):00765                 stb $ff02
+12EE F6FF00           (         main.asm):00766                 ldb $ff00
+12F1 C47F             (         main.asm):00767                 andb #$7f
+12F3 C177             (         main.asm):00768                 cmpb #$77
+12F5 276D             (         main.asm):00769                 beq key@
+12F7 CC08DF           (         main.asm):00770                 ldd #$08df      ; LEFT 8
+12FA F7FF02           (         main.asm):00771                 stb $ff02
+12FD F6FF00           (         main.asm):00772                 ldb $ff00
+1300 C47F             (         main.asm):00773                 andb #$7f
+1302 C177             (         main.asm):00774                 cmpb #$77
+1304 275E             (         main.asm):00775                 beq key@
+1306 CC09BF           (         main.asm):00776                 ldd #$09bf      ; RIGHT 9
+1309 F7FF02           (         main.asm):00777                 stb $ff02
+130C F6FF00           (         main.asm):00778                 ldb $ff00
+130F C47F             (         main.asm):00779                 andb #$7f
+1311 C177             (         main.asm):00780                 cmpb #$77
+1313 274F             (         main.asm):00781                 beq key@
+1315 CC5EF7           (         main.asm):00782                 ldd #$5ef7      ; K UP 94
+1318 F7FF02           (         main.asm):00783                 stb $ff02
+131B F6FF00           (         main.asm):00784                 ldb $ff00
+131E C47F             (         main.asm):00785                 andb #$7f
+1320 C17D             (         main.asm):00786                 cmpb #$7d
+1322 2740             (         main.asm):00787                 beq key@
+1324 CC0AFB           (         main.asm):00788                 ldd #$0afb      ; J DOWN 94
+1327 F7FF02           (         main.asm):00789                 stb $ff02
+132A F6FF00           (         main.asm):00790                 ldb $ff00
+132D C47F             (         main.asm):00791                 andb #$7f
+132F C17D             (         main.asm):00792                 cmpb #$7d
+1331 2731             (         main.asm):00793                 beq key@
+1333 CC08FE           (         main.asm):00794                 ldd #$08fe      ; H LEFT 8
+1336 F7FF02           (         main.asm):00795                 stb $ff02
+1339 F6FF00           (         main.asm):00796                 ldb $ff00
+133C C47F             (         main.asm):00797                 andb #$7f
+133E C17D             (         main.asm):00798                 cmpb #$7d
+1340 2722             (         main.asm):00799                 beq key@
+1342 CC09EF           (         main.asm):00800                 ldd #$09ef      ; L RIGHT 9
+1345 F7FF02           (         main.asm):00801                 stb $ff02
+1348 F6FF00           (         main.asm):00802                 ldb $ff00
+134B C47F             (         main.asm):00803                 andb #$7f
+134D C17D             (         main.asm):00804                 cmpb #$7d
+134F 2713             (         main.asm):00805                 beq key@
+1351 CC03FB           (         main.asm):00806                 ldd #$03fb      ; BREAK 3
+1354 F7FF02           (         main.asm):00807                 stb $ff02
+1357 F6FF00           (         main.asm):00808                 ldb $ff00
+135A C47F             (         main.asm):00809                 andb #$7f
+135C C13F             (         main.asm):00810                 cmpb #$3f
+135E 2704             (         main.asm):00811                 beq key@
+1360 4F               (         main.asm):00812                 clra            ; no key pressed
+1361 0F17             (         main.asm):00813                 clr kbbusy
+1363 39               (         main.asm):00814                 rts
+1364                  (         main.asm):00815         key@
+1364 0C17             (         main.asm):00816                 inc kbbusy      ; going to ignore keys for a while
+1366 1715A1           (         main.asm):00817                 lbsr delay
+1369 39               (         main.asm):00818                 rts
+                      (         main.asm):00819         
+                      (         main.asm):00820                 incl lines.asm
      00F0             (        lines.asm):00001         WIDTH = 240
      00F0             (        lines.asm):00002         HEIGHT = 240
                       (        lines.asm):00003         
@@ -2500,7 +2501,7 @@
 26F2 AAE4E7           (        lines.asm):01676          fcb 170,228,231
 26F5 AFE4E6           (        lines.asm):01677          fcb 175,228,230
 26F8 FFFF             (        lines.asm):01678          fdb $ffff
-                      (         main.asm):00820                 incl prnum.asm
+                      (         main.asm):00821                 incl prnum.asm
                       (        prnum.asm):00001         * Entry:
                       (        prnum.asm):00002         *       D number
                       (        prnum.asm):00003         * Exit:
@@ -2543,7 +2544,7 @@
 2741 3341             (        prnum.asm):00040         done@   leau 1,u
 2743 3262             (        prnum.asm):00041                 leas 2,s
 2745 39               (        prnum.asm):00042                 rts
-                      (         main.asm):00821                 incl objects.asm
+                      (         main.asm):00822                 incl objects.asm
                       (      objects.asm):00001         
                       (      objects.asm):00002         * List of objects
 2746                  (      objects.asm):00003         objtable
@@ -2765,7 +2766,7 @@
 28F4 2418             (      objects.asm):00219          fdb $2418
 28F6 FFFF             (      objects.asm):00220          fdb $ffff
                       (      objects.asm):00221         
-     0068             (      objects.asm):00222         NOBJECTS equ 104
+     006C             (      objects.asm):00222         NOBJECTS equ 108
                       (      objects.asm):00223         
                       (      objects.asm):00224         * List of door objects
 28F8                  (      objects.asm):00225         doortbl
@@ -2781,139 +2782,139 @@
                       (      objects.asm):00235         
      0004             (      objects.asm):00236         NDOORS equ 4
                       (      objects.asm):00237         
-                      (         main.asm):00822         
-290A                  (         main.asm):00823         delay
-290A C646             (         main.asm):00824                 ldb #70
-290C 5A               (         main.asm):00825         loop@   decb
-290D 26FD             (         main.asm):00826                 bne loop@
-290F 39               (         main.asm):00827                 rts
-                      (         main.asm):00828         
-                      (         main.asm):00829         * Length of string
-                      (         main.asm):00830         *
-                      (         main.asm):00831         * Entry:
-                      (         main.asm):00832         *       X string
-                      (         main.asm):00833         *
-                      (         main.asm):00834         * Exit:
-                      (         main.asm):00835         *       B length
-                      (         main.asm):00836         *
-2910                  (         main.asm):00837         strlen
-2910 5F               (         main.asm):00838                 clrb
-2911 5C               (         main.asm):00839         loop@   incb            ; how many chars?
-2912 6D80             (         main.asm):00840                 tst ,x+
-2914 2AFB             (         main.asm):00841                 bpl loop@
-2916 39               (         main.asm):00842                 rts
-                      (         main.asm):00843         
-                      (         main.asm):00844         * Print status message on status line 1
-                      (         main.asm):00845         *
-                      (         main.asm):00846         * leau msg,pcr
-                      (         main.asm):00847         * lbsr prstatus1
-                      (         main.asm):00848         *
-                      (         main.asm):00849         * msg  fcs /This is a test/
-                      (         main.asm):00850         *
-2917                  (         main.asm):00851         prstatus1
-2917 1F31             (         main.asm):00852                 tfr u,x
-2919 8DF5             (         main.asm):00853                 bsr strlen
-291B 54               (         main.asm):00854                 lsrb
-291C 50               (         main.asm):00855                 negb
-291D CB28             (         main.asm):00856                 addb #40
-291F 58               (         main.asm):00857                 aslb
-2920 9E0D             (         main.asm):00858                 ldx screen      ; center on line
-2922 3A               (         main.asm):00859                 abx
-2923 A6C0             (         main.asm):00860         loop@   lda ,u+
-2925 A781             (         main.asm):00861                 sta ,x++
-2927 2AFA             (         main.asm):00862                 bpl loop@
-2929 39               (         main.asm):00863                 rts
-                      (         main.asm):00864         
-292A 206974656D732072 (         main.asm):00865         remain  fcs / items remaining/ ; 16 chars
+                      (         main.asm):00823         
+290A                  (         main.asm):00824         delay
+290A C646             (         main.asm):00825                 ldb #70
+290C 5A               (         main.asm):00826         loop@   decb
+290D 26FD             (         main.asm):00827                 bne loop@
+290F 39               (         main.asm):00828                 rts
+                      (         main.asm):00829         
+                      (         main.asm):00830         * Length of string
+                      (         main.asm):00831         *
+                      (         main.asm):00832         * Entry:
+                      (         main.asm):00833         *       X string
+                      (         main.asm):00834         *
+                      (         main.asm):00835         * Exit:
+                      (         main.asm):00836         *       B length
+                      (         main.asm):00837         *
+2910                  (         main.asm):00838         strlen
+2910 5F               (         main.asm):00839                 clrb
+2911 5C               (         main.asm):00840         loop@   incb            ; how many chars?
+2912 6D80             (         main.asm):00841                 tst ,x+
+2914 2AFB             (         main.asm):00842                 bpl loop@
+2916 39               (         main.asm):00843                 rts
+                      (         main.asm):00844         
+                      (         main.asm):00845         * Print status message on status line 1
+                      (         main.asm):00846         *
+                      (         main.asm):00847         * leau msg,pcr
+                      (         main.asm):00848         * lbsr prstatus1
+                      (         main.asm):00849         *
+                      (         main.asm):00850         * msg  fcs /This is a test/
+                      (         main.asm):00851         *
+2917                  (         main.asm):00852         prstatus1
+2917 1F31             (         main.asm):00853                 tfr u,x
+2919 8DF5             (         main.asm):00854                 bsr strlen
+291B 54               (         main.asm):00855                 lsrb
+291C 50               (         main.asm):00856                 negb
+291D CB28             (         main.asm):00857                 addb #40
+291F 58               (         main.asm):00858                 aslb
+2920 9E0D             (         main.asm):00859                 ldx screen      ; center on line
+2922 3A               (         main.asm):00860                 abx
+2923 A6C0             (         main.asm):00861         loop@   lda ,u+
+2925 A781             (         main.asm):00862                 sta ,x++
+2927 2AFA             (         main.asm):00863                 bpl loop@
+2929 39               (         main.asm):00864                 rts
+                      (         main.asm):00865         
+292A 206974656D732072 (         main.asm):00866         remain  fcs / items remaining/ ; 16 chars
      656D61696E696EE7
-                      (         main.asm):00866         
-                      (         main.asm):00867         * Print remaining items
-                      (         main.asm):00868         *
-293A                  (         main.asm):00869         pritems
-293A C610             (         main.asm):00870                 ldb #16
-293C 9618             (         main.asm):00871                 lda nobjs
-293E 8164             (         main.asm):00872                 cmpa #100
-2940 2301             (         main.asm):00873                 bls lt100@
-2942 5C               (         main.asm):00874                 incb
-2943 810A             (         main.asm):00875         lt100@  cmpa #10
-2945 2301             (         main.asm):00876                 bls lt10@
-2947 5C               (         main.asm):00877                 incb
-2948 54               (         main.asm):00878         lt10@   lsrb
-2949 50               (         main.asm):00879                 negb
-294A CB28             (         main.asm):00880                 addb #40
-294C 58               (         main.asm):00881                 aslb
-294D 9E0D             (         main.asm):00882                 ldx screen      ; center on line
-294F 3A               (         main.asm):00883                 abx
-2950 30890E60         (         main.asm):00884                 leax 160*23,x
-2954 9F00             (         main.asm):00885                 stx textptr
-2956 D618             (         main.asm):00886                 ldb nobjs
-2958 4F               (         main.asm):00887                 clra
-2959 17FD9E           (         main.asm):00888                 lbsr prnum
-295C 17E670           (         main.asm):00889                 lbsr printline
-295F 338CC8           (         main.asm):00890                 leau remain,pcr
-2962 17E66A           (         main.asm):00891                 lbsr printline
-2965 39               (         main.asm):00892                 rts
-                      (         main.asm):00893         
-                      (         main.asm):00894         * Print status message on status line 2
-                      (         main.asm):00895         *
-                      (         main.asm):00896         * leau msg,pcr
-                      (         main.asm):00897         * lbsr prstatus2
-                      (         main.asm):00898         *
-                      (         main.asm):00899         * msg  fcs /This is a test/
-                      (         main.asm):00900         *
-2966                  (         main.asm):00901         prstatus2
-2966 1F31             (         main.asm):00902                 tfr u,x
-2968 8DA6             (         main.asm):00903                 bsr strlen
-296A 54               (         main.asm):00904                 lsrb
-296B 50               (         main.asm):00905                 negb
-296C CB28             (         main.asm):00906                 addb #40
-296E 58               (         main.asm):00907                 aslb
-296F 9E0D             (         main.asm):00908                 ldx screen      ; center on line
-2971 3A               (         main.asm):00909                 abx
-2972 30890E60         (         main.asm):00910                 leax 160*23,x
-2976 A6C0             (         main.asm):00911         loop@   lda ,u+
-2978 A781             (         main.asm):00912                 sta ,x++
-297A 2AFA             (         main.asm):00913                 bpl loop@
-297C 39               (         main.asm):00914                 rts
-                      (         main.asm):00915         
-                      (         main.asm):00916         * Draw doors
-                      (         main.asm):00917         *
-297D                  (         main.asm):00918         drawdoors
-297D CE6000           (         main.asm):00919                 ldu #DOORS
-2980 ECC4             (         main.asm):00920         loop@   ldd ,u
-2982 1083FFFF         (         main.asm):00921                 cmpd #$ffff
-2986 273A             (         main.asm):00922                 beq exit@
-2988 9004             (         main.asm):00923                 suba origin
-298A D005             (         main.asm):00924                 subb origin+1
-298C 17E678           (         main.asm):00925                 lbsr isvisible
-298F 242D             (         main.asm):00926                 bcc next@
-2991 5C               (         main.asm):00927                 incb
-2992 5C               (         main.asm):00928                 incb
-2993 17E651           (         main.asm):00929                 lbsr curspos
-2996 9E00             (         main.asm):00930                 ldx textptr
-2998 108E0020         (         main.asm):00931                 ldy #key3
-299C EC42             (         main.asm):00932                 ldd 2,u
-299E C120             (         main.asm):00933                 cmpb #DOOR1
-29A0 2604             (         main.asm):00934                 bne door2@
-29A2 108E001E         (         main.asm):00935                 ldy #key1
-29A6 C128             (         main.asm):00936         door2@  cmpb #DOOR2
-29A8 2604             (         main.asm):00937                 bne door4@
-29AA 108E001F         (         main.asm):00938                 ldy #key2
-29AE C138             (         main.asm):00939         door4@  cmpb #DOOR4
-29B0 2604             (         main.asm):00940                 bne unlock@
-29B2 108E0021         (         main.asm):00941                 ldy #key4
-29B6 6DA4             (         main.asm):00942         unlock@ tst ,y          ; do we have the key for this door?
-29B8 2702             (         main.asm):00943                 beq draw@
-29BA 8A80             (         main.asm):00944                 ora #$80        ; unlock door
-29BC ED84             (         main.asm):00945         draw@   std ,x
-29BE 3344             (         main.asm):00946         next@   leau 4,u
-29C0 20BE             (         main.asm):00947                 bra loop@
-29C2 39               (         main.asm):00948         exit@   rts
-                      (         main.asm):00949         
-29C3                  (         main.asm):00950         zprog
-                      (         main.asm):00951         
-                      (         main.asm):00952                 * Intercept "Close File" hook to autostart program
-                      (         main.asm):00953                 org $a42e
-A42E 0E00             (         main.asm):00954                 fdb start
-                      (         main.asm):00955         
-                      (         main.asm):00956                 end start
+                      (         main.asm):00867         
+                      (         main.asm):00868         * Print remaining items
+                      (         main.asm):00869         *
+293A                  (         main.asm):00870         pritems
+293A C610             (         main.asm):00871                 ldb #16
+293C 9618             (         main.asm):00872                 lda nobjs
+293E 8164             (         main.asm):00873                 cmpa #100
+2940 2301             (         main.asm):00874                 bls lt100@
+2942 5C               (         main.asm):00875                 incb
+2943 810A             (         main.asm):00876         lt100@  cmpa #10
+2945 2301             (         main.asm):00877                 bls lt10@
+2947 5C               (         main.asm):00878                 incb
+2948 54               (         main.asm):00879         lt10@   lsrb
+2949 50               (         main.asm):00880                 negb
+294A CB28             (         main.asm):00881                 addb #40
+294C 58               (         main.asm):00882                 aslb
+294D 9E0D             (         main.asm):00883                 ldx screen      ; center on line
+294F 3A               (         main.asm):00884                 abx
+2950 30890E60         (         main.asm):00885                 leax 160*23,x
+2954 9F00             (         main.asm):00886                 stx textptr
+2956 D618             (         main.asm):00887                 ldb nobjs
+2958 4F               (         main.asm):00888                 clra
+2959 17FD9E           (         main.asm):00889                 lbsr prnum
+295C 17E670           (         main.asm):00890                 lbsr printline
+295F 338CC8           (         main.asm):00891                 leau remain,pcr
+2962 17E66A           (         main.asm):00892                 lbsr printline
+2965 39               (         main.asm):00893                 rts
+                      (         main.asm):00894         
+                      (         main.asm):00895         * Print status message on status line 2
+                      (         main.asm):00896         *
+                      (         main.asm):00897         * leau msg,pcr
+                      (         main.asm):00898         * lbsr prstatus2
+                      (         main.asm):00899         *
+                      (         main.asm):00900         * msg  fcs /This is a test/
+                      (         main.asm):00901         *
+2966                  (         main.asm):00902         prstatus2
+2966 1F31             (         main.asm):00903                 tfr u,x
+2968 8DA6             (         main.asm):00904                 bsr strlen
+296A 54               (         main.asm):00905                 lsrb
+296B 50               (         main.asm):00906                 negb
+296C CB28             (         main.asm):00907                 addb #40
+296E 58               (         main.asm):00908                 aslb
+296F 9E0D             (         main.asm):00909                 ldx screen      ; center on line
+2971 3A               (         main.asm):00910                 abx
+2972 30890E60         (         main.asm):00911                 leax 160*23,x
+2976 A6C0             (         main.asm):00912         loop@   lda ,u+
+2978 A781             (         main.asm):00913                 sta ,x++
+297A 2AFA             (         main.asm):00914                 bpl loop@
+297C 39               (         main.asm):00915                 rts
+                      (         main.asm):00916         
+                      (         main.asm):00917         * Draw doors
+                      (         main.asm):00918         *
+297D                  (         main.asm):00919         drawdoors
+297D CE6000           (         main.asm):00920                 ldu #DOORS
+2980 ECC4             (         main.asm):00921         loop@   ldd ,u
+2982 1083FFFF         (         main.asm):00922                 cmpd #$ffff
+2986 273A             (         main.asm):00923                 beq exit@
+2988 9004             (         main.asm):00924                 suba origin
+298A D005             (         main.asm):00925                 subb origin+1
+298C 17E678           (         main.asm):00926                 lbsr isvisible
+298F 242D             (         main.asm):00927                 bcc next@
+2991 5C               (         main.asm):00928                 incb
+2992 5C               (         main.asm):00929                 incb
+2993 17E651           (         main.asm):00930                 lbsr curspos
+2996 9E00             (         main.asm):00931                 ldx textptr
+2998 108E0020         (         main.asm):00932                 ldy #key3
+299C EC42             (         main.asm):00933                 ldd 2,u
+299E C120             (         main.asm):00934                 cmpb #DOOR1
+29A0 2604             (         main.asm):00935                 bne door2@
+29A2 108E001E         (         main.asm):00936                 ldy #key1
+29A6 C128             (         main.asm):00937         door2@  cmpb #DOOR2
+29A8 2604             (         main.asm):00938                 bne door4@
+29AA 108E001F         (         main.asm):00939                 ldy #key2
+29AE C138             (         main.asm):00940         door4@  cmpb #DOOR4
+29B0 2604             (         main.asm):00941                 bne unlock@
+29B2 108E0021         (         main.asm):00942                 ldy #key4
+29B6 6DA4             (         main.asm):00943         unlock@ tst ,y          ; do we have the key for this door?
+29B8 2702             (         main.asm):00944                 beq draw@
+29BA 8A80             (         main.asm):00945                 ora #$80        ; unlock door
+29BC ED84             (         main.asm):00946         draw@   std ,x
+29BE 3344             (         main.asm):00947         next@   leau 4,u
+29C0 20BE             (         main.asm):00948                 bra loop@
+29C2 39               (         main.asm):00949         exit@   rts
+                      (         main.asm):00950         
+29C3                  (         main.asm):00951         zprog
+                      (         main.asm):00952         
+                      (         main.asm):00953                 * Intercept "Close File" hook to autostart program
+                      (         main.asm):00954                 org $a42e
+A42E 0E00             (         main.asm):00955                 fdb start
+                      (         main.asm):00956         
+                      (         main.asm):00957                 end start
