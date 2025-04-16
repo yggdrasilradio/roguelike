@@ -219,7 +219,7 @@ objtable
  fdb $2418
  fdb $ffff
 
-NOBJECTS equ 104
+NOBJECTS equ 108
 
 * List of door objects
 doortbl

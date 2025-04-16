@@ -700,6 +700,7 @@ loop@	ldd ,u
 	bne draw@
 	clr ,u		; delete object
 	clr 1,u
+	dec nobjs	; one less object
 	lda 2,u		; is it gold?
 	cmpa #'$'
 	beq gold@
@@ -728,7 +729,7 @@ gold@
 	ldd score	; add 50 to score
 	addd #50
 	std score
-	dec nobjs	; one less object
+	;dec nobjs	; one less object
 	pshs u
 	leau gotgold,pcr
 	lbsr prstatus1	; "+50 gold"

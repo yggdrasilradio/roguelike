@@ -59,12 +59,16 @@ for y in range(0, height):
 	    nobjects += 1
         elif objtype == KEY1:
 	    objects.append({"x": x, "y": y, "objtype": 0x5f*256+TKEY1})
+	    nobjects += 1
         elif objtype == KEY2:
 	    objects.append({"x": x, "y": y, "objtype": 0x5f*256+TKEY2})
+	    nobjects += 1
         elif objtype == KEY3:
 	    objects.append({"x": x, "y": y, "objtype": 0x5f*256+TKEY3})
+	    nobjects += 1
         elif objtype == KEY4:
 	    objects.append({"x": x, "y": y, "objtype": 0x5f*256+TKEY4})
+	    nobjects += 1
 for obj in sorted(objects, key=lambda obj: (obj["x"], obj["y"])):
     x = obj["x"]
     y = obj["y"]
