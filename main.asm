@@ -584,7 +584,7 @@ line1d	fcs /Keys found: /
 line1e	fcs /none/
 line2a	fcs /Temple of Rogue/
 line2b	fcs /by Rick Adams/
-youwon	fcs /You won!/
+youwon	fcs /You have conquered the Temple of Rogue!/
 
 status	
 	* Status line one
