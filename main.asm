@@ -26,7 +26,8 @@ vcount	rmb 1
 secs	rmb 1
 mins	rmb 1
 hours	rmb 1
-timebuf	rmb 7
+pmsg	rmb 2
+timer	rmb 1
 
 	org $E00
 start
@@ -69,13 +70,17 @@ start
 	clrb
 	std score
 
+	* Clear status message timer and pointer
+	sta timer
+	std pmsg
+
 	* Clear key flags
 	clr key1
 	clr key2
 	clr key3
 	clr key4
 
-	* Clear timer
+	* Clear elapsed time
 	clr secs
 	clr mins
 	clr hours
@@ -116,7 +121,7 @@ exit@
 
 	* Idle loop
 loop@
-	lbsr prtime ; HOLD MY BEER
+	lbsr prtime
 	lbsr keycheck
 	cmpa #8	   ; left arrow
 	bne notl@
@@ -161,7 +166,7 @@ drawframe
 	lbsr drawplayer
 	lbsr drawobjects
 	lbsr status
-	;lbsr prtime
+	lbsr updstatus1
 	bsr flipscreen
 	rts
 
@@ -675,11 +680,11 @@ done@
 	lbsr printline ; "Temple of Rogue"
 	tst nobjs
 	bne notdone@
-	leau youwon,pcr ; "You won!"
+	leau youwon,pcr ; "You have conquered the Temple of Rogue!"
 	lbsr prstatus2
 	bra credits@
 notdone@
-	; "N items remaining"
+	; "{nobjs} items remaining"
 	lbsr pritems
 credits@
 	lda #80-13
@@ -738,7 +743,6 @@ gold@
 	ldd score	; add 50 to score
 	addd #50
 	std score
-	;dec nobjs	; one less object
 	pshs u
 	leau gotgold,pcr
 	lbsr prstatus1	; "+50 gold"
@@ -835,7 +839,7 @@ loop@	incb		; how many chars?
 	bpl loop@
 	rts
 
-* Print status message on status line 1
+* Queue status message to display on status line 1
 *
 * leau msg,pcr
 * lbsr prstatus1
@@ -843,6 +847,17 @@ loop@	incb		; how many chars?
 * msg  fcs /This is a test/
 *
 prstatus1
+	stu pmsg
+	lda #130	; status message will persist for around 2 secs
+	sta timer
+	rts
+
+* Update status message on status line 1
+*
+updstatus1
+	ldd pmsg
+	beq exit@
+	ldu pmsg
 	tfr u,x
 	bsr strlen
 	lsrb
@@ -854,7 +869,7 @@ prstatus1
 loop@	lda ,u+
 	sta ,x++
 	bpl loop@
-	rts
+exit@	rts
 
 remain	fcs / items remaining/ ; 16 chars
 
@@ -941,7 +956,12 @@ next@	leau 4,u
 	bra loop@
 exit@	rts
 
-IRQ	dec vcount	; decrement vsync counter
+IRQ	dec timer	; has status message timed out?
+	bne irq1@
+	clr pmsg	; yes, so clear it
+	clr pmsg+1
+irq1@
+	dec vcount	; decrement vsync counter
 	bne exit@
 	lda #60
 	sta vcount
@@ -1012,7 +1032,7 @@ nozero2@
 	lbsr prnum
 	lbsr printline	; {secs}
 	leau time4,pcr
-	lbsr printline	; "  "
+	lbsr printline	; "  " (this shouldn't be necessary but it is)
 	ldd screen
 	eora #$10
 	std screen	; flip back to original screen
