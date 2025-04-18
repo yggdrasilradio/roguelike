@@ -9,7 +9,6 @@ Work in progress.  It's playable, but just barely.
 
 **Todo**
 
-- Add elapsed time display
 - Make this into some kind of reasonable game
 
 **Done**
@@ -35,3 +34,4 @@ Work in progress.  It's playable, but just barely.
 - Add "You won!" message
 - Add a better count of remaining items
 - Count keys as items also
+- Add elapsed time display
