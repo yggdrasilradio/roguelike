@@ -15,7 +15,6 @@ playerx	rmb 1
 playery	rmb 1
 number	rmb 2
 score	rmb 2
-kbbusy	rmb 1
 nobjs	rmb 1 ; number of objects left to find
 value	rmb 5
 key1	rmb 1
@@ -23,6 +22,11 @@ key2	rmb 1
 key3	rmb 1
 key4	rmb 1
 nkeys	rmb 1
+vcount	rmb 1
+secs	rmb 1
+mins	rmb 1
+hours	rmb 1
+timebuf	rmb 7
 
 	org $E00
 start
@@ -36,6 +40,15 @@ start
 
 	* Fast CPU
 	sta $ffd9
+
+	* Setup for IRQ
+	lda $ff03
+	ora #$01 ; enable VSYNC / IRQ
+	sta $ff03
+	lda #$7e ; set IRQ vector to JMP [IRQ]
+	sta $fef7
+	ldx #IRQ
+	stx $fef8
 
 	* Initialize graphics and MMU
 	lbsr initgfx
@@ -61,6 +74,11 @@ start
 	clr key2
 	clr key3
 	clr key4
+
+	* Clear timer
+	clr secs
+	clr mins
+	clr hours
 
 	* Number of objects
 	lda #NOBJECTS
@@ -93,8 +111,12 @@ exit@
 	* Draw initial frame
 	lbsr drawframe
 
+	* Turn on IRQ
+	andcc #$ef
+
 	* Idle loop
 loop@
+	lbsr prtime ; HOLD MY BEER
 	lbsr keycheck
 	cmpa #8	   ; left arrow
 	bne notl@
@@ -139,6 +161,7 @@ drawframe
 	lbsr drawplayer
 	lbsr drawobjects
 	lbsr status
+	;lbsr prtime
 	bsr flipscreen
 	rts
 
@@ -576,16 +599,14 @@ ymaxok@ std playerx	; save new position
 exit@	leas 2,s
 	rts
 
-* Put text into the status areas
 line1a	fcs /Score: /
-;line1b	fcs / (/
-;line1c	fcs / remaining)/
 line1d	fcs /Keys found: /
 line1e	fcs /none/
 line2a	fcs /Temple of Rogue/
 line2b	fcs /by Rick Adams/
 youwon	fcs /You have conquered the Temple of Rogue!/
 
+* Put text into the status areas
 status	
 	* Status line one
 	clra
@@ -598,17 +619,6 @@ status
 	lbsr prnum
 	lbsr printline
 
-	;leau line1b,pcr	; " ("
-	;lbsr printline
-
-	;clra		; {nobjs}
-	;ldb nobjs
-	;lbsr prnum
-	;lbsr printline
-
-	;leau line1c,pcr	; " remaining)"
-	;lbsr printline
-	
 	clra
 	sta nkeys
 	tst key1
@@ -665,7 +675,6 @@ done@
 	lbsr printline ; "Temple of Rogue"
 	tst nobjs
 	bne notdone@
-*
 	leau youwon,pcr ; "You won!"
 	lbsr prstatus2
 	bra credits@
@@ -750,11 +759,6 @@ gotkey fcs /Found a key!/
 * Exit: char in A
 *
 keyin
-	tst kbbusy	; key still down?
-	beq poll@
-	clra
-	lbra key@	; ignore for a bit
-poll@
 	ldd #$5ef7	; UP 94
 	stb $ff02
 	ldb $ff00
@@ -810,22 +814,11 @@ poll@
 	cmpb #$3f
 	beq key@
 	clra		; no key pressed
-	clr kbbusy
-	rts
-key@
-	inc kbbusy	; going to ignore keys for a while
-	lbsr delay
-	rts
+key@	rts
 
 	incl lines.asm
 	incl prnum.asm
 	incl objects.asm
-
-delay
-	ldb #70
-loop@	decb
-	bne loop@
-	rts
 
 * Length of string
 *
@@ -947,6 +940,83 @@ draw@	std ,x
 next@	leau 4,u
 	bra loop@
 exit@	rts
+
+IRQ	dec vcount	; decrement vsync counter
+	bne exit@
+	lda #60
+	sta vcount
+	tst nobjs	; stop counting if game over
+	beq exit@
+	inc secs	; update seconds
+	lda secs
+	cmpa #60
+	blo exit@
+	clr secs
+	inc mins	; update minutes
+	lda mins
+	cmpa #60
+	blo exit@
+	clr secs
+	clr mins
+	inc hours	; update hours
+exit@	lda $ff02	; dismiss IRQ interrupt
+	rti
+
+time1	fcs /Time: /
+time2	fcs /:/
+time3	fcs /0/
+time4	fcs /  /
+
+* Display elapsed time
+*
+prtime
+	ldd screen	; flip temporarily to other screen
+	eora #$10
+	std screen
+	lda #35		; position cursor to status area 2
+	tst hours
+	beq noadj@	; adjust position if displaying hours?
+	deca
+noadj@	ldb #22
+	lbsr curspos
+	leau time1,pcr
+	lbsr printline	; "Time: "
+	clra
+	ldb hours
+	beq nohours@
+	lbsr prnum
+	lbsr printline	; {hours}
+	leau time2,pcr
+	lbsr printline	; ":"
+nohours@
+	ldb mins
+	cmpb #10
+	bhs nozero1@
+	leau time3,pcr
+	lbsr printline	; "0"
+nozero1@
+	clra
+	ldb mins
+	lbsr prnum
+	lbsr printline	; {mins}
+	leau time2,pcr
+	lbsr printline	; ":"
+	ldb secs
+	cmpb #10
+	bhs nozero2@
+	leau time3,pcr
+	lbsr printline	; "0"
+nozero2@
+	clra
+	ldb secs
+	lbsr prnum
+	lbsr printline	; {secs}
+	leau time4,pcr
+	lbsr printline	; "  "
+	ldd screen
+	eora #$10
+	std screen	; flip back to original screen
+	rts
 
 zprog
 
