@@ -9,6 +9,7 @@ Work in progress.  It's playable, but just barely.
 
 **Todo**
 
+- Add elapsed time display
 - Make this into some kind of reasonable game
 
 **Done**
