@@ -9,6 +9,7 @@ Work in progress.  It's playable, but just barely.
 
 **Todo**
 
+- Persist the status messages
 - Make this into some kind of reasonable game
 
 **Done**
