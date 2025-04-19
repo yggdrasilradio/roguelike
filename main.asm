@@ -766,8 +766,7 @@ gotkey fcs /Found a key!/
 *
 * Exit: char in A
 *
-keyin
-	ldd #$5ef7	; UP 94
+keyin	ldd #$5ef7	; UP 94
 	stb $ff02
 	ldb $ff00
 	andb #$7f
@@ -824,11 +823,13 @@ keyin
 	clra		; no key pressed
 	clr kbbusy	; clear keyboard busy timer
 	rts
-key@	tst kbbusy	; key pressed: ignoring keypresses?
-	bne exit@	; yup
-	ldb #200	; going to ignore keypresses for a bit
-	stb kbbusy
-exit@	rts
+key@    tst kbbusy	; key pressed: ignoring keypresses?
+	beq delay@
+        clra            ; clear keystroke
+        rts             ; get out of here
+delay@	ldb #7		; going to ignore keypresses for a bit
+	stb kbbusy	; store key delay
+exit@   rts
 
 	incl lines.asm
 	incl prnum.asm
