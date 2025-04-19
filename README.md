@@ -36,3 +36,4 @@ Work in progress.  It's playable, but just barely.
 - Count keys as items also
 - Add elapsed time display
 - Persist the status messages
+- Improve the key repeat
