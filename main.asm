@@ -28,6 +28,7 @@ mins	rmb 1
 hours	rmb 1
 pmsg	rmb 2
 timer	rmb 1
+kbbusy	rmb 1 ; keyboard busy
 
 	org $E00
 start
@@ -73,6 +74,9 @@ start
 	* Clear status message timer and pointer
 	sta timer
 	std pmsg
+
+	* Clear keyboard busy flag
+	sta kbbusy
 
 	* Clear key flags
 	clr key1
@@ -763,6 +767,8 @@ gotkey fcs /Found a key!/
 * Exit: char in A
 *
 keyin
+	tst kbbusy	; ignore keypresses?
+	lbne exit@
 	ldd #$5ef7	; UP 94
 	stb $ff02
 	ldb $ff00
@@ -818,7 +824,11 @@ keyin
 	cmpb #$3f
 	beq key@
 	clra		; no key pressed
-key@	rts
+	clr kbbusy	; clear keyboard busy flag
+	rts
+key@	ldb #5		; going to ignore keypresses for a bit
+	stb kbbusy
+exit@	rts
 
 	incl lines.asm
 	incl prnum.asm
@@ -960,8 +970,10 @@ IRQ	dec timer	; has status message timed out?
 	bne irq1@
 	clr pmsg	; yes, so clear it
 	clr pmsg+1
-irq1@
-	dec vcount	; decrement vsync counter
+irq1@	tst kbbusy	; keyboard busy?
+	beq irq2@
+	dec kbbusy
+irq2@	dec vcount	; decrement vsync counter
 	bne exit@
 	lda #60
 	sta vcount
