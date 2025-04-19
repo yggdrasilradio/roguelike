@@ -75,7 +75,7 @@ start
 	sta timer
 	std pmsg
 
-	* Clear keyboard busy flag
+	* Clear keyboard busy timer
 	sta kbbusy
 
 	* Clear key flags
@@ -767,8 +767,6 @@ gotkey fcs /Found a key!/
 * Exit: char in A
 *
 keyin
-	tst kbbusy	; ignore keypresses?
-	lbne exit@
 	ldd #$5ef7	; UP 94
 	stb $ff02
 	ldb $ff00
@@ -824,9 +822,11 @@ keyin
 	cmpb #$3f
 	beq key@
 	clra		; no key pressed
-	clr kbbusy	; clear keyboard busy flag
+	clr kbbusy	; clear keyboard busy timer
 	rts
-key@	ldb #5		; going to ignore keypresses for a bit
+key@	tst kbbusy	; key pressed: ignoring keypresses?
+	bne exit@	; yup
+	ldb #200	; going to ignore keypresses for a bit
 	stb kbbusy
 exit@	rts
 
@@ -972,7 +972,7 @@ IRQ	dec timer	; has status message timed out?
 	clr pmsg+1
 irq1@	tst kbbusy	; keyboard busy?
 	beq irq2@
-	dec kbbusy
+	dec kbbusy	; decrement keyboard busy timer
 irq2@	dec vcount	; decrement vsync counter
 	bne exit@
 	lda #60
