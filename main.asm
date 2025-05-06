@@ -1,7 +1,8 @@
 SCREEN1	equ $4000
 SCREEN2	equ $5000
 DOORS	equ $6000
-OBJS	equ $6100
+ENEMIES	equ $6100
+OBJS	equ $6200
 
 	org $0000
 
@@ -79,15 +80,15 @@ start
 	sta kbbusy
 
 	* Clear key flags
-	clr key1
-	clr key2
-	clr key3
-	clr key4
+	sta key1
+	sta key2
+	sta key3
+	sta key4
 
 	* Clear elapsed time
-	clr secs
-	clr mins
-	clr hours
+	sta secs
+	sta mins
+	sta hours
 
 	* Number of objects
 	lda #NOBJECTS
@@ -96,26 +97,12 @@ start
 	* Initialize gold and key objects
 	leax objtable,pcr
 	ldy #OBJS
-loop@	ldd ,x++
-	std ,y++
-	cmpd #$ffff
-	beq exit@
-	ldd ,x++
-	std ,y++
-	bra loop@
-exit@
+	lbsr tfrxy
 
 	* Initialize door objects
 	leax doortbl,pcr
 	ldy #DOORS
-loop@	ldd ,x++
-	std ,y++
-	cmpd #$ffff
-	beq exit@
-	ldd ,x++
-	std ,y++
-	bra loop@
-exit@
+	lbsr tfrxy
 
 	* Draw initial frame
 	lbsr drawframe
@@ -124,8 +111,7 @@ exit@
 	andcc #$ef
 
 	* Idle loop
-loop@
-	lbsr prtime
+loop@	lbsr prtime
 	lbsr keycheck
 	cmpa #8	   ; left arrow
 	bne notl@
@@ -155,6 +141,12 @@ notd@
 	lbsr drawframe
 notu@
 	bra loop@
+
+tfrxy	ldd ,x++
+	std ,y++
+	cmpd #$ffff
+	bne tfrxy
+exit@	rts
 
 * Draw frame
 drawframe
