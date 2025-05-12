@@ -1,305 +1,306 @@
 
 * List of objects
 objtable
- fcb 7,109
+ fcb 6,22
  fdb $1818
- fcb 8,178
+ fcb 8,12
  fdb $1818
- fcb 10,33
+ fcb 8,97
  fdb $1818
- fcb 10,46
+ fcb 10,34
  fdb $1818
- fcb 10,154
+ fcb 10,117
+ fdb $1818
+ fcb 12,49
+ fdb $1818
+ fcb 12,190
  fdb $5f38
- fcb 12,58
+ fcb 13,142
  fdb $1818
- fcb 12,154
+ fcb 13,192
  fdb $1818
- fcb 13,217
+ fcb 14,70
  fdb $1818
- fcb 25,45
+ fcb 16,130
  fdb $1818
- fcb 25,96
+ fcb 23,106
  fdb $1818
- fcb 25,201
+ fcb 25,12
  fdb $1818
- fcb 27,21
+ fcb 26,36
  fdb $1818
- fcb 27,178
+ fcb 26,154
  fdb $1818
- fcb 29,12
+ fcb 27,48
  fdb $1818
- fcb 30,105
- fdb $5f28
- fcb 30,106
+ fcb 27,130
  fdb $1818
- fcb 42,48
+ fcb 29,24
  fdb $1818
- fcb 42,201
+ fcb 29,117
  fdb $1818
- fcb 44,26
+ fcb 29,190
  fdb $1818
- fcb 44,158
+ fcb 30,202
  fdb $1818
- fcb 47,82
+ fcb 30,229
  fdb $1818
- fcb 48,165
+ fcb 31,213
  fdb $1818
- fcb 49,190
+ fcb 43,133
  fdb $1818
- fcb 57,142
+ fcb 44,108
  fdb $1818
- fcb 59,133
+ fcb 46,97
  fdb $1818
- fcb 60,58
+ fcb 47,144
  fdb $1818
- fcb 61,154
+ fcb 49,120
  fdb $1818
- fcb 61,168
+ fcb 59,188
  fdb $1818
- fcb 63,117
+ fcb 60,118
  fdb $1818
- fcb 65,46
+ fcb 60,216
  fdb $1818
- fcb 76,213
+ fcb 61,36
  fdb $1818
- fcb 77,96
+ fcb 65,108
  fdb $1818
- fcb 80,12
+ fcb 66,85
  fdb $1818
- fcb 80,180
+ fcb 74,145
  fdb $1818
- fcb 81,26
+ fcb 76,130
  fdb $1818
- fcb 81,70
+ fcb 77,69
  fdb $1818
- fcb 83,49
+ fcb 77,116
  fdb $1818
- fcb 84,117
+ fcb 77,153
  fdb $1818
- fcb 95,180
+ fcb 81,33
  fdb $1818
- fcb 95,204
+ fcb 83,85
  fdb $1818
- fcb 97,58
+ fcb 95,72
  fdb $1818
- fcb 97,94
+ fcb 95,93
  fdb $1818
- fcb 97,190
+ fcb 95,130
  fdb $1818
- fcb 98,156
+ fcb 98,193
  fdb $1818
- fcb 98,214
+ fcb 99,58
  fdb $1818
- fcb 99,110
+ fcb 100,50
  fdb $1818
- fcb 99,122
+ fcb 101,8
  fdb $1818
- fcb 111,121
+ fcb 109,154
  fdb $1818
- fcb 111,230
+ fcb 110,96
  fdb $1818
- fcb 112,153
+ fcb 111,46
  fdb $1818
- fcb 112,204
+ fcb 111,130
  fdb $1818
- fcb 114,56
+ fcb 112,116
  fdb $1818
- fcb 114,133
+ fcb 114,25
  fdb $1818
- fcb 115,108
+ fcb 114,60
  fdb $1818
- fcb 115,166
+ fcb 114,178
  fdb $1818
- fcb 126,190
+ fcb 114,188
  fdb $1818
- fcb 127,226
+ fcb 114,214
  fdb $1818
- fcb 128,9
+ fcb 116,106
  fdb $1818
- fcb 132,73
+ fcb 116,169
  fdb $1818
- fcb 133,213
+ fcb 116,204
  fdb $1818
- fcb 134,145
+ fcb 117,144
  fdb $1818
- fcb 145,12
- fdb $1818
- fcb 145,153
- fdb $1818
- fcb 146,46
- fdb $1818
- fcb 146,73
- fdb $1818
- fcb 148,36
- fdb $1818
- fcb 148,145
- fdb $1818
- fcb 148,201
- fdb $1818
- fcb 149,97
- fdb $1818
- fcb 151,104
- fdb $1818
- fcb 160,178
- fdb $1818
- fcb 161,60
- fdb $1818
- fcb 162,93
- fdb $1818
- fcb 162,190
- fdb $1818
- fcb 165,45
- fdb $1818
- fcb 165,84
- fdb $1818
- fcb 165,164
- fdb $1818
- fcb 166,230
- fdb $1818
- fcb 167,154
- fdb $1818
- fcb 168,106
- fdb $5f30
- fcb 177,106
- fdb $1818
- fcb 178,217
- fdb $1818
- fcb 180,22
- fdb $1818
- fcb 180,60
- fdb $1818
- fcb 180,201
- fdb $1818
- fcb 182,12
- fdb $1818
- fcb 184,84
- fdb $1818
- fcb 185,120
- fdb $1818
- fcb 185,132
- fdb $1818
- fcb 195,154
- fdb $1818
- fcb 197,10
- fdb $1818
- fcb 197,81
- fdb $1818
- fcb 199,24
- fdb $1818
- fcb 199,45
- fdb $1818
- fcb 200,145
- fdb $1818
- fcb 200,214
- fdb $1818
- fcb 201,60
- fdb $1818
- fcb 201,108
- fdb $1818
- fcb 201,132
- fdb $1818
- fcb 211,190
- fdb $1818
- fcb 213,166
- fdb $1818
- fcb 214,84
- fdb $1818
- fcb 214,132
- fdb $1818
- fcb 214,178
+ fcb 117,168
  fdb $5f20
- fcb 214,180
+ fcb 128,57
  fdb $1818
- fcb 214,216
+ fcb 128,170
  fdb $1818
- fcb 216,120
+ fcb 128,193
  fdb $1818
- fcb 217,24
+ fcb 129,10
  fdb $1818
- fcb 218,204
+ fcb 129,34
  fdb $1818
- fcb 220,34
+ fcb 129,133
+ fdb $1818
+ fcb 129,156
+ fdb $1818
+ fcb 131,145
+ fdb $1818
+ fcb 143,108
+ fdb $1818
+ fcb 145,168
+ fdb $1818
+ fcb 145,214
+ fdb $1818
+ fcb 146,82
+ fdb $1818
+ fcb 146,132
+ fdb $1818
+ fcb 148,22
+ fdb $1818
+ fcb 148,50
+ fdb $1818
+ fcb 150,96
+ fdb $1818
+ fcb 150,154
+ fdb $1818
+ fcb 162,14
+ fdb $1818
+ fcb 162,214
+ fdb $1818
+ fcb 162,228
+ fdb $1818
+ fcb 163,72
+ fdb $1818
+ fcb 165,120
+ fdb $1818
+ fcb 166,104
+ fdb $1818
+ fcb 166,140
+ fdb $1818
+ fcb 166,202
+ fdb $1818
+ fcb 167,84
+ fdb $1818
+ fcb 168,190
+ fdb $1818
+ fcb 169,58
+ fdb $1818
+ fcb 169,165
+ fdb $1818
+ fcb 180,154
+ fdb $1818
+ fcb 182,120
+ fdb $1818
+ fcb 183,70
+ fdb $1818
+ fcb 195,226
+ fdb $5f30
+ fcb 196,61
+ fdb $1818
+ fcb 196,94
+ fdb $1818
+ fcb 196,109
+ fdb $5f28
+ fcb 200,50
+ fdb $1818
+ fcb 200,82
+ fdb $1818
+ fcb 200,105
+ fdb $1818
+ fcb 200,118
+ fdb $1818
+ fcb 201,37
+ fdb $1818
+ fcb 212,142
+ fdb $1818
+ fcb 213,10
+ fdb $1818
+ fcb 213,157
+ fdb $1818
+ fcb 217,74
+ fdb $1818
+ fcb 218,190
+ fdb $1818
+ fcb 220,38
+ fdb $1818
+ fcb 220,81
  fdb $1818
  fdb $ffff
 
-NOBJECTS equ 110
+NOBJECTS equ 111
 
 * List of door objects
 doortbl
- fcb 18,35
- fdb $7c38
- fcb 36,23
- fdb $7c28
- fcb 87,203
+ fcb 37,47
  fdb $7c30
- fcb 207,59
+ fcb 121,227
  fdb $7c20
+ fcb 188,155
+ fdb $7c28
+ fcb 207,119
+ fdb $7c38
  fdb $ffff
 
 NDOORS equ 4
 
 * List of enemies
 enemytbl
- fcb 11,59,4,1
- fcb 11,83,2,2
- fcb 11,107,4,3
- fcb 28,35,4,3
+ fcb 11,23,5,2
+ fcb 11,59,2,1
+ fcb 11,71,5,2
+ fcb 11,119,2,2
+ fcb 11,191,2,2
+ fcb 28,83,4,2
  fcb 28,95,5,2
- fcb 28,215,3,3
- fcb 45,11,2,3
- fcb 45,23,4,3
- fcb 45,155,2,3
- fcb 45,203,3,3
- fcb 62,11,3,3
- fcb 62,47,5,3
- fcb 62,95,2,2
- fcb 62,167,2,1
- fcb 62,203,4,3
- fcb 79,11,4,1
- fcb 79,35,2,3
- fcb 79,47,4,2
- fcb 79,155,3,2
- fcb 79,191,2,2
- fcb 96,23,5,3
- fcb 96,71,2,2
- fcb 96,119,5,3
- fcb 96,167,4,3
- fcb 96,227,4,3
- fcb 113,23,3,1
- fcb 113,47,4,2
- fcb 113,131,3,2
- fcb 113,143,4,3
- fcb 113,179,5,2
- fcb 130,95,4,2
- fcb 130,143,5,3
- fcb 130,167,2,2
- fcb 147,203,4,2
- fcb 147,227,4,3
- fcb 164,35,4,3
- fcb 164,155,4,1
- fcb 181,23,3,2
- fcb 181,95,2,2
- fcb 181,119,5,1
- fcb 181,179,2,1
- fcb 181,191,4,1
- fcb 181,203,2,2
- fcb 181,215,3,3
- fcb 198,11,2,1
- fcb 198,119,3,3
- fcb 198,143,3,2
- fcb 198,155,3,2
- fcb 198,179,4,1
- fcb 198,191,5,3
- fcb 198,203,5,2
- fcb 198,227,5,3
- fcb 215,11,4,1
- fcb 215,23,2,1
- fcb 215,59,2,3
- fcb 215,143,3,1
- fcb 215,179,2,1
- fcb 215,203,3,3
+ fcb 28,227,3,2
+ fcb 45,155,5,3
+ fcb 45,203,3,2
+ fcb 45,215,3,2
+ fcb 62,83,4,2
+ fcb 62,95,2,3
+ fcb 62,107,4,1
+ fcb 62,191,3,3
+ fcb 79,59,4,1
+ fcb 79,119,2,3
+ fcb 96,35,3,2
+ fcb 96,131,2,2
+ fcb 96,191,3,2
+ fcb 113,35,5,1
+ fcb 113,71,5,3
+ fcb 113,107,3,1
+ fcb 113,155,4,1
+ fcb 113,167,4,3
+ fcb 113,203,5,1
+ fcb 130,11,4,3
+ fcb 130,95,3,2
+ fcb 130,215,3,3
+ fcb 130,227,3,3
+ fcb 147,47,2,3
+ fcb 147,59,4,2
+ fcb 147,83,2,1
+ fcb 147,119,5,3
+ fcb 147,131,3,1
+ fcb 147,191,5,3
+ fcb 147,203,4,3
+ fcb 147,215,2,1
+ fcb 164,131,2,2
+ fcb 164,155,3,3
+ fcb 164,179,3,3
+ fcb 164,203,2,2
+ fcb 181,23,4,2
+ fcb 181,119,4,3
+ fcb 181,131,2,1
+ fcb 181,155,2,1
+ fcb 181,215,3,2
+ fcb 198,143,2,2
+ fcb 198,203,5,1
+ fcb 198,227,5,1
+ fcb 215,35,5,3
+ fcb 215,47,5,3
+ fcb 215,83,5,3
+ fcb 215,119,2,1
+ fcb 215,155,5,3
+ fcb 215,191,4,1
+ fcb 215,215,2,1
  fdb $ffff
 
-NENEMIES equ 58
+NENEMIES equ 57
 
