@@ -23,6 +23,11 @@ GOLD = pix[7, 0]	# yellow
 KEY3 = pix[8, 0]	# orange
 DOOR4 = pix[9, 0]	# gray
 KEY4 = pix[10, 0]	# maroon
+ENEMY = pix[11, 0]	# crimson
+
+# Remove color swatches
+for x in range(1, 12):
+	pix[x, 0] = BACKGROUND
 
 # Text color attributes
 TWALLS = 0x00
@@ -37,10 +42,7 @@ TKEY3 = 0x30
 TDOOR3 = 0x30
 TKEY4 = 0x38
 TDOOR4 = 0x38
-
-# Remove color swatches
-for x in range(1, 11):
-	pix[x, 0] = BACKGROUND
+TENEMY = 0x10
 
 width = img.size[0]
 height = img.size[1]
@@ -55,7 +57,8 @@ for y in range(0, height):
     for x in range(0, width):
         objtype = pix[x, y]
         if objtype == GOLD:
-	    objects.append({"x": x, "y": y, "objtype": ord('$')*256+TGOLD})
+	    #objects.append({"x": x, "y": y, "objtype": ord('$')*256+TGOLD})
+	    objects.append({"x": x, "y": y, "objtype": 0x18*256+TGOLD})
 	    nobjects += 1
         elif objtype == KEY1:
 	    objects.append({"x": x, "y": y, "objtype": 0x5f*256+TKEY1})
@@ -112,4 +115,37 @@ print ' fdb $ffff'
 
 print
 print "NDOORS equ " + str(ndoors)
+print
+
+# Objects: enemies
+print '* List of enemies'
+print 'enemytbl'
+nenemies = 0
+enemies = []
+for ycenter in range(0, height):
+    for xcenter in range(0, width):
+        objtype = pix[xcenter, ycenter]
+        if objtype == ENEMY:
+	    xdelta = 0
+	    ydelta = 0
+	    for x in range(xcenter, xcenter + 20):
+		if pix[x, ycenter - 1] == WALLS:
+		    break;
+		xdelta += 1
+	    for y in range(ycenter, ycenter + 20):
+		if pix[xcenter - 2, y] == WALLS:
+		    break;
+		ydelta += 1
+	    enemies.append({"x": xcenter, "y": ycenter, "xdelta": xdelta - 1, "ydelta": ydelta - 1})
+	    nenemies += 1
+for obj in sorted(enemies, key=lambda obj: (obj["x"], obj["y"])):
+    x = obj["x"]
+    y = obj["y"]
+    xdelta = obj["xdelta"]
+    ydelta = obj["ydelta"]
+    print ' fcb ' + str(x + 1) + ',' + str(y + 1) + ',' + str(xdelta) + ',' + str(ydelta)
+print ' fdb $ffff'
+
+print
+print "NENEMIES equ " + str(nenemies)
 print

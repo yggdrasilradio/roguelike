@@ -1,8 +1,8 @@
 SCREEN1	equ $4000
 SCREEN2	equ $5000
 DOORS	equ $6000
-ENEMIES	equ $6100
-OBJS	equ $6200
+ENEMIES	equ $6200
+OBJS	equ $6400
 
 	org $0000
 
@@ -30,6 +30,8 @@ hours	rmb 1
 pmsg	rmb 2
 timer	rmb 1
 kbbusy	rmb 1 ; keyboard busy
+player	rmb 2 ; global player coordinates
+dead	rmb 1 ; player died flag
 
 	org $E00
 start
@@ -76,6 +78,9 @@ start
 	sta timer
 	std pmsg
 
+	* Clear player died flag
+	sta dead
+
 	* Clear keyboard busy timer
 	sta kbbusy
 
@@ -104,6 +109,19 @@ start
 	ldy #DOORS
 	lbsr tfrxy
 
+	* Initialize enemy objects
+	leax enemytbl,pcr
+	ldy #ENEMIES
+loop@	ldd ,x++
+	std ,y++ ; xpos, ypos
+	cmpd #$ffff
+	beq exit@
+	std ,y++ ; xcenter, ycenter
+	ldd ,x++
+	std ,y++ ; xdelta, ydelta
+	bra loop@
+exit@
+
 	* Draw initial frame
 	lbsr drawframe
 
@@ -111,8 +129,13 @@ start
 	andcc #$ef
 
 	* Idle loop
-loop@	lbsr prtime
+loop@
+	lbsr prtime	; Elapsed time
 	lbsr keycheck
+	tst dead	; End game if player has won or lost
+	bne endgame
+	tst nobjs
+	beq endgame
 	cmpa #8	   ; left arrow
 	bne notl@
 	ldd #$ff00 ; move player left
@@ -142,6 +165,17 @@ notd@
 notu@
 	bra loop@
 
+* Restart game on any key
+endgame
+	jsr [$a000] ; wait for keyup
+	bne endgame
+loop@
+	jsr [$a000] ; wait for keydown
+	beq loop@
+	cmpa #3	    ; is it BREAK?
+	lbeq reset  ; exit to BASIC
+	lbra start  ; restart game
+
 tfrxy	ldd ,x++
 	std ,y++
 	cmpd #$ffff
@@ -161,6 +195,7 @@ drawframe
 	lbsr drawdoors
 	lbsr drawplayer
 	lbsr drawobjects
+	lbsr drawenemies
 	lbsr status
 	lbsr updstatus1
 	bsr flipscreen
@@ -606,6 +641,7 @@ line1e	fcs /none/
 line2a	fcs /Temple of Rogue/
 line2b	fcs /by Rick Adams/
 youwon	fcs /You have conquered the Temple of Rogue!/
+youlost	fcs /You have died in the Temple of Rogue!/
 
 * Put text into the status areas
 status	
@@ -667,19 +703,24 @@ no3@	ldb key4
 	beq done@
 	std ,x++
 done@
-
 	* Status line two
 	clra
 	ldb #23
 	lbsr curspos
 	leau line2a,pcr
-	lbsr printline ; "Temple of Rogue"
+	lbsr printline		; "Temple of Rogue"
 	tst nobjs
 	bne notdone@
-	leau youwon,pcr ; "You have conquered the Temple of Rogue!"
+	leau youwon,pcr		; "You have conquered the Temple of Rogue!"
 	lbsr prstatus2
 	bra credits@
 notdone@
+	tst dead
+	beq notdead@
+	leau youlost,pcr	; "You have died in the Temple of Rogue!"
+	lbsr prstatus2
+	bra credits@
+notdead@
 	; "{nobjs} items remaining"
 	lbsr pritems
 credits@
@@ -697,7 +738,7 @@ drawobjects
 loop@	ldd ,u
 	cmpd #$ffff
 	beq exit@
-	suba origin
+	suba origin	; map to viewport
 	subb origin+1
 	lbsr isvisible
 	bcc next@
@@ -712,7 +753,8 @@ loop@	ldd ,u
 	clr 1,u
 	dec nobjs	; one less object
 	lda 2,u		; is it gold?
-	cmpa #'$'
+	;cmpa #'$'
+	cmpa #$18
 	beq gold@
 	cmpa #$5f	; is it a key?
 	bne next@
@@ -972,6 +1014,8 @@ irq2@	dec vcount	; decrement vsync counter
 	sta vcount
 	tst nobjs	; stop counting if game over
 	beq exit@
+	tst dead
+	bne exit@
 	inc secs	; update seconds
 	lda secs
 	cmpa #60
@@ -1041,6 +1085,113 @@ nozero2@
 	ldd screen
 	eora #$10
 	std screen	; flip back to original screen
+	rts
+
+drawenemies
+	ldu #ENEMIES
+loop@	ldd ,u
+	beq next@
+	cmpd #$ffff
+	beq exit@
+*
+	ldd ,u
+	suba origin
+	subb origin+1
+	lbsr isvisible
+	bcc next@
+	incb
+	incb
+	lbsr curspos
+	ldx textptr
+	lbsr isaggro		; Is player in monster aggro area?
+	bcs aggro@
+noaggro@
+	ldd #$1b*256+$10	; No
+	bra draw@
+aggro@
+	ldd #$1b*256+$38	; Yes
+draw@
+	pshs a
+	lda ,x
+	cmpa #'O'
+	bne notdead@
+	inc dead		; Game over flag
+notdead@
+	puls a
+	std ,x
+*	
+next@	leau 6,u
+	bra loop@
+exit@	rts
+
+* Is player within aggro area?
+*
+* Entry:
+*	U points to monster entry in table
+*	    ,U	xpos
+*	    1,U	ypos
+*	    2,U	xcenter
+*	    3,U	ycenter
+*	    4,U	xdelta
+*	    5,U	ydelta
+* Calling sequence:
+*	lbsr isaggro
+*	bcc notaggro
+*	bcs aggro
+isaggro
+	ldd playerx	; local coordinates of player
+	adda origin
+	addb origin+1
+	std player	; global coordinates of player
+*
+	ldd 2,u		; xcenter, ycenter
+	suba 4,u	; a = left edge of aggro area
+	subb 5,u	; b = upper edge of aggro area
+	incb
+	incb
+	cmpa player	; is left edge of aggro area to right of player?
+	bhi notaggro@
+	cmpb player+1	; is upper edge of aggro aread below player?
+	bhi notaggro@
+*
+	ldd 2,u		; xcenter, ycenter
+	adda 4,u	; a = right edge of aggro area
+	addb 5,u	; b = lower edge of aggro area
+	incb
+	incb
+	cmpa player	; is right edge of aggro area to left of player?
+	blo notaggro@
+	cmpb player+1	; is lower edge of aggro area above player?
+	blo notaggro@
+*
+aggro@
+	ldd player	; chase player
+	decb
+	decb
+	lbsr chase
+	coma		; set carry
+	rts
+notaggro@
+	ldd 2,u		; return to home position
+	lbsr chase
+	clra		; clear carry
+	rts
+
+chase
+	cmpa ,u		; compare target x with current x
+	bls no1@
+	inc ,u		; chase right
+	;bra no2@
+no1@	bhs no2@
+	dec ,u		; chase left
+no2@
+	cmpb 1,u	; compare target y with current y
+	bls no3@
+	inc 1,u		; chase down
+	;bra no4@
+no3@	bhs no4@
+	dec 1,u		; chase up
+no4@
 	rts
 
 zprog
