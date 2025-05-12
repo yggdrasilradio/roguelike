@@ -37,3 +37,4 @@ Work in progress.  It's playable, but just barely.
 - Add elapsed time display
 - Persist the status messages
 - Improve the key repeat
+- Add monsters
