@@ -9,6 +9,7 @@ WIDTH = 240
 
 XSPACING = 17
 YSPACING = 12
+LMARGIN = 10
 
 def CreateBarrier(doorcolor, keycolor):
 
@@ -76,8 +77,8 @@ def GenerateMaze(x, y):
         # Check if the new position is within bounds and unvisited
         if 1 <= nx < 2 * ncolumns and 1 <= ny < 2 * nrows and maze[ny][nx] == "#":
             maze[y + dy][x + dx] = " "  # Visit the next cell
-	    xcenter = 10 + (int(nx / 2)) * XSPACING
-	    ycenter = 10 + (int(ny / 2)) * YSPACING
+	    xcenter = LMARGIN + (int(nx / 2)) * XSPACING
+	    ycenter = LMARGIN + (int(ny / 2)) * YSPACING
 	    pathlist.append((nx, ny, xcenter, ycenter))
             GenerateMaze(nx, ny)  # Recurse to generate the maze from the next cell
 
@@ -132,6 +133,7 @@ def DrawRoom(xcenter, ycenter):
     roomlist.append((xcenter, ycenter, xdelta, ydelta))
     return;
 
+# Where are we generating the map?
 if len(sys.argv) == 1:
 	filename = "map.gif"
 else:
@@ -159,24 +161,23 @@ draw.point((7, 0), fill="yellow")	# GOLD
 draw.point((8, 0), fill="orange")	# KEY3
 draw.point((9, 0), fill="gray")		# DOOR4
 draw.point((10, 0), fill="maroon")	# KEY4
+draw.point((11, 0), fill="crimson")	# MONSTER
 
 # How many rooms will fit?
 ncolumns = 0
-for x in range(10, WIDTH - XSPACING, XSPACING):
+for x in range(LMARGIN, WIDTH - XSPACING, XSPACING):
     ncolumns += 1
     nrows = 0
-    for y in range(10, HEIGHT - YSPACING, YSPACING):
+    for y in range(LMARGIN, HEIGHT - YSPACING, YSPACING):
         nrows += 1
 
 # Initialize maze
 maze = [["#"] * (2 * ncolumns + 1) for _ in range(2 * nrows + 1)]
 directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
-# Suppress some rooms randomly
-centerx = int(ncolumns / 2)
-centery = int(nrows / 2)
-homex = centerx * 2 + 1
-homey = centery * 2 + 1
+# Randomly suppress 40 rooms (but not the starting room)
+homex = int(ncolumns / 2) * 2 + 1
+homey = int(nrows / 2) * 2 + 1
 for i in range(1, 40):
     row = random.choice(range(1, len(maze), 2))
     column = random.choice(range(1, len(maze[0]), 2))
@@ -188,13 +189,17 @@ GenerateMaze(homex, homey)
 
 # Draw rooms
 column = -1
-for x in range(10, WIDTH - XSPACING, XSPACING):
+for xcenter in range(LMARGIN, WIDTH - XSPACING, XSPACING):
     column += 2
     row = -1
-    for y in range(10, HEIGHT - YSPACING, YSPACING):
+    for ycenter in range(LMARGIN, HEIGHT - YSPACING, YSPACING):
         row += 2
         if maze[row][column] == " ":
-            DrawRoom(x, y)
+            DrawRoom(xcenter, ycenter)
+	    # Randomly create monster in 25% of the rooms (but not the starting room)
+	    if column != homex or row != homey:
+		if random.choice([True, False, False, False]):
+			draw.point((xcenter, ycenter), fill="crimson")
 
 # Print the maze
 for y in range(0, nrows * 2 + 1):
@@ -204,10 +209,10 @@ for y in range(0, nrows * 2 + 1):
 
 # Draw maze exits
 column = -1
-for x in range(10, WIDTH - XSPACING, XSPACING):
+for x in range(LMARGIN, WIDTH - XSPACING, XSPACING):
     column += 2
     row = -1
-    for y in range(10, HEIGHT - YSPACING, YSPACING):
+    for y in range(LMARGIN, HEIGHT - YSPACING, YSPACING):
         row += 2
         if maze[row][column] != "X":
             if maze[row][column + 1] != "#":
