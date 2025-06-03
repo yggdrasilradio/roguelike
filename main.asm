@@ -1146,7 +1146,7 @@ draw@
 	lda ,x
 	cmpa #'O'
 	bne notdead@
-	inc dead		; Game over flag
+	;inc dead		; Game over flag DISABLE FOR NOW
 notdead@
 	puls d
 	std ,x			; Draw enemy

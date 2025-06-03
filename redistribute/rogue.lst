@@ -3185,20 +3185,20 @@
 2C87                  (         main.asm):01114         drawenemies
 2C87 CE6200           (         main.asm):01115                 ldu #ENEMIES
 2C8A ECC4             (         main.asm):01116         loop@   ldd ,u
-2C8C 2740             (         main.asm):01117                 beq next@
+2C8C 273E             (         main.asm):01117                 beq next@
 2C8E 1083FFFF         (         main.asm):01118                 cmpd #$ffff
-2C92 273E             (         main.asm):01119                 beq exit@
+2C92 273C             (         main.asm):01119                 beq exit@
                       (         main.asm):01120         *
 2C94 ECC4             (         main.asm):01121                 ldd ,u
 2C96 9004             (         main.asm):01122                 suba origin
 2C98 D005             (         main.asm):01123                 subb origin+1
 2C9A 17E3E6           (         main.asm):01124                 lbsr isvisible
-2C9D 242F             (         main.asm):01125                 bcc next@
+2C9D 242D             (         main.asm):01125                 bcc next@
 2C9F 5C               (         main.asm):01126                 incb
 2CA0 5C               (         main.asm):01127                 incb
 2CA1 17E3BF           (         main.asm):01128                 lbsr curspos
 2CA4 9E00             (         main.asm):01129                 ldx textptr
-2CA6 17002A           (         main.asm):01130                 lbsr isaggro            ; Is player in enemy aggro area?
+2CA6 170028           (         main.asm):01130                 lbsr isaggro            ; Is player in enemy aggro area?
 2CA9 2505             (         main.asm):01131                 bcs aggro@
 2CAB                  (         main.asm):01132         noaggro@
 2CAB CC1B10           (         main.asm):01133                 ldd #$1b*256+$10        ; No, draw without highlight
@@ -3216,15 +3216,15 @@
 2CC0 9E00             (         main.asm):01145                 ldx textptr
 2CC2 A684             (         main.asm):01146                 lda ,x
 2CC4 814F             (         main.asm):01147                 cmpa #'O'
-2CC6 2602             (         main.asm):01148                 bne notdead@
-2CC8 0C2C             (         main.asm):01149                 inc dead                ; Game over flag
-2CCA                  (         main.asm):01150         notdead@
-2CCA 3506             (         main.asm):01151                 puls d
-2CCC ED84             (         main.asm):01152                 std ,x                  ; Draw enemy
+2CC6 2600             (         main.asm):01148                 bne notdead@
+                      (         main.asm):01149                 ;inc dead               ; Game over flag DISABLE FOR NOW
+2CC8                  (         main.asm):01150         notdead@
+2CC8 3506             (         main.asm):01151                 puls d
+2CCA ED84             (         main.asm):01152                 std ,x                  ; Draw enemy
                       (         main.asm):01153         *       
-2CCE 3346             (         main.asm):01154         next@   leau 6,u
-2CD0 20B8             (         main.asm):01155                 bra loop@
-2CD2 39               (         main.asm):01156         exit@   rts
+2CCC 3346             (         main.asm):01154         next@   leau 6,u
+2CCE 20BA             (         main.asm):01155                 bra loop@
+2CD0 39               (         main.asm):01156         exit@   rts
                       (         main.asm):01157         
                       (         main.asm):01158         * Is player within aggro area?
                       (         main.asm):01159         *
@@ -3240,59 +3240,59 @@
                       (         main.asm):01169         *       lbsr isaggro
                       (         main.asm):01170         *       bcc notaggro
                       (         main.asm):01171         *       bcs aggro
-2CD3                  (         main.asm):01172         isaggro
-2CD3 DC11             (         main.asm):01173                 ldd playerx     ; local coordinates of player
-2CD5 9B04             (         main.asm):01174                 adda origin
-2CD7 DB05             (         main.asm):01175                 addb origin+1
-2CD9 DD2A             (         main.asm):01176                 std player      ; global coordinates of player
+2CD1                  (         main.asm):01172         isaggro
+2CD1 DC11             (         main.asm):01173                 ldd playerx     ; local coordinates of player
+2CD3 9B04             (         main.asm):01174                 adda origin
+2CD5 DB05             (         main.asm):01175                 addb origin+1
+2CD7 DD2A             (         main.asm):01176                 std player      ; global coordinates of player
                       (         main.asm):01177         *
-2CDB EC42             (         main.asm):01178                 ldd 2,u         ; xcenter, ycenter
-2CDD A044             (         main.asm):01179                 suba 4,u        ; a = left edge of aggro area
-2CDF E045             (         main.asm):01180                 subb 5,u        ; b = upper edge of aggro area
-2CE1 5C               (         main.asm):01181                 incb
-2CE2 5C               (         main.asm):01182                 incb
-2CE3 912A             (         main.asm):01183                 cmpa player     ; is left edge of aggro area to right of player?
-2CE5 221D             (         main.asm):01184                 bhi notaggro@
-2CE7 D12B             (         main.asm):01185                 cmpb player+1   ; is upper edge of aggro aread below player?
-2CE9 2219             (         main.asm):01186                 bhi notaggro@
+2CD9 EC42             (         main.asm):01178                 ldd 2,u         ; xcenter, ycenter
+2CDB A044             (         main.asm):01179                 suba 4,u        ; a = left edge of aggro area
+2CDD E045             (         main.asm):01180                 subb 5,u        ; b = upper edge of aggro area
+2CDF 5C               (         main.asm):01181                 incb
+2CE0 5C               (         main.asm):01182                 incb
+2CE1 912A             (         main.asm):01183                 cmpa player     ; is left edge of aggro area to right of player?
+2CE3 221D             (         main.asm):01184                 bhi notaggro@
+2CE5 D12B             (         main.asm):01185                 cmpb player+1   ; is upper edge of aggro aread below player?
+2CE7 2219             (         main.asm):01186                 bhi notaggro@
                       (         main.asm):01187         *
-2CEB EC42             (         main.asm):01188                 ldd 2,u         ; xcenter, ycenter
-2CED AB44             (         main.asm):01189                 adda 4,u        ; a = right edge of aggro area
-2CEF EB45             (         main.asm):01190                 addb 5,u        ; b = lower edge of aggro area
-2CF1 5C               (         main.asm):01191                 incb
-2CF2 5C               (         main.asm):01192                 incb
-2CF3 912A             (         main.asm):01193                 cmpa player     ; is right edge of aggro area to left of player?
-2CF5 250D             (         main.asm):01194                 blo notaggro@
-2CF7 D12B             (         main.asm):01195                 cmpb player+1   ; is lower edge of aggro area above player?
-2CF9 2509             (         main.asm):01196                 blo notaggro@
+2CE9 EC42             (         main.asm):01188                 ldd 2,u         ; xcenter, ycenter
+2CEB AB44             (         main.asm):01189                 adda 4,u        ; a = right edge of aggro area
+2CED EB45             (         main.asm):01190                 addb 5,u        ; b = lower edge of aggro area
+2CEF 5C               (         main.asm):01191                 incb
+2CF0 5C               (         main.asm):01192                 incb
+2CF1 912A             (         main.asm):01193                 cmpa player     ; is right edge of aggro area to left of player?
+2CF3 250D             (         main.asm):01194                 blo notaggro@
+2CF5 D12B             (         main.asm):01195                 cmpb player+1   ; is lower edge of aggro area above player?
+2CF7 2509             (         main.asm):01196                 blo notaggro@
                       (         main.asm):01197         *
-2CFB                  (         main.asm):01198         aggro@
-2CFB DC2A             (         main.asm):01199                 ldd player      ; chase player
-2CFD 5A               (         main.asm):01200                 decb
-2CFE 5A               (         main.asm):01201                 decb
-2CFF 170009           (         main.asm):01202                 lbsr chase
-2D02 43               (         main.asm):01203                 coma            ; set carry
-2D03 39               (         main.asm):01204                 rts
-2D04                  (         main.asm):01205         notaggro@
-2D04 EC42             (         main.asm):01206                 ldd 2,u         ; return to home position
-2D06 170002           (         main.asm):01207                 lbsr chase
-2D09 4F               (         main.asm):01208                 clra            ; clear carry
-2D0A 39               (         main.asm):01209                 rts
+2CF9                  (         main.asm):01198         aggro@
+2CF9 DC2A             (         main.asm):01199                 ldd player      ; chase player
+2CFB 5A               (         main.asm):01200                 decb
+2CFC 5A               (         main.asm):01201                 decb
+2CFD 170009           (         main.asm):01202                 lbsr chase
+2D00 43               (         main.asm):01203                 coma            ; set carry
+2D01 39               (         main.asm):01204                 rts
+2D02                  (         main.asm):01205         notaggro@
+2D02 EC42             (         main.asm):01206                 ldd 2,u         ; return to home position
+2D04 170002           (         main.asm):01207                 lbsr chase
+2D07 4F               (         main.asm):01208                 clra            ; clear carry
+2D08 39               (         main.asm):01209                 rts
                       (         main.asm):01210         
-2D0B                  (         main.asm):01211         chase
-2D0B A1C4             (         main.asm):01212                 cmpa ,u         ; compare target x with current x
-2D0D 2302             (         main.asm):01213                 bls no1@
-2D0F 6CC4             (         main.asm):01214                 inc ,u          ; chase right
-2D11 2402             (         main.asm):01215         no1@    bhs no2@
-2D13 6AC4             (         main.asm):01216                 dec ,u          ; chase left
-2D15 E141             (         main.asm):01217         no2@    cmpb 1,u        ; compare target y with current y
-2D17 2302             (         main.asm):01218                 bls no3@
-2D19 6C41             (         main.asm):01219                 inc 1,u         ; chase down
-2D1B 2402             (         main.asm):01220         no3@    bhs no4@
-2D1D 6A41             (         main.asm):01221                 dec 1,u         ; chase up
-2D1F 39               (         main.asm):01222         no4@    rts
+2D09                  (         main.asm):01211         chase
+2D09 A1C4             (         main.asm):01212                 cmpa ,u         ; compare target x with current x
+2D0B 2302             (         main.asm):01213                 bls no1@
+2D0D 6CC4             (         main.asm):01214                 inc ,u          ; chase right
+2D0F 2402             (         main.asm):01215         no1@    bhs no2@
+2D11 6AC4             (         main.asm):01216                 dec ,u          ; chase left
+2D13 E141             (         main.asm):01217         no2@    cmpb 1,u        ; compare target y with current y
+2D15 2302             (         main.asm):01218                 bls no3@
+2D17 6C41             (         main.asm):01219                 inc 1,u         ; chase down
+2D19 2402             (         main.asm):01220         no3@    bhs no4@
+2D1B 6A41             (         main.asm):01221                 dec 1,u         ; chase up
+2D1D 39               (         main.asm):01222         no4@    rts
                       (         main.asm):01223         
-2D20                  (         main.asm):01224         zprog
+2D1E                  (         main.asm):01224         zprog
                       (         main.asm):01225         
                       (         main.asm):01226                 * Intercept "Close File" hook to autostart program
                       (         main.asm):01227                 org $a42e
