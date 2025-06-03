@@ -33,6 +33,8 @@ kbbusy	rmb 1 ; keyboard busy
 player	rmb 2 ; global player coordinates
 dead	rmb 1 ; player died flag
 
+KEYBUF equ $152
+
 	org $E00
 start
 	* Disable interrupts
@@ -167,14 +169,36 @@ notu@
 
 * Restart game on any key
 endgame
-	jsr [$a000] ; wait for keyup
-	bne endgame
+	;jsr [$a000] ; wait for keyup
+	;bne endgame
+	clra	    ; clear keyboard
+	clrb
+	std KEYBUF
+	std KEYBUF+2
+	std KEYBUF+4
+	std KEYBUF+6
 loop@
 	jsr [$a000] ; wait for keydown
 	beq loop@
 	cmpa #3	    ; is it BREAK?
 	lbeq reset  ; exit to BASIC
-	lbra start  ; restart game
+	cmpa #8	    ; ignore all navigation keys
+	beq loop@
+	cmpa #9
+	beq loop@
+	cmpa #10
+	beq loop@
+	cmpa #94
+	beq loop@
+	cmpa #'H'
+	beq loop@
+	cmpa #'J'
+	beq loop@
+	cmpa #'K'
+	beq loop@
+	cmpa #'L'
+	beq loop@
+	lbra start  ; any other key will restart game
 
 tfrxy	ldd ,x++
 	std ,y++
@@ -1103,22 +1127,29 @@ loop@	ldd ,u
 	incb
 	lbsr curspos
 	ldx textptr
-	lbsr isaggro		; Is player in monster aggro area?
+	lbsr isaggro		; Is player in enemy aggro area?
 	bcs aggro@
 noaggro@
-	ldd #$1b*256+$10	; No
+	ldd #$1b*256+$10	; No, draw without highlight
 	bra draw@
 aggro@
-	ldd #$1b*256+$38	; Yes
+	ldd #$1b*256+$38	; Yes, draw with highlight
 draw@
-	pshs a
+	pshs d
+        ldd ,u
+        suba origin
+        subb origin+1
+        incb
+        incb
+        lbsr curspos
+        ldx textptr
 	lda ,x
 	cmpa #'O'
 	bne notdead@
 	inc dead		; Game over flag
 notdead@
-	puls a
-	std ,x
+	puls d
+	std ,x			; Draw enemy
 *	
 next@	leau 6,u
 	bra loop@
@@ -1127,7 +1158,7 @@ exit@	rts
 * Is player within aggro area?
 *
 * Entry:
-*	U points to monster entry in table
+*	U points to enemy entry in table
 *	    ,U	xpos
 *	    1,U	ypos
 *	    2,U	xcenter
@@ -1181,18 +1212,14 @@ chase
 	cmpa ,u		; compare target x with current x
 	bls no1@
 	inc ,u		; chase right
-	;bra no2@
 no1@	bhs no2@
 	dec ,u		; chase left
-no2@
-	cmpb 1,u	; compare target y with current y
+no2@	cmpb 1,u	; compare target y with current y
 	bls no3@
 	inc 1,u		; chase down
-	;bra no4@
 no3@	bhs no4@
 	dec 1,u		; chase up
-no4@
-	rts
+no4@	rts
 
 zprog
 
