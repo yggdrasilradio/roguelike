@@ -32,6 +32,7 @@ timer	rmb 1
 kbbusy	rmb 1 ; keyboard busy
 player	rmb 2 ; global player coordinates
 dead	rmb 1 ; player died flag
+health	rmb 1 ; player health
 
 KEYBUF equ $152
 
@@ -70,6 +71,10 @@ start
 	* Initial player position
 	ldd #40*256+10
 	std playerx
+
+	* Init health
+	lda #100
+	sta health
 
 	* Clear score
 	clra
@@ -660,6 +665,8 @@ exit@	leas 2,s
 	rts
 
 line1a	fcs /Score: /
+line1b	fcs /  Health: /
+line1c	fcs /%/
 line1d	fcs /Keys found: /
 line1e	fcs /none/
 line2a	fcs /Temple of Rogue/
@@ -675,9 +682,17 @@ status
 	lbsr curspos
 	leau line1a,pcr ; "Score: "
 	lbsr printline
-
 	ldd score	; {score}
 	lbsr prnum
+	lbsr printline
+
+	leau line1b,pcr	; " Health: "
+	lbsr printline
+	clra
+	ldb health	; {health}
+	lbsr prnum
+	lbsr printline
+	leau line1c,pcr	; "%"
 	lbsr printline
 
 	clra
@@ -1146,7 +1161,15 @@ draw@
 	lda ,x
 	cmpa #'O'
 	bne notdead@
-	;inc dead		; Game over flag DISABLE FOR NOW
+	dec health		; health = health - 1%
+*
+	pshs u
+	leau gothurt,pcr	; "Ow, that hurt!"
+	lbsr prstatus1
+	puls u
+*
+	bne notdead@
+	inc dead		; Game over flag
 notdead@
 	puls d
 	std ,x			; Draw enemy
@@ -1154,6 +1177,8 @@ notdead@
 next@	leau 6,u
 	bra loop@
 exit@	rts
+
+gothurt	fcs /Ow, that hurt!/
 
 * Is player within aggro area?
 *

@@ -9,9 +9,7 @@ Work in progress.  It's playable, but just barely.
 
 **Todo**
 
-- Player death disabled for now
-- Add combat of some kind so the enemies don't invariably kill you
-- Make this into some kind of reasonable game
+- Add health buffs, shields, swords
 
 **Done**
 
@@ -41,3 +39,4 @@ Work in progress.  It's playable, but just barely.
 - Improve the key repeat
 - Add enemies
 - Fix enemy chase logic
+- Introduce "health" stat
