@@ -9,6 +9,7 @@ Work in progress.  It's playable, but just barely.
 
 **Todo**
 
+- Add combat of some kind so the enemies don't invariably kill you
 - Make this into some kind of reasonable game
 
 **Done**
