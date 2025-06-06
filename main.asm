@@ -870,7 +870,7 @@ gold@
 	addd #50
 	std score
 	leay gotgold,pcr
-	lbsr prstatus1	; "Found +50 gold"
+	lbsr prstatus1	; "Found +50 gold!"
 	bra next@
 draw@	ldd 2,u		; draw object
 	ldx textptr
@@ -879,7 +879,7 @@ next@	leau 4,u
 	lbra loop@
 exit@	rts
 
-gotgold fcs /Found +50 gold/
+gotgold fcs /Found +50 gold!/
 gotkey fcs /Found a key!/
 gotswd	fcs /Found a sword!/
 gotshd	fcs /Found a shield!/
@@ -1214,12 +1214,25 @@ draw@
         ldx textptr
 	lda ,x
 	cmpa #'O'
-	bne notdead@
-	dec health		; health = health - 1%
+	bne nothit@
+	* Dragon hits player
+	tst nsword		; holding a sword?
+	beq nosword@
+	leay killed,pcr		; "You killed a dragon!"
+	clr ,u			; kill dragon
+	clr 1,u
+	bra nothit@
+nosword@
 	leay gothurt,pcr	; "The dragon attacks you!"
-	bne notdead@
+	;dec health		; health = health - 1%
+	tst nshield
+	bne shielded@
+	dec health		; health = health - 1%
+	dec health		; health = health - 1%
+shielded@
+	bne nothit@
 	inc dead		; Game over flag
-notdead@
+nothit@
 	lbsr prstatus1		; and display it
 	puls d			; Retrieve text and attributes
 	std ,x			; Draw enemy
@@ -1229,6 +1242,7 @@ exit@	rts
 
 gothurt	fcs /The dragon attacks you!/
 yousee	fcs /You see a dragon!/
+killed	fcs /You killed a dragon!/
 
 * Is player within aggro area?
 *
@@ -1283,6 +1297,7 @@ notaggro@
 	clra		; clear carry
 	rts
 
+* Seek after player
 chase
 	cmpa ,u		; compare target x with current x
 	bls no1@
@@ -1295,6 +1310,13 @@ no2@	cmpb 1,u	; compare target y with current y
 no3@	bhs no4@
 	dec 1,u		; chase up
 no4@	rts
+
+* Decrement until zero
+takeaway
+	deca
+	bge exit@
+	clra
+exit@	rts
 
 zprog
 

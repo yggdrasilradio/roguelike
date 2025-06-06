@@ -9,7 +9,8 @@ Work in progress.  It's playable, but just barely.
 
 **Todo**
 
-- Make swords and shields actually do something
+- Swords and shields are "working," but not in a reasonable way
+- Show player, not dragon, when dragon dies
 
 **Done**
 
