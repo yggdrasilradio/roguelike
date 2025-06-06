@@ -3499,27 +3499,27 @@
 2F19                  (         main.asm):01181         drawenemies
 2F19 CE6200           (         main.asm):01182                 ldu #ENEMIES
 2F1C ECC4             (         main.asm):01183         loop@   ldd ,u
-2F1E 2767             (         main.asm):01184                 beq next@
+2F1E 2769             (         main.asm):01184                 beq next@
 2F20 1083FFFF         (         main.asm):01185                 cmpd #$ffff
-2F24 2765             (         main.asm):01186                 beq exit@
+2F24 2767             (         main.asm):01186                 beq exit@
                       (         main.asm):01187         *
 2F26 ECC4             (         main.asm):01188                 ldd ,u
 2F28 108E0000         (         main.asm):01189                 ldy #0
 2F2C 9004             (         main.asm):01190                 suba origin
 2F2E D005             (         main.asm):01191                 subb origin+1
 2F30 17E158           (         main.asm):01192                 lbsr isvisible
-2F33 2452             (         main.asm):01193                 bcc next@
+2F33 2454             (         main.asm):01193                 bcc next@
 2F35 5C               (         main.asm):01194                 incb
 2F36 5C               (         main.asm):01195                 incb
 2F37 17E131           (         main.asm):01196                 lbsr curspos
 2F3A 9E00             (         main.asm):01197                 ldx textptr
-2F3C 170089           (         main.asm):01198                 lbsr isaggro            ; Is player in enemy aggro area?
+2F3C 17008B           (         main.asm):01198                 lbsr isaggro            ; Is player in enemy aggro area?
 2F3F 2505             (         main.asm):01199                 bcs aggro@
 2F41                  (         main.asm):01200         noaggro@
 2F41 CC1B10           (         main.asm):01201                 ldd #$1b*256+$10        ; No, draw without highlight
 2F44 2007             (         main.asm):01202                 bra draw@
 2F46                  (         main.asm):01203         aggro@
-2F46 318D0059         (         main.asm):01204                 leay yousee,pcr         ; "You see a dragon!"
+2F46 318D005B         (         main.asm):01204                 leay yousee,pcr         ; "You see a dragon!"
 2F4A CC1B38           (         main.asm):01205                 ldd #$1b*256+$38        ; Yes, draw with highlight
 2F4D                  (         main.asm):01206         draw@
 2F4D 3406             (         main.asm):01207                 pshs d                  ; save text and attributes
@@ -3532,120 +3532,122 @@
 2F5A 9E00             (         main.asm):01214                 ldx textptr
 2F5C A684             (         main.asm):01215                 lda ,x
 2F5E 814F             (         main.asm):01216                 cmpa #'O'
-2F60 261E             (         main.asm):01217                 bne nothit@
+2F60 2620             (         main.asm):01217                 bne nothit@
                       (         main.asm):01218                 * Dragon hits player
 2F62 0D22             (         main.asm):01219                 tst nsword              ; holding a sword?
-2F64 270A             (         main.asm):01220                 beq nosword@
-2F66 318D004A         (         main.asm):01221                 leay killed,pcr         ; "You killed a dragon!"
+2F64 270C             (         main.asm):01220                 beq nosword@
+2F66 318D004C         (         main.asm):01221                 leay killed,pcr         ; "You killed a dragon!"
 2F6A 6FC4             (         main.asm):01222                 clr ,u                  ; kill dragon
 2F6C 6F41             (         main.asm):01223                 clr 1,u
-2F6E 2010             (         main.asm):01224                 bra nothit@
-2F70                  (         main.asm):01225         nosword@
-2F70 318D0018         (         main.asm):01226                 leay gothurt,pcr        ; "The dragon attacks you!"
-                      (         main.asm):01227                 ;dec health             ; health = health - 1%
-2F74 0D21             (         main.asm):01228                 tst nshield
-2F76 2604             (         main.asm):01229                 bne shielded@
-2F78 0A2F             (         main.asm):01230                 dec health              ; health = health - 1%
+2F6E 3262             (         main.asm):01224                 leas 2,s                ; throw away text and attributes
+2F70 2014             (         main.asm):01225                 bra nodraw@             ; don't draw dragon, it's gone
+2F72                  (         main.asm):01226         nosword@
+2F72 318D0018         (         main.asm):01227                 leay gothurt,pcr        ; "The dragon attacks you!"
+                      (         main.asm):01228                 ;dec health             ; health = health - 1%
+2F76 0D21             (         main.asm):01229                 tst nshield
+2F78 2604             (         main.asm):01230                 bne shielded@
 2F7A 0A2F             (         main.asm):01231                 dec health              ; health = health - 1%
-2F7C                  (         main.asm):01232         shielded@
-2F7C 2602             (         main.asm):01233                 bne nothit@
-2F7E 0C2E             (         main.asm):01234                 inc dead                ; Game over flag
-2F80                  (         main.asm):01235         nothit@
-2F80 17FE2E           (         main.asm):01236                 lbsr prstatus1          ; and display it
-2F83 3506             (         main.asm):01237                 puls d                  ; Retrieve text and attributes
-2F85 ED84             (         main.asm):01238                 std ,x                  ; Draw enemy
-2F87 3346             (         main.asm):01239         next@   leau 6,u
-2F89 2091             (         main.asm):01240                 bra loop@
-2F8B 39               (         main.asm):01241         exit@   rts
-                      (         main.asm):01242         
-2F8C 5468652064726167 (         main.asm):01243         gothurt fcs /The dragon attacks you!/
+2F7C 0A2F             (         main.asm):01232                 dec health              ; health = health - 1%
+2F7E                  (         main.asm):01233         shielded@
+2F7E 2602             (         main.asm):01234                 bne nothit@
+2F80 0C2E             (         main.asm):01235                 inc dead                ; game over flag
+2F82                  (         main.asm):01236         nothit@
+2F82 3506             (         main.asm):01237                 puls d                  ; retrieve text and attributes
+2F84 ED84             (         main.asm):01238                 std ,x                  ; draw enemy
+2F86                  (         main.asm):01239         nodraw@
+2F86 17FE28           (         main.asm):01240                 lbsr prstatus1          ; update status line
+2F89 3346             (         main.asm):01241         next@   leau 6,u
+2F8B 208F             (         main.asm):01242                 bra loop@
+2F8D 39               (         main.asm):01243         exit@   rts
+                      (         main.asm):01244         
+2F8E 5468652064726167 (         main.asm):01245         gothurt fcs /The dragon attacks you!/
      6F6E206174746163
      6B7320796F75A1
-2FA3 596F752073656520 (         main.asm):01244         yousee  fcs /You see a dragon!/
+2FA5 596F752073656520 (         main.asm):01246         yousee  fcs /You see a dragon!/
      6120647261676F6E
      A1
-2FB4 596F75206B696C6C (         main.asm):01245         killed  fcs /You killed a dragon!/
+2FB6 596F75206B696C6C (         main.asm):01247         killed  fcs /You killed a dragon!/
      6564206120647261
      676F6EA1
-                      (         main.asm):01246         
-                      (         main.asm):01247         * Is player within aggro area?
-                      (         main.asm):01248         *
-                      (         main.asm):01249         * Entry:
-                      (         main.asm):01250         *       U points to enemy entry in table
-                      (         main.asm):01251         *           ,U  xpos
-                      (         main.asm):01252         *           1,U ypos
-                      (         main.asm):01253         *           2,U xcenter
-                      (         main.asm):01254         *           3,U ycenter
-                      (         main.asm):01255         *           4,U xdelta
-                      (         main.asm):01256         *           5,U ydelta
-                      (         main.asm):01257         * Calling sequence:
-                      (         main.asm):01258         *       lbsr isaggro
-                      (         main.asm):01259         *       bcc notaggro
-                      (         main.asm):01260         *       bcs aggro
-2FC8                  (         main.asm):01261         isaggro
-2FC8 DC11             (         main.asm):01262                 ldd playerx     ; local coordinates of player
-2FCA 9B04             (         main.asm):01263                 adda origin
-2FCC DB05             (         main.asm):01264                 addb origin+1
-2FCE DD2C             (         main.asm):01265                 std player      ; global coordinates of player
-                      (         main.asm):01266         *
-2FD0 EC42             (         main.asm):01267                 ldd 2,u         ; xcenter, ycenter
-2FD2 A044             (         main.asm):01268                 suba 4,u        ; a = left edge of aggro area
-2FD4 E045             (         main.asm):01269                 subb 5,u        ; b = upper edge of aggro area
-2FD6 5C               (         main.asm):01270                 incb
-2FD7 5C               (         main.asm):01271                 incb
-2FD8 912C             (         main.asm):01272                 cmpa player     ; is left edge of aggro area to right of player?
-2FDA 221D             (         main.asm):01273                 bhi notaggro@
-2FDC D12D             (         main.asm):01274                 cmpb player+1   ; is upper edge of aggro aread below player?
-2FDE 2219             (         main.asm):01275                 bhi notaggro@
-                      (         main.asm):01276         *
-2FE0 EC42             (         main.asm):01277                 ldd 2,u         ; xcenter, ycenter
-2FE2 AB44             (         main.asm):01278                 adda 4,u        ; a = right edge of aggro area
-2FE4 EB45             (         main.asm):01279                 addb 5,u        ; b = lower edge of aggro area
-2FE6 5C               (         main.asm):01280                 incb
-2FE7 5C               (         main.asm):01281                 incb
-2FE8 912C             (         main.asm):01282                 cmpa player     ; is right edge of aggro area to left of player?
-2FEA 250D             (         main.asm):01283                 blo notaggro@
-2FEC D12D             (         main.asm):01284                 cmpb player+1   ; is lower edge of aggro area above player?
-2FEE 2509             (         main.asm):01285                 blo notaggro@
-                      (         main.asm):01286         *
-2FF0                  (         main.asm):01287         aggro@
-2FF0 DC2C             (         main.asm):01288                 ldd player      ; chase player
-2FF2 5A               (         main.asm):01289                 decb
-2FF3 5A               (         main.asm):01290                 decb
-2FF4 170009           (         main.asm):01291                 lbsr chase
-2FF7 43               (         main.asm):01292                 coma            ; set carry
-2FF8 39               (         main.asm):01293                 rts
-2FF9                  (         main.asm):01294         notaggro@
-2FF9 EC42             (         main.asm):01295                 ldd 2,u         ; return to home position
-2FFB 170002           (         main.asm):01296                 lbsr chase
-2FFE 4F               (         main.asm):01297                 clra            ; clear carry
-2FFF 39               (         main.asm):01298                 rts
-                      (         main.asm):01299         
-                      (         main.asm):01300         * Seek after player
-3000                  (         main.asm):01301         chase
-3000 A1C4             (         main.asm):01302                 cmpa ,u         ; compare target x with current x
-3002 2302             (         main.asm):01303                 bls no1@
-3004 6CC4             (         main.asm):01304                 inc ,u          ; chase right
-3006 2402             (         main.asm):01305         no1@    bhs no2@
-3008 6AC4             (         main.asm):01306                 dec ,u          ; chase left
-300A E141             (         main.asm):01307         no2@    cmpb 1,u        ; compare target y with current y
-300C 2302             (         main.asm):01308                 bls no3@
-300E 6C41             (         main.asm):01309                 inc 1,u         ; chase down
-3010 2402             (         main.asm):01310         no3@    bhs no4@
-3012 6A41             (         main.asm):01311                 dec 1,u         ; chase up
-3014 39               (         main.asm):01312         no4@    rts
-                      (         main.asm):01313         
-                      (         main.asm):01314         * Decrement until zero
-3015                  (         main.asm):01315         takeaway
-3015 4A               (         main.asm):01316                 deca
-3016 2C01             (         main.asm):01317                 bge exit@
-3018 4F               (         main.asm):01318                 clra
-3019 39               (         main.asm):01319         exit@   rts
-                      (         main.asm):01320         
-301A                  (         main.asm):01321         zprog
+                      (         main.asm):01248         
+                      (         main.asm):01249         * Is player within aggro area?
+                      (         main.asm):01250         *
+                      (         main.asm):01251         * Entry:
+                      (         main.asm):01252         *       U points to enemy entry in table
+                      (         main.asm):01253         *           ,U  xpos
+                      (         main.asm):01254         *           1,U ypos
+                      (         main.asm):01255         *           2,U xcenter
+                      (         main.asm):01256         *           3,U ycenter
+                      (         main.asm):01257         *           4,U xdelta
+                      (         main.asm):01258         *           5,U ydelta
+                      (         main.asm):01259         * Calling sequence:
+                      (         main.asm):01260         *       lbsr isaggro
+                      (         main.asm):01261         *       bcc notaggro
+                      (         main.asm):01262         *       bcs aggro
+2FCA                  (         main.asm):01263         isaggro
+2FCA DC11             (         main.asm):01264                 ldd playerx     ; local coordinates of player
+2FCC 9B04             (         main.asm):01265                 adda origin
+2FCE DB05             (         main.asm):01266                 addb origin+1
+2FD0 DD2C             (         main.asm):01267                 std player      ; global coordinates of player
+                      (         main.asm):01268         *
+2FD2 EC42             (         main.asm):01269                 ldd 2,u         ; xcenter, ycenter
+2FD4 A044             (         main.asm):01270                 suba 4,u        ; a = left edge of aggro area
+2FD6 E045             (         main.asm):01271                 subb 5,u        ; b = upper edge of aggro area
+2FD8 5C               (         main.asm):01272                 incb
+2FD9 5C               (         main.asm):01273                 incb
+2FDA 912C             (         main.asm):01274                 cmpa player     ; is left edge of aggro area to right of player?
+2FDC 221D             (         main.asm):01275                 bhi notaggro@
+2FDE D12D             (         main.asm):01276                 cmpb player+1   ; is upper edge of aggro aread below player?
+2FE0 2219             (         main.asm):01277                 bhi notaggro@
+                      (         main.asm):01278         *
+2FE2 EC42             (         main.asm):01279                 ldd 2,u         ; xcenter, ycenter
+2FE4 AB44             (         main.asm):01280                 adda 4,u        ; a = right edge of aggro area
+2FE6 EB45             (         main.asm):01281                 addb 5,u        ; b = lower edge of aggro area
+2FE8 5C               (         main.asm):01282                 incb
+2FE9 5C               (         main.asm):01283                 incb
+2FEA 912C             (         main.asm):01284                 cmpa player     ; is right edge of aggro area to left of player?
+2FEC 250D             (         main.asm):01285                 blo notaggro@
+2FEE D12D             (         main.asm):01286                 cmpb player+1   ; is lower edge of aggro area above player?
+2FF0 2509             (         main.asm):01287                 blo notaggro@
+                      (         main.asm):01288         *
+2FF2                  (         main.asm):01289         aggro@
+2FF2 DC2C             (         main.asm):01290                 ldd player      ; chase player
+2FF4 5A               (         main.asm):01291                 decb
+2FF5 5A               (         main.asm):01292                 decb
+2FF6 170009           (         main.asm):01293                 lbsr chase
+2FF9 43               (         main.asm):01294                 coma            ; set carry
+2FFA 39               (         main.asm):01295                 rts
+2FFB                  (         main.asm):01296         notaggro@
+2FFB EC42             (         main.asm):01297                 ldd 2,u         ; return to home position
+2FFD 170002           (         main.asm):01298                 lbsr chase
+3000 4F               (         main.asm):01299                 clra            ; clear carry
+3001 39               (         main.asm):01300                 rts
+                      (         main.asm):01301         
+                      (         main.asm):01302         * Seek after player
+3002                  (         main.asm):01303         chase
+3002 A1C4             (         main.asm):01304                 cmpa ,u         ; compare target x with current x
+3004 2302             (         main.asm):01305                 bls no1@
+3006 6CC4             (         main.asm):01306                 inc ,u          ; chase right
+3008 2402             (         main.asm):01307         no1@    bhs no2@
+300A 6AC4             (         main.asm):01308                 dec ,u          ; chase left
+300C E141             (         main.asm):01309         no2@    cmpb 1,u        ; compare target y with current y
+300E 2302             (         main.asm):01310                 bls no3@
+3010 6C41             (         main.asm):01311                 inc 1,u         ; chase down
+3012 2402             (         main.asm):01312         no3@    bhs no4@
+3014 6A41             (         main.asm):01313                 dec 1,u         ; chase up
+3016 39               (         main.asm):01314         no4@    rts
+                      (         main.asm):01315         
+                      (         main.asm):01316         * Decrement until zero
+3017                  (         main.asm):01317         takeaway
+3017 4A               (         main.asm):01318                 deca
+3018 2C01             (         main.asm):01319                 bge exit@
+301A 4F               (         main.asm):01320                 clra
+301B 39               (         main.asm):01321         exit@   rts
                       (         main.asm):01322         
-                      (         main.asm):01323                 * Intercept "Close File" hook to autostart program
-                      (         main.asm):01324                 org $a42e
-A42E 0E00             (         main.asm):01325                 fdb start
-                      (         main.asm):01326         
-                      (         main.asm):01327                 end start
+301C                  (         main.asm):01323         zprog
+                      (         main.asm):01324         
+                      (         main.asm):01325                 * Intercept "Close File" hook to autostart program
+                      (         main.asm):01326                 org $a42e
+A42E 0E00             (         main.asm):01327                 fdb start
+                      (         main.asm):01328         
+                      (         main.asm):01329                 end start

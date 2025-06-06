@@ -10,7 +10,6 @@ Work in progress.  It's playable, but just barely.
 **Todo**
 
 - Swords and shields are "working," but not in a reasonable way
-- Show player, not dragon, when dragon dies
 
 **Done**
 
@@ -42,3 +41,4 @@ Work in progress.  It's playable, but just barely.
 - Fix enemy chase logic
 - Introduce "health" stat
 - Add potions, shields, swords
+- Show player, not dragon, when dragon dies

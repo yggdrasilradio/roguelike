@@ -1221,7 +1221,8 @@ draw@
 	leay killed,pcr		; "You killed a dragon!"
 	clr ,u			; kill dragon
 	clr 1,u
-	bra nothit@
+	leas 2,s		; throw away text and attributes
+	bra nodraw@		; don't draw dragon, it's gone
 nosword@
 	leay gothurt,pcr	; "The dragon attacks you!"
 	;dec health		; health = health - 1%
@@ -1231,11 +1232,12 @@ nosword@
 	dec health		; health = health - 1%
 shielded@
 	bne nothit@
-	inc dead		; Game over flag
+	inc dead		; game over flag
 nothit@
-	lbsr prstatus1		; and display it
-	puls d			; Retrieve text and attributes
-	std ,x			; Draw enemy
+	puls d			; retrieve text and attributes
+	std ,x			; draw enemy
+nodraw@
+	lbsr prstatus1		; update status line
 next@	leau 6,u
 	bra loop@
 exit@	rts
