@@ -9,7 +9,7 @@ Work in progress.  It's playable, but just barely.
 
 **Todo**
 
-- Add health buffs, shields, swords
+- Make swords and shields actually do something
 
 **Done**
 
@@ -40,3 +40,4 @@ Work in progress.  It's playable, but just barely.
 - Add enemies
 - Fix enemy chase logic
 - Introduce "health" stat
+- Add potions, shields, swords

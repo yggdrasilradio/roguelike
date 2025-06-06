@@ -22,7 +22,9 @@ key1	rmb 1
 key2	rmb 1
 key3	rmb 1
 key4	rmb 1
-nkeys	rmb 1
+nshield	rmb 1
+nsword	rmb 1
+nfound	rmb 1
 vcount	rmb 1
 secs	rmb 1
 mins	rmb 1
@@ -91,11 +93,13 @@ start
 	* Clear keyboard busy timer
 	sta kbbusy
 
-	* Clear key flags
+	* Clear found object flags
 	sta key1
 	sta key2
 	sta key3
 	sta key4
+	sta nsword
+	sta nshield
 
 	* Clear elapsed time
 	sta secs
@@ -137,9 +141,9 @@ exit@
 
 	* Idle loop
 loop@
-	lbsr prtime	; Elapsed time
+	lbsr prtime	; elapsed time
 	lbsr keycheck
-	tst dead	; End game if player has won or lost
+	tst dead	; end game if player has won or lost
 	bne endgame
 	tst nobjs
 	beq endgame
@@ -223,8 +227,8 @@ drawframe
 	lbsr hlines
 	lbsr drawdoors
 	lbsr drawplayer
-	lbsr drawobjects
 	lbsr drawenemies
+	lbsr drawobjects
 	lbsr status
 	lbsr updstatus1
 	bsr flipscreen
@@ -667,8 +671,8 @@ exit@	leas 2,s
 line1a	fcs /Score: /
 line1b	fcs /  Health: /
 line1c	fcs /%/
-line1d	fcs /Keys found: /
-line1e	fcs /none/
+line1d	fcs /Found: /
+line1e	fcs /nothing/
 line2a	fcs /Temple of Rogue/
 line2b	fcs /by Rick Adams/
 youwon	fcs /You have conquered the Temple of Rogue!/
@@ -695,36 +699,47 @@ status
 	leau line1c,pcr	; "%"
 	lbsr printline
 
+	* Count how many "Found:" icons to display
 	clra
-	sta nkeys
+	sta nfound
 	tst key1
 	beq nokey1@
-	inc nkeys
+	inc nfound
 nokey1@	tst key2
 	beq nokey2@
-	inc nkeys
+	inc nfound
 nokey2@	tst key3
 	beq nokey3@
-	inc nkeys
+	inc nfound
 nokey3@	tst key4
 	beq nokey4@
-	inc nkeys
-nokey4@ lda #80-12
-	suba nkeys
-	tst nkeys
+	inc nfound
+nokey4@
+	tst nshield
+	beq noshield@
+	inc nfound
+noshield@
+	tst nsword
+	beq nosword@
+	inc nfound
+nosword@
+
+	lda #80-7
+	suba nfound
+	tst nfound
 	bne keys@
-	suba #4
+	suba #7		; strlen("nothing")
 keys@	clrb
 	lbsr curspos
 	leau line1d,pcr
-	lbsr printline ; "Keys found: "
-	tst nkeys
+	lbsr printline	; "Found: "
+	tst nfound
 	bne prkeys@
 	leau line1e,pcr
-	lbsr printline ; "none"
+	lbsr printline	; "nothing"
 	bra done@
 prkeys@ ldx textptr
-	lda #$5f
+	lda #$5f	; key icon
 	* Show key1
 	ldb key1
 	beq no1@
@@ -739,8 +754,19 @@ no2@	ldb key3
 	std ,x++
 	* Show key4
 no3@	ldb key4
-	beq done@
+	beq no4@
 	std ,x++
+	* Show shield
+no4@	tst nshield
+	beq noshd@
+	ldd #$1a*256+$18
+	std ,x++
+	* Show sword
+noshd@	tst nsword
+	beq noswd@
+	ldd #$5e*256+$18
+	std ,x++
+noswd@
 done@
 	* Status line two
 	clra
@@ -776,27 +802,60 @@ drawobjects
 	ldu #OBJS
 loop@	ldd ,u
 	cmpd #$ffff
-	beq exit@
+	lbeq exit@
 	suba origin	; map to viewport
 	subb origin+1
 	lbsr isvisible
-	bcc next@
+	lbcc next@
 	incb
 	incb
 	lbsr curspos
 	ldx textptr
 	lda ,x		; is player there?
 	cmpa #'O'
-	bne draw@
+	lbne draw@
 	clr ,u		; delete object
 	clr 1,u
 	dec nobjs	; one less object
-	lda 2,u		; is it gold?
-	;cmpa #'$'
-	cmpa #$18
+	lda 2,u		; get object character
+	cmpa #$18	; is it gold?
 	beq gold@
 	cmpa #$5f	; is it a key?
-	bne next@
+	beq key@
+* Other objects (shield, sword) go here
+	cmpa #$5e	; is it a sword?
+	beq sword@
+	cmpa #$1a	; is it a shield?
+	beq shield@
+	cmpa #$1d	; is it a potion?
+	beq potion@
+	bra next@	; ignore
+potion@
+	pshs u
+	leau gotptn,pcr
+	lbsr prstatus1	; "Drank a potion!"
+	puls u
+	lda health
+	adda #10	; increase health by 10%
+	cmpa #100
+	bls health@
+	lda #100	; can't top off over 100%
+health@	sta health
+	bra next@
+sword@
+	inc nsword
+	pshs u
+	leau gotswd,pcr
+	lbsr prstatus1	; "Found a sword!"
+	puls u
+	bra next@
+shield@
+	inc nshield
+	pshs u
+	leau gotshd,pcr
+	lbsr prstatus1	; "Found a shield!"
+	puls u
+	bra next@
 key@
 	pshs u
 	leau gotkey,pcr
@@ -822,18 +881,21 @@ gold@
 	std score
 	pshs u
 	leau gotgold,pcr
-	lbsr prstatus1	; "+50 gold"
+	lbsr prstatus1	; "Found +50 gold"
 	puls u
 	bra next@
 draw@	ldd 2,u		; draw object
 	ldx textptr
 	std ,x
 next@	leau 4,u
-	bra loop@
+	lbra loop@
 exit@	rts
 
-gotgold fcs /+50 gold/
+gotgold fcs /Found +50 gold/
 gotkey fcs /Found a key!/
+gotswd	fcs /Found a sword!/
+gotshd	fcs /Found a shield!/
+gotptn	fcs /Drank a potion!/
 
 * Read keyboard
 *
@@ -1134,6 +1196,7 @@ loop@	ldd ,u
 	beq exit@
 *
 	ldd ,u
+	ldy #0
 	suba origin
 	subb origin+1
 	lbsr isvisible
@@ -1148,9 +1211,10 @@ noaggro@
 	ldd #$1b*256+$10	; No, draw without highlight
 	bra draw@
 aggro@
+	leay yousee,pcr		; "You see a dragon!"
 	ldd #$1b*256+$38	; Yes, draw with highlight
 draw@
-	pshs d
+	pshs d			; save text and attributes
         ldd ,u
         suba origin
         subb origin+1
@@ -1162,23 +1226,25 @@ draw@
 	cmpa #'O'
 	bne notdead@
 	dec health		; health = health - 1%
-*
-	pshs u
-	leau gothurt,pcr	; "Ow, that hurt!"
-	lbsr prstatus1
-	puls u
-*
+	leay gothurt,pcr	; "The dragon attacks you!"
 	bne notdead@
 	inc dead		; Game over flag
 notdead@
-	puls d
+	leay ,y			; is there a saved status?
+	beq nomsg@
+	pshs u
+	tfr y,u			; yes, so get saved status
+	lbsr prstatus1		; and display it
+	puls u
+nomsg@
+	puls d			; Retrieve text and attributes
 	std ,x			; Draw enemy
-*	
 next@	leau 6,u
 	bra loop@
 exit@	rts
 
-gothurt	fcs /Ow, that hurt!/
+gothurt	fcs /The dragon attacks you!/
+yousee	fcs /You see a dragon!/
 
 * Is player within aggro area?
 *

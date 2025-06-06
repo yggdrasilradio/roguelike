@@ -27,7 +27,7 @@ MAROON = pix[10, 0]
 CRIMSON = pix[11, 0]
 
 # Remove color swatches
-for x in range(1, 12):
+for x in range(1, 15):
 	pix[x, 0] = BLACK
 
 width = img.size[0]

@@ -24,9 +24,12 @@ KEY3 = pix[8, 0]	# orange
 DOOR4 = pix[9, 0]	# gray
 KEY4 = pix[10, 0]	# maroon
 ENEMY = pix[11, 0]	# crimson
+POTION = pix[12, 0]	# springgreen
+SWORD = pix[13, 0]	# mintcream
+SHIELD = pix[14, 0]	# silver
 
 # Remove color swatches
-for x in range(1, 12):
+for x in range(1, 15):
 	pix[x, 0] = BACKGROUND
 
 # Text color attributes
@@ -43,6 +46,9 @@ TDOOR3 = 0x30
 TKEY4 = 0x38
 TDOOR4 = 0x38
 TENEMY = 0x10
+TPOTION = 0x18
+TSWORD = 0x18
+TSHIELD = 0x18
 
 width = img.size[0]
 height = img.size[1]
@@ -57,7 +63,6 @@ for y in range(0, height):
     for x in range(0, width):
         objtype = pix[x, y]
         if objtype == GOLD:
-	    #objects.append({"x": x, "y": y, "objtype": ord('$')*256+TGOLD})
 	    objects.append({"x": x, "y": y, "objtype": 0x18*256+TGOLD})
 	    nobjects += 1
         elif objtype == KEY1:
@@ -71,6 +76,15 @@ for y in range(0, height):
 	    nobjects += 1
         elif objtype == KEY4:
 	    objects.append({"x": x, "y": y, "objtype": 0x5f*256+TKEY4})
+	    nobjects += 1
+        elif objtype == POTION:
+	    objects.append({"x": x, "y": y, "objtype": 0x1d*256+TPOTION})
+	    nobjects += 1
+        elif objtype == SWORD:
+	    objects.append({"x": x, "y": y, "objtype": 0x5e*256+TSWORD})
+	    nobjects += 1
+        elif objtype == SHIELD:
+	    objects.append({"x": x, "y": y, "objtype": 0x1a*256+TSHIELD})
 	    nobjects += 1
 for obj in sorted(objects, key=lambda obj: (obj["x"], obj["y"])):
     x = obj["x"]

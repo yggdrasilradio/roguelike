@@ -162,6 +162,9 @@ draw.point((8, 0), fill="orange")	# KEY3
 draw.point((9, 0), fill="gray")		# DOOR4
 draw.point((10, 0), fill="maroon")	# KEY4
 draw.point((11, 0), fill="crimson")	# MONSTER
+draw.point((12, 0), fill="springgreen")	# POTION
+draw.point((13, 0), fill="mintcream")	# SWORD
+draw.point((14, 0), fill="silver")	# SHIELD
 
 # How many rooms will fit?
 ncolumns = 0
@@ -226,14 +229,51 @@ CreateBarrier("blue", "cyan")
 CreateBarrier("magenta", "orange")
 CreateBarrier("gray", "maroon")
 
-# Create objects
 nrooms = len(roomlist)
 print(str(nrooms) + " rooms generated")
-nobjects = int(nrooms / 2)
-for _ in range(0, nobjects):
-    xcenter, ycenter, xdelta, ydelta = random.choice(roomlist)
-    roomlist.remove((xcenter, ycenter, xdelta, ydelta))
+
+nobjects = 0
+
+# Create gold objects
+ngold = int(nrooms / 2)
+rooms = list(roomlist)
+for _ in range(0, ngold):
+    xcenter, ycenter, xdelta, ydelta = random.choice(rooms)
+    rooms.remove((xcenter, ycenter, xdelta, ydelta))
     CreateObject(xcenter, ycenter, xdelta, ydelta, "yellow")
+    nobjects += 1
+print(str(ngold) + " gold objects generated")
+
+# Create potion objects
+npotions = int(nrooms / 20)
+rooms = list(roomlist)
+for _ in range(0, npotions):
+    xcenter, ycenter, xdelta, ydelta = random.choice(rooms)
+    rooms.remove((xcenter, ycenter, xdelta, ydelta))
+    CreateObject(xcenter, ycenter, xdelta, ydelta, "springgreen")
+    nobjects += 1
+print(str(npotions) + " potion objects generated")
+
+# Create sword objects
+nswords = int(nrooms / 20)
+rooms = list(roomlist)
+for _ in range(0, nswords):
+    xcenter, ycenter, xdelta, ydelta = random.choice(rooms)
+    rooms.remove((xcenter, ycenter, xdelta, ydelta))
+    CreateObject(xcenter, ycenter, xdelta, ydelta, "mintcream")
+    nobjects += 1
+print(str(nswords) + " sword objects generated")
+
+# Create shield objects
+nshields = int(nrooms / 2)
+rooms = list(roomlist)
+for _ in range(0, nshields):
+    xcenter, ycenter, xdelta, ydelta = random.choice(rooms)
+    rooms.remove((xcenter, ycenter, xdelta, ydelta))
+    CreateObject(xcenter, ycenter, xdelta, ydelta, "silver")
+    nobjects += 1
+print(str(nshields) + " shield objects generated")
+
 print(str(nobjects) + " objects generated")
 
 # Save map
