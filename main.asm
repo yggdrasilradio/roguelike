@@ -610,10 +610,8 @@ drawplayer
 	cmpa #'|'+$80	; is it an unlocked door?
 	bne draw@
 door@
-	pshs x
-	leau gotdoor,pcr
+	leay gotdoor,pcr
 	lbsr prstatus1	; "Door unlocked!"
-	puls x
 draw@
 	ldd #'O'*256+PLAYER
 	std ,x
@@ -831,10 +829,8 @@ loop@	ldd ,u
 	beq potion@
 	bra next@	; ignore
 potion@
-	pshs u
-	leau gotptn,pcr
+	leay gotptn,pcr
 	lbsr prstatus1	; "Drank a potion!"
-	puls u
 	lda health
 	adda #10	; increase health by 10%
 	cmpa #100
@@ -844,23 +840,17 @@ health@	sta health
 	bra next@
 sword@
 	inc nsword
-	pshs u
-	leau gotswd,pcr
+	leay gotswd,pcr
 	lbsr prstatus1	; "Found a sword!"
-	puls u
 	bra next@
 shield@
 	inc nshield
-	pshs u
-	leau gotshd,pcr
+	leay gotshd,pcr
 	lbsr prstatus1	; "Found a shield!"
-	puls u
 	bra next@
 key@
-	pshs u
-	leau gotkey,pcr
+	leay gotkey,pcr
 	lbsr prstatus1	; "Found a key!"
-	puls u
 	lda 3,u		; key type (KEY1, KEY2, KEY3, KEY4)
 	cmpa #KEY1
 	bne key2@
@@ -879,10 +869,8 @@ gold@
 	ldd score	; add 50 to score
 	addd #50
 	std score
-	pshs u
-	leau gotgold,pcr
+	leay gotgold,pcr
 	lbsr prstatus1	; "Found +50 gold"
-	puls u
 	bra next@
 draw@	ldd 2,u		; draw object
 	ldx textptr
@@ -987,16 +975,18 @@ loop@	incb		; how many chars?
 
 * Queue status message to display on status line 1
 *
-* leau msg,pcr
+* leay msg,pcr
 * lbsr prstatus1
 *
 * msg  fcs /This is a test/
 *
 prstatus1
-	stu pmsg
+	leay ,y
+	beq exit@
+	sty pmsg
 	lda #130	; status message will persist for around 2 secs
 	sta timer
-	rts
+exit@	rts
 
 * Update status message on status line 1
 *
@@ -1230,13 +1220,7 @@ draw@
 	bne notdead@
 	inc dead		; Game over flag
 notdead@
-	leay ,y			; is there a saved status?
-	beq nomsg@
-	pshs u
-	tfr y,u			; yes, so get saved status
 	lbsr prstatus1		; and display it
-	puls u
-nomsg@
 	puls d			; Retrieve text and attributes
 	std ,x			; Draw enemy
 next@	leau 6,u
