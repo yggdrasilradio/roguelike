@@ -42,3 +42,4 @@ Work in progress.  It's playable, but just barely.
 - Introduce "health" stat
 - Add potions, shields, swords
 - Show player, not dragon, when dragon dies
+- Add second status line

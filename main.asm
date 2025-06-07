@@ -29,8 +29,10 @@ vcount	rmb 1
 secs	rmb 1
 mins	rmb 1
 hours	rmb 1
-pmsg	rmb 2
-timer	rmb 1
+pmsg1	rmb 2
+pmsg2	rmb 2
+timer1a	rmb 1
+timer1b	rmb 1
 kbbusy	rmb 1 ; keyboard busy
 player	rmb 2 ; global player coordinates
 dead	rmb 1 ; player died flag
@@ -83,9 +85,11 @@ start
 	clrb
 	std score
 
-	* Clear status message timer and pointer
-	sta timer
-	std pmsg
+	* Clear status message timers and pointers
+	sta timer1a
+	sta timer1b
+	std pmsg1
+	std pmsg2
 
 	* Clear player died flag
 	sta dead
@@ -231,6 +235,7 @@ drawframe
 	lbsr drawobjects
 	lbsr status
 	lbsr updstatus1
+	lbsr updstatus1b
 	bsr flipscreen
 	rts
 
@@ -611,7 +616,7 @@ drawplayer
 	bne draw@
 door@
 	leay gotdoor,pcr
-	lbsr prstatus1	; "Door unlocked!"
+	lbsr prstatus1a	; "Door unlocked!"
 draw@
 	ldd #'O'*256+PLAYER
 	std ,x
@@ -830,7 +835,9 @@ loop@	ldd ,u
 	bra next@	; ignore
 potion@
 	leay gotptn,pcr
-	lbsr prstatus1	; "Drank a potion!"
+	lbsr prstatus1a	; "Found a potion!"
+	leay better,pcr
+	lbsr prstatus1b	; "Drinking it, you feel much better!"
 	lda health
 	adda #10	; increase health by 10%
 	cmpa #100
@@ -841,16 +848,16 @@ health@	sta health
 sword@
 	inc nsword
 	leay gotswd,pcr
-	lbsr prstatus1	; "Found a sword!"
+	lbsr prstatus1a	; "Found a sword!"
 	bra next@
 shield@
 	inc nshield
 	leay gotshd,pcr
-	lbsr prstatus1	; "Found a shield!"
+	lbsr prstatus1a	; "Found a shield!"
 	bra next@
 key@
 	leay gotkey,pcr
-	lbsr prstatus1	; "Found a key!"
+	lbsr prstatus1a	; "Found a key!"
 	lda 3,u		; key type (KEY1, KEY2, KEY3, KEY4)
 	cmpa #KEY1
 	bne key2@
@@ -870,7 +877,7 @@ gold@
 	addd #50
 	std score
 	leay gotgold,pcr
-	lbsr prstatus1	; "Found +50 gold!"
+	lbsr prstatus1a	; "Found +50 gold!"
 	bra next@
 draw@	ldd 2,u		; draw object
 	ldx textptr
@@ -880,10 +887,11 @@ next@	leau 4,u
 exit@	rts
 
 gotgold fcs /Found +50 gold!/
-gotkey fcs /Found a key!/
+gotkey	fcs /Found a key!/
 gotswd	fcs /Found a sword!/
 gotshd	fcs /Found a shield!/
-gotptn	fcs /Drank a potion!/
+gotptn	fcs /Found a potion!/
+better	fcs /Drinking it, you feel much better!/
 
 * Read keyboard
 *
@@ -973,34 +981,69 @@ loop@	incb		; how many chars?
 	bpl loop@
 	rts
 
-* Queue status message to display on status line 1
+* Queue status message to display on first line of status area 1
 *
 * leay msg,pcr
-* lbsr prstatus1
+* lbsr prstatus1a
 *
 * msg  fcs /This is a test/
 *
-prstatus1
+prstatus1a
 	leay ,y
 	beq exit@
-	sty pmsg
+	sty pmsg1
 	lda #130	; status message will persist for around 2 secs
-	sta timer
+	sta timer1a
 exit@	rts
 
-* Update status message on status line 1
+* Queue status message to display on second line of status area 1
+*
+* leay msg,pcr
+* lbsr prstatus1b
+*
+* msg  fcs /This is a test/
+*
+prstatus1b
+	leay ,y
+	beq exit@
+	sty pmsg2
+	lda #130	; status message will persist for around 2 secs
+	sta timer1b
+exit@	rts
+
+* Update status message for first line of status area 1
 *
 updstatus1
-	ldd pmsg
+	ldd pmsg1
 	beq exit@
-	ldu pmsg
+	ldu pmsg1
 	tfr u,x
 	bsr strlen
 	lsrb
 	negb
 	addb #40
 	aslb
-	ldx screen	; center on line
+	ldx screen	; center on first line
+	abx
+loop@	lda ,u+
+	sta ,x++
+	bpl loop@
+exit@	rts
+
+* Update status message for second line of status area 1
+*
+updstatus1b
+	ldd pmsg2
+	beq exit@
+	ldu pmsg2
+	tfr u,x
+	bsr strlen
+	lsrb
+	negb
+	addb #40
+	aslb
+	ldx screen	; center on second line
+	leax 160,x
 	abx
 loop@	lda ,u+
 	sta ,x++
@@ -1036,7 +1079,7 @@ lt10@	lsrb
 	lbsr printline
 	rts
 
-* Print status message on status line 2
+* Print status message on status area 2
 *
 * leau msg,pcr
 * lbsr prstatus2
@@ -1045,7 +1088,7 @@ lt10@	lsrb
 *
 prstatus2
 	tfr u,x
-	bsr strlen
+	lbsr strlen
 	lsrb
 	negb
 	addb #40
@@ -1092,10 +1135,14 @@ next@	leau 4,u
 	bra loop@
 exit@	rts
 
-IRQ	dec timer	; has status message timed out?
+IRQ	dec timer1a	; has status message line 1 timed out?
+	bne irq0@
+	clr pmsg1	; yes, so clear status message line 1
+	clr pmsg1+1
+irq0@	dec timer1b	; has status message line 2 timed out?
 	bne irq1@
-	clr pmsg	; yes, so clear it
-	clr pmsg+1
+	clr pmsg2	; yes, so clear status message line 2
+	clr pmsg2+1
 irq1@	tst kbbusy	; keyboard busy?
 	beq irq2@
 	dec kbbusy	; decrement keyboard busy timer
@@ -1237,7 +1284,7 @@ nothit@
 	puls d			; retrieve text and attributes
 	std ,x			; draw enemy
 nodraw@
-	lbsr prstatus1		; update status line
+	lbsr prstatus1a		; update status line
 next@	leau 6,u
 	bra loop@
 exit@	rts
