@@ -3418,7 +3418,7 @@
 2E5C 2602             (         main.asm):01315                 bne shielded@
 2E5E 0A34             (         main.asm):01316                 dec health              ; health = health - 1%
 2E60                  (         main.asm):01317         shielded@
-2E60 2204             (         main.asm):01318                 bhi nothit@
+2E60 2E04             (         main.asm):01318                 bgt nothit@
 2E62 0F34             (         main.asm):01319                 clr health
 2E64 0C33             (         main.asm):01320                 inc dead                ; game over flag
 2E66                  (         main.asm):01321         nothit@
