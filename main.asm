@@ -4,6 +4,10 @@ DOORS	equ $6000
 ENEMIES	equ $6200
 OBJS	equ $6400
 
+* Tuning constants
+SWDTO	equ 50		; sword failure timeout
+SHDTO	equ 50		; shield failure timeout
+
 	org $0000
 
 textptr	rmb 2 
@@ -33,10 +37,13 @@ pmsg1	rmb 2
 pmsg2	rmb 2
 timer1a	rmb 1
 timer1b	rmb 1
+swdtmr	rmb 1
+shdtmr	rmb 1
 kbbusy	rmb 1 ; keyboard busy
 player	rmb 2 ; global player coordinates
 dead	rmb 1 ; player died flag
 health	rmb 1 ; player health
+reason	rmb 1 ; flavor text index
 
 KEYBUF equ $152
 
@@ -91,6 +98,9 @@ start
 	std pmsg1
 	std pmsg2
 
+	* Init flavor text index
+	sta reason
+
 	* Clear player died flag
 	sta dead
 
@@ -109,6 +119,10 @@ start
 	sta secs
 	sta mins
 	sta hours
+
+	* Init sword and shield failure timers
+	sta swdtmr
+	sta shdtmr
 
 	* Number of objects
 	lda #NOBJECTS
@@ -182,8 +196,6 @@ notu@
 
 * Restart game on any key
 endgame
-	;jsr [$a000] ; wait for keyup
-	;bne endgame
 	clra	    ; clear keyboard
 	clrb
 	std KEYBUF
@@ -226,6 +238,7 @@ drawframe
 	addb #20
 	std origin+2
 	sync
+	lbsr timeout
 	lbsr cls
 	lbsr vlines
 	lbsr hlines
@@ -234,7 +247,7 @@ drawframe
 	lbsr drawenemies
 	lbsr drawobjects
 	lbsr status
-	lbsr updstatus1
+	lbsr updstatus1a
 	lbsr updstatus1b
 	bsr flipscreen
 	rts
@@ -817,12 +830,14 @@ loop@	ldd ,u
 	lda ,x		; is player there?
 	cmpa #'O'
 	lbne draw@
-	clr ,u		; delete object
-	clr 1,u
-	dec nobjs	; one less object
+*
+	;clr ,u		; delete object
+	;clr 1,u
+	;dec nobjs	; one less object
+*
 	lda 2,u		; get object character
 	cmpa #$18	; is it gold?
-	beq gold@
+	lbeq gold@
 	cmpa #$5f	; is it a key?
 	beq key@
 * Other objects (shield, sword) go here
@@ -832,32 +847,52 @@ loop@	ldd ,u
 	beq shield@
 	cmpa #$1d	; is it a potion?
 	beq potion@
-	bra next@	; ignore
+	lbra next@	; ignore
 potion@
 	leay gotptn,pcr
 	lbsr prstatus1a	; "Found a potion!"
 	leay better,pcr
 	lbsr prstatus1b	; "Drinking it, you feel much better!"
+	lbsr delobj
 	lda health
-	adda #10	; increase health by 10%
+	adda #20	; increase health by 20%
 	cmpa #100
 	bls health@
 	lda #100	; can't top off over 100%
 health@	sta health
 	bra next@
 sword@
-	inc nsword
 	leay gotswd,pcr
 	lbsr prstatus1a	; "Found a sword!"
+	tst nsword
+	beq swdok@
+	leay notok,pcr	; "But you already have one!"
+	lbsr prstatus1b
+	bra next@
+swdok@
+	lbsr delobj	; get sword
+	inc nsword
+	lda #SWDTO	; set sword timeout
+	sta swdtmr
 	bra next@
 shield@
-	inc nshield
 	leay gotshd,pcr
 	lbsr prstatus1a	; "Found a shield!"
+	tst nshield
+	beq shdok@
+	leay notok,pcr	; "But you already have one!"
+	lbsr prstatus1b
+	bra next@
+shdok@
+	lbsr delobj	; get shield
+	inc nshield
+	lda #SHDTO	; set shield timeout
+	sta shdtmr
 	bra next@
 key@
 	leay gotkey,pcr
 	lbsr prstatus1a	; "Found a key!"
+	lbsr delobj
 	lda 3,u		; key type (KEY1, KEY2, KEY3, KEY4)
 	cmpa #KEY1
 	bne key2@
@@ -876,6 +911,7 @@ gold@
 	ldd score	; add 50 to score
 	addd #50
 	std score
+	lbsr delobj
 	leay gotgold,pcr
 	lbsr prstatus1a	; "Found +50 gold!"
 	bra next@
@@ -892,6 +928,7 @@ gotswd	fcs /Found a sword!/
 gotshd	fcs /Found a shield!/
 gotptn	fcs /Found a potion!/
 better	fcs /Drinking it, you feel much better!/
+notok	fcs /But you already have one!/
 
 * Read keyboard
 *
@@ -1013,7 +1050,7 @@ exit@	rts
 
 * Update status message for first line of status area 1
 *
-updstatus1
+updstatus1a
 	ldd pmsg1
 	beq exit@
 	ldu pmsg1
@@ -1135,7 +1172,8 @@ next@	leau 4,u
 	bra loop@
 exit@	rts
 
-IRQ	dec timer1a	; has status message line 1 timed out?
+IRQ
+	dec timer1a	; has status message line 1 timed out?
 	bne irq0@
 	clr pmsg1	; yes, so clear status message line 1
 	clr pmsg1+1
@@ -1272,13 +1310,13 @@ draw@
 	bra nodraw@		; don't draw dragon, it's gone
 nosword@
 	leay gothurt,pcr	; "The dragon attacks you!"
-	;dec health		; health = health - 1%
+	dec health		; health = health - 1%
 	tst nshield
 	bne shielded@
 	dec health		; health = health - 1%
-	dec health		; health = health - 1%
 shielded@
-	bne nothit@
+	bhs nothit@
+	clr health
 	inc dead		; game over flag
 nothit@
 	puls d			; retrieve text and attributes
@@ -1360,12 +1398,68 @@ no3@	bhs no4@
 	dec 1,u		; chase up
 no4@	rts
 
-* Decrement until zero
-takeaway
-	deca
-	bge exit@
-	clra
+* Delete object
+delobj
+	clr ,u		; delete object
+	clr 1,u
+	dec nobjs	; one less object
+	rts
+
+* Limit the use of shields and swords
+timeout
+	tst swdtmr
+	beq shield@
+	dec swdtmr	; count down sword timer
+	bne shield@
+	clr nsword	; no more sword
+	leay noswd,pcr	; "Oops! No more sword!"
+	lbsr prstatus1a
+	lbsr excuse
+shield@
+	tst shdtmr
+	beq exit@
+	dec shdtmr	; count down shield timer
+	bne exit@
+	clr nshield	; no more shield
+	leay noshd,pcr	; "Oops! No more shield!"
+	lbsr prstatus1a
+	lbsr excuse
 exit@	rts
+
+* Come up with a whimsical excuse for an object timing out
+excuse
+	ldb reason
+	andb #7
+	aslb
+	leay msgs,pcr
+	ldd b,y
+	leay reason0,pcr
+	leay d,y
+	;leay reason0,pcr ; DEBUG
+	lbsr prstatus1b
+	inc reason
+	rts
+
+msgs	fdb reason0-reason0
+	fdb reason1-reason0
+	fdb reason2-reason0
+	fdb reason3-reason0
+	fdb reason4-reason0
+	fdb reason5-reason0
+	fdb reason6-reason0
+	fdb reason7-reason0
+
+* Whimsical flavor text
+noshd	fcs /Oops! No more shield!/
+noswd	fcs /Oops! No more sword!/
+reason0 fcs /Gone in a poof of glitter! Unstable magic! Never order from Temu again!/
+reason1	fcs /"There it is!" An adventurer in another dimension yoinks it through a portal!/
+reason2	fcs /The gods misfiled it—-back it goes into the Vault of Misplaced Artifacts!/
+reason3	fcs /Repossessed due to unpaid taxes to the Kingdom’s Bureau of Arbitrary Fees!/
+reason4	fcs /Sorry, manufacturer recall due to faulty airbags!/
+reason5	fcs /Repossessed by the bank! Should have kept up with the payments!/
+reason6	fcs /The sentient magic object sighs, "Sorry, just not into it today!"/
+reason7	fcs /I guess it was more sorely needed over in Dungeons of Daggorath!/
 
 zprog
 

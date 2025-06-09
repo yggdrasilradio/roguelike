@@ -265,7 +265,7 @@ for _ in range(0, nswords):
 print(str(nswords) + " sword objects generated")
 
 # Create shield objects
-nshields = int(nrooms / 2)
+nshields = int(nrooms / 20)
 rooms = list(roomlist)
 for _ in range(0, nshields):
     xcenter, ycenter, xdelta, ydelta = random.choice(rooms)

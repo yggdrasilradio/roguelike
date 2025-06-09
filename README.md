@@ -5,11 +5,9 @@ Temple of Rogue
 
 Attempting to make a roguelike with some features inspired by my previous game Temple of ROM.
 
-Work in progress.  It's playable, but just barely.
+Progressing fairly well, I'd describe it as "Fairly decent" at this point.
 
 **Todo**
-
-- Swords and shields are "working," but not in a reasonable way
 
 **Done**
 
@@ -43,3 +41,4 @@ Work in progress.  It's playable, but just barely.
 - Add potions, shields, swords
 - Show player, not dragon, when dragon dies
 - Add second status line
+- Add flavor text
