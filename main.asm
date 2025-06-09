@@ -1315,7 +1315,7 @@ nosword@
 	bne shielded@
 	dec health		; health = health - 1%
 shielded@
-	bhi nothit@
+	bgt nothit@
 	clr health
 	inc dead		; game over flag
 nothit@
