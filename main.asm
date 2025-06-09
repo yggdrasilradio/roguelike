@@ -5,8 +5,8 @@ ENEMIES	equ $6200
 OBJS	equ $6400
 
 * Tuning constants
-SWDTO	equ 50		; sword failure timeout
-SHDTO	equ 50		; shield failure timeout
+SWDTO	equ 80		; sword failure timeout
+SHDTO	equ 80		; shield failure timeout
 
 	org $0000
 
