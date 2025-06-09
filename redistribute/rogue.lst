@@ -5,8 +5,8 @@
      6400             (         main.asm):00005         OBJS    equ $6400
                       (         main.asm):00006         
                       (         main.asm):00007         * Tuning constants
-     0032             (         main.asm):00008         SWDTO   equ 50          ; sword failure timeout
-     0032             (         main.asm):00009         SHDTO   equ 50          ; shield failure timeout
+     0050             (         main.asm):00008         SWDTO   equ 80          ; sword failure timeout
+     0050             (         main.asm):00009         SHDTO   equ 80          ; shield failure timeout
                       (         main.asm):00010         
                       (         main.asm):00011                 org $0000
                       (         main.asm):00012         
@@ -884,7 +884,7 @@
 13DD                  (         main.asm):00872         swdok@
 13DD 171B1B           (         main.asm):00873                 lbsr delobj     ; get sword
 13E0 0C22             (         main.asm):00874                 inc nsword
-13E2 8632             (         main.asm):00875                 lda #SWDTO      ; set sword timeout
+13E2 8650             (         main.asm):00875                 lda #SWDTO      ; set sword timeout
 13E4 972E             (         main.asm):00876                 sta swdtmr
 13E6 205E             (         main.asm):00877                 bra next@
 13E8                  (         main.asm):00878         shield@
@@ -898,7 +898,7 @@
 13FC                  (         main.asm):00886         shdok@
 13FC 171AFC           (         main.asm):00887                 lbsr delobj     ; get shield
 13FF 0C21             (         main.asm):00888                 inc nshield
-1401 8632             (         main.asm):00889                 lda #SHDTO      ; set shield timeout
+1401 8650             (         main.asm):00889                 lda #SHDTO      ; set shield timeout
 1403 972F             (         main.asm):00890                 sta shdtmr
 1405 203F             (         main.asm):00891                 bra next@
 1407                  (         main.asm):00892         key@
