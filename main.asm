@@ -5,8 +5,8 @@ ENEMIES	equ $6200
 OBJS	equ $6400
 
 * Tuning constants
-SWDTO	equ 80		; sword failure timeout
-SHDTO	equ 80		; shield failure timeout
+SWDTO	equ 100		; sword failure timeout
+SHDTO	equ 100		; shield failure timeout
 
 	org $0000
 
@@ -20,7 +20,7 @@ playerx	rmb 1
 playery	rmb 1
 number	rmb 2
 score	rmb 2
-nobjs	rmb 1 ; number of objects left to find
+ngold	rmb 1 ; number of gold left to find
 value	rmb 5
 key1	rmb 1
 key2	rmb 1
@@ -124,9 +124,9 @@ start
 	sta swdtmr
 	sta shdtmr
 
-	* Number of objects
-	lda #NOBJECTS
-	sta nobjs
+	* Number of treasures
+	lda #NGOLD
+	sta ngold
 
 	* Initialize gold and key objects
 	leax objtable,pcr
@@ -163,7 +163,7 @@ loop@
 	lbsr keycheck
 	tst dead	; end game if player has won or lost
 	bne endgame
-	tst nobjs
+	tst ngold
 	beq endgame
 	cmpa #8	   ; left arrow
 	bne notl@
@@ -790,7 +790,7 @@ done@
 	lbsr curspos
 	leau line2a,pcr
 	lbsr printline		; "Temple of Rogue"
-	tst nobjs
+	tst ngold
 	bne notdone@
 	leau youwon,pcr		; "You have conquered the Temple of Rogue!"
 	lbsr prstatus2
@@ -802,7 +802,7 @@ notdone@
 	lbsr prstatus2
 	bra credits@
 notdead@
-	; "{nobjs} items remaining"
+	; "{ngold} treasures remaining"
 	lbsr pritems
 credits@
 	lda #80-13
@@ -830,17 +830,11 @@ loop@	ldd ,u
 	lda ,x		; is player there?
 	cmpa #'O'
 	lbne draw@
-*
-	;clr ,u		; delete object
-	;clr 1,u
-	;dec nobjs	; one less object
-*
 	lda 2,u		; get object character
 	cmpa #$18	; is it gold?
 	lbeq gold@
 	cmpa #$5f	; is it a key?
 	beq key@
-* Other objects (shield, sword) go here
 	cmpa #$5e	; is it a sword?
 	beq sword@
 	cmpa #$1a	; is it a shield?
@@ -860,15 +854,17 @@ potion@
 	bls health@
 	lda #100	; can't top off over 100%
 health@	sta health
-	bra next@
+	lbra next@
 sword@
 	leay gotswd,pcr
 	lbsr prstatus1a	; "Found a sword!"
+	leay null,pcr
+	lbsr prstatus1b
 	tst nsword
 	beq swdok@
 	leay notok,pcr	; "But you already have one!"
 	lbsr prstatus1b
-	bra next@
+	lbra next@
 swdok@
 	lbsr delobj	; get sword
 	inc nsword
@@ -878,6 +874,8 @@ swdok@
 shield@
 	leay gotshd,pcr
 	lbsr prstatus1a	; "Found a shield!"
+	leay null,pcr
+	lbsr prstatus1b
 	tst nshield
 	beq shdok@
 	leay notok,pcr	; "But you already have one!"
@@ -892,6 +890,8 @@ shdok@
 key@
 	leay gotkey,pcr
 	lbsr prstatus1a	; "Found a key!"
+	leay null,pcr
+	lbsr prstatus1b
 	lbsr delobj
 	lda 3,u		; key type (KEY1, KEY2, KEY3, KEY4)
 	cmpa #KEY1
@@ -912,8 +912,11 @@ gold@
 	addd #50
 	std score
 	lbsr delobj
+	dec ngold
 	leay gotgold,pcr
 	lbsr prstatus1a	; "Found +50 gold!"
+	leay null,pcr
+	lbsr prstatus1b
 	bra next@
 draw@	ldd 2,u		; draw object
 	ldx textptr
@@ -922,6 +925,7 @@ next@	leau 4,u
 	lbra loop@
 exit@	rts
 
+null	fcs / /
 gotgold fcs /Found +50 gold!/
 gotkey	fcs /Found a key!/
 gotswd	fcs /Found a sword!/
@@ -1087,13 +1091,13 @@ loop@	lda ,u+
 	bpl loop@
 exit@	rts
 
-remain	fcs / items remaining/ ; 16 chars
+remain	fcs / treasures remaining/ ; 20 chars
 
 * Print remaining items
 *
 pritems
-	ldb #16
-	lda nobjs
+	ldb #20
+	lda ngold
 	cmpa #100
 	bls lt100@
 	incb
@@ -1108,7 +1112,7 @@ lt10@	lsrb
 	abx
 	leax 160*23,x
 	stx textptr
-	ldb nobjs
+	ldb ngold
 	clra
 	lbsr prnum
 	lbsr printline
@@ -1188,7 +1192,7 @@ irq2@	dec vcount	; decrement vsync counter
 	bne exit@
 	lda #60
 	sta vcount
-	tst nobjs	; stop counting if game over
+	tst ngold	; stop counting if game over
 	beq exit@
 	tst dead
 	bne exit@
@@ -1269,7 +1273,6 @@ loop@	ldd ,u
 	beq next@
 	cmpd #$ffff
 	beq exit@
-*
 	ldd ,u
 	ldy #0
 	suba origin
@@ -1350,7 +1353,6 @@ isaggro
 	adda origin
 	addb origin+1
 	std player	; global coordinates of player
-*
 	ldd 2,u		; xcenter, ycenter
 	suba 4,u	; a = left edge of aggro area
 	subb 5,u	; b = upper edge of aggro area
@@ -1360,7 +1362,6 @@ isaggro
 	bhi notaggro@
 	cmpb player+1	; is upper edge of aggro aread below player?
 	bhi notaggro@
-*
 	ldd 2,u		; xcenter, ycenter
 	adda 4,u	; a = right edge of aggro area
 	addb 5,u	; b = lower edge of aggro area
@@ -1402,7 +1403,6 @@ no4@	rts
 delobj
 	clr ,u		; delete object
 	clr 1,u
-	dec nobjs	; one less object
 	rts
 
 * Limit the use of shields and swords
@@ -1435,7 +1435,6 @@ excuse
 	ldd b,y
 	leay reason0,pcr
 	leay d,y
-	;leay reason0,pcr ; DEBUG
 	lbsr prstatus1b
 	inc reason
 	rts
