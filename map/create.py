@@ -235,7 +235,7 @@ print(str(nrooms) + " rooms generated")
 nobjects = 0
 
 # Create gold objects
-ngold = int(nrooms / 2)
+ngold = 100
 rooms = list(roomlist)
 for _ in range(0, ngold):
     xcenter, ycenter, xdelta, ydelta = random.choice(rooms)

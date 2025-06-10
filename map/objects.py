@@ -53,8 +53,9 @@ TSHIELD = 0x18
 width = img.size[0]
 height = img.size[1]
 
-# Objects: gold and keys
+# Objects: gold, keys, potions, shields, swords
 nobjects = 0
+ngold = 0
 print
 print "* List of objects"
 print "objtable"
@@ -65,6 +66,7 @@ for y in range(0, height):
         if objtype == GOLD:
 	    objects.append({"x": x, "y": y, "objtype": 0x18*256+TGOLD})
 	    nobjects += 1
+	    ngold += 1
         elif objtype == KEY1:
 	    objects.append({"x": x, "y": y, "objtype": 0x5f*256+TKEY1})
 	    nobjects += 1
@@ -96,7 +98,7 @@ for obj in sorted(objects, key=lambda obj: (obj["x"], obj["y"])):
 print ' fdb $ffff'
 
 print
-print "NOBJECTS equ " + str(nobjects)
+print "NGOLD equ " + str(ngold)
 print
 
 # Objects: doors
@@ -128,8 +130,6 @@ for obj in sorted(doors, key=lambda obj: (obj["x"], obj["y"])):
 print ' fdb $ffff'
 
 print
-print "NDOORS equ " + str(ndoors)
-print
 
 # Objects: enemies
 print '* List of enemies'
@@ -159,7 +159,3 @@ for obj in sorted(enemies, key=lambda obj: (obj["x"], obj["y"])):
     ydelta = obj["ydelta"]
     print ' fcb ' + str(x + 1) + ',' + str(y + 1) + ',' + str(xdelta) + ',' + str(ydelta)
 print ' fdb $ffff'
-
-print
-print "NENEMIES equ " + str(nenemies)
-print
