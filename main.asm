@@ -5,8 +5,8 @@ ENEMIES	equ $6200
 OBJS	equ $6400
 
 * Tuning constants
-SWDTO	equ 200		; sword failure timeout
-SHDTO	equ 200		; shield failure timeout
+SWDTO	equ 250		; sword failure timeout
+SHDTO	equ 250		; shield failure timeout
 
 	org $0000
 
@@ -1033,7 +1033,7 @@ prstatus1a
 	leay ,y
 	beq exit@
 	sty pmsg1
-	lda #130	; status message will persist for around 2 secs
+	lda #255	; status message will persist for 4 secs
 	sta timer1a
 exit@	rts
 
@@ -1048,7 +1048,7 @@ prstatus1b
 	leay ,y
 	beq exit@
 	sty pmsg2
-	lda #130	; status message will persist for around 2 secs
+	lda #255	; status message will persist for 4 secs
 	sta timer1b
 exit@	rts
 
