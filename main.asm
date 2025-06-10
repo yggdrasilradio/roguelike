@@ -5,8 +5,8 @@ ENEMIES	equ $6200
 OBJS	equ $6400
 
 * Tuning constants
-SWDTO	equ 100		; sword failure timeout
-SHDTO	equ 100		; shield failure timeout
+SWDTO	equ 200		; sword failure timeout
+SHDTO	equ 200		; shield failure timeout
 
 	org $0000
 
@@ -43,7 +43,7 @@ kbbusy	rmb 1 ; keyboard busy
 player	rmb 2 ; global player coordinates
 dead	rmb 1 ; player died flag
 health	rmb 1 ; player health
-reason	rmb 1 ; flavor text index
+reason	rmb 1 ; text index
 
 KEYBUF equ $152
 
@@ -98,7 +98,7 @@ start
 	std pmsg1
 	std pmsg2
 
-	* Init flavor text index
+	* Init text index
 	sta reason
 
 	* Clear player died flag
@@ -1448,7 +1448,7 @@ msgs	fdb reason0-reason0
 	fdb reason6-reason0
 	fdb reason7-reason0
 
-* Whimsical flavor text
+* Whimsical text
 noshd	fcs /Oops! No more shield!/
 noswd	fcs /Oops! No more sword!/
 reason0 fcs /Gone in a poof of glitter! Unstable magic! Never order from Temu again!/
