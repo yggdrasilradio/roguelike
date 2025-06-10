@@ -5,8 +5,8 @@
      6400             (         main.asm):00005         OBJS    equ $6400
                       (         main.asm):00006         
                       (         main.asm):00007         * Tuning constants
-     00C8             (         main.asm):00008         SWDTO   equ 200         ; sword failure timeout
-     00C8             (         main.asm):00009         SHDTO   equ 200         ; shield failure timeout
+     00FA             (         main.asm):00008         SWDTO   equ 250         ; sword failure timeout
+     00FA             (         main.asm):00009         SHDTO   equ 250         ; shield failure timeout
                       (         main.asm):00010         
                       (         main.asm):00011                 org $0000
                       (         main.asm):00012         
@@ -880,7 +880,7 @@
 13E6                  (         main.asm):00868         swdok@
 13E6 171B99           (         main.asm):00869                 lbsr delobj     ; get sword
 13E9 0C22             (         main.asm):00870                 inc nsword
-13EB 86C8             (         main.asm):00871                 lda #SWDTO      ; set sword timeout
+13EB 86FA             (         main.asm):00871                 lda #SWDTO      ; set sword timeout
 13ED 972E             (         main.asm):00872                 sta swdtmr
 13EF 2075             (         main.asm):00873                 bra next@
 13F1                  (         main.asm):00874         shield@
@@ -896,7 +896,7 @@
 140C                  (         main.asm):00884         shdok@
 140C 171B73           (         main.asm):00885                 lbsr delobj     ; get shield
 140F 0C21             (         main.asm):00886                 inc nshield
-1411 86C8             (         main.asm):00887                 lda #SHDTO      ; set shield timeout
+1411 86FA             (         main.asm):00887                 lda #SHDTO      ; set shield timeout
 1413 972F             (         main.asm):00888                 sta shdtmr
 1415 204F             (         main.asm):00889                 bra next@
 1417                  (         main.asm):00890         key@
@@ -3160,7 +3160,7 @@
 2CE2 31A4             (         main.asm):01033                 leay ,y
 2CE4 2707             (         main.asm):01034                 beq exit@
 2CE6 109F28           (         main.asm):01035                 sty pmsg1
-2CE9 8682             (         main.asm):01036                 lda #130        ; status message will persist for around 2 secs
+2CE9 86FF             (         main.asm):01036                 lda #255        ; status message will persist for 4 secs
 2CEB 972C             (         main.asm):01037                 sta timer1a
 2CED 39               (         main.asm):01038         exit@   rts
                       (         main.asm):01039         
@@ -3175,7 +3175,7 @@
 2CEE 31A4             (         main.asm):01048                 leay ,y
 2CF0 2707             (         main.asm):01049                 beq exit@
 2CF2 109F2A           (         main.asm):01050                 sty pmsg2
-2CF5 8682             (         main.asm):01051                 lda #130        ; status message will persist for around 2 secs
+2CF5 86FF             (         main.asm):01051                 lda #255        ; status message will persist for 4 secs
 2CF7 972D             (         main.asm):01052                 sta timer1b
 2CF9 39               (         main.asm):01053         exit@   rts
                       (         main.asm):01054         
