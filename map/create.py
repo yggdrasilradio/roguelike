@@ -245,7 +245,7 @@ for _ in range(0, ngold):
 print(str(ngold) + " gold objects generated")
 
 # Create potion objects
-npotions = int(nrooms / 20)
+npotions = int(nrooms / 10)
 rooms = list(roomlist)
 for _ in range(0, npotions):
     xcenter, ycenter, xdelta, ydelta = random.choice(rooms)
@@ -255,7 +255,7 @@ for _ in range(0, npotions):
 print(str(npotions) + " potion objects generated")
 
 # Create sword objects
-nswords = int(nrooms / 20)
+nswords = int(nrooms / 10)
 rooms = list(roomlist)
 for _ in range(0, nswords):
     xcenter, ycenter, xdelta, ydelta = random.choice(rooms)
@@ -265,7 +265,7 @@ for _ in range(0, nswords):
 print(str(nswords) + " sword objects generated")
 
 # Create shield objects
-nshields = int(nrooms / 20)
+nshields = int(nrooms / 10)
 rooms = list(roomlist)
 for _ in range(0, nshields):
     xcenter, ycenter, xdelta, ydelta = random.choice(rooms)
