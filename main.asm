@@ -44,6 +44,8 @@ player	rmb 2 ; global player coordinates
 dead	rmb 1 ; player died flag
 health	rmb 1 ; player health
 reason	rmb 1 ; text index
+prior1a	rmb 1 ; status1a priority flag
+prior1b	rmb 1 ; status1b priority flag
 
 KEYBUF equ $152
 
@@ -97,6 +99,8 @@ start
 	sta timer1b
 	std pmsg1
 	std pmsg2
+	sta prior1a
+	sta prior1b
 
 	* Init text index
 	sta reason
@@ -630,6 +634,8 @@ drawplayer
 door@
 	leay gotdoor,pcr
 	lbsr prstatus1a	; "Door unlocked!"
+	leay null,pcr
+	lbsr prstatus1b
 draw@
 	ldd #'O'*256+PLAYER
 	std ,x
@@ -916,6 +922,7 @@ gold@
 	leay gotgold,pcr
 	lbsr prstatus1a	; "Found +50 gold!"
 	leay null,pcr
+	leay rich,pcr ; DEBUG
 	lbsr prstatus1b
 	bra next@
 draw@	ldd 2,u		; draw object
@@ -927,6 +934,7 @@ exit@	rts
 
 null	fcs / /
 gotgold fcs /Found +50 gold!/
+rich	fcs /You feel much richer!/
 gotkey	fcs /Found a key!/
 gotswd	fcs /Found a sword!/
 gotshd	fcs /Found a shield!/
@@ -1030,8 +1038,10 @@ loop@	incb		; how many chars?
 * msg  fcs /This is a test/
 *
 prstatus1a
-	leay ,y
+	leay ,y		; ignore null message
 	beq exit@
+	tst prior1a	; existing message has priority?
+	bne exit@
 	sty pmsg1
 	lda #255	; status message will persist for 4 secs
 	sta timer1a
@@ -1045,8 +1055,10 @@ exit@	rts
 * msg  fcs /This is a test/
 *
 prstatus1b
-	leay ,y
+	leay ,y		; ignore null message
 	beq exit@
+	tst prior1b	; existing message has priority?
+	bne exit@
 	sty pmsg2
 	lda #255	; status message will persist for 4 secs
 	sta timer1b
@@ -1055,7 +1067,7 @@ exit@	rts
 * Update status message for first line of status area 1
 *
 updstatus1a
-	ldd pmsg1
+	ldd pmsg1	; ignore null message
 	beq exit@
 	ldu pmsg1
 	tfr u,x
@@ -1074,7 +1086,7 @@ exit@	rts
 * Update status message for second line of status area 1
 *
 updstatus1b
-	ldd pmsg2
+	ldd pmsg2	; ignore null message
 	beq exit@
 	ldu pmsg2
 	tfr u,x
@@ -1181,10 +1193,12 @@ IRQ
 	bne irq0@
 	clr pmsg1	; yes, so clear status message line 1
 	clr pmsg1+1
+	clr prior1a	; and priority
 irq0@	dec timer1b	; has status message line 2 timed out?
 	bne irq1@
 	clr pmsg2	; yes, so clear status message line 2
 	clr pmsg2+1
+	clr prior1b	; and priority
 irq1@	tst kbbusy	; keyboard busy?
 	beq irq2@
 	dec kbbusy	; decrement keyboard busy timer
@@ -1327,6 +1341,8 @@ nothit@
 	std ,x			; draw enemy
 nodraw@
 	lbsr prstatus1a		; update status line
+	leay null,pcr
+	lbsr prstatus1b
 next@	leau 6,u
 	bra loop@
 exit@	rts
@@ -1415,6 +1431,7 @@ timeout
 	clr nsword	; no more sword
 	leay noswd,pcr	; "Oops! No more sword!"
 	lbsr prstatus1a
+	inc prior1a	; priority message
 	lbsr excuse
 shield@
 	tst shdtmr
@@ -1424,6 +1441,7 @@ shield@
 	clr nshield	; no more shield
 	leay noshd,pcr	; "Oops! No more shield!"
 	lbsr prstatus1a
+	inc prior1a	; priority message
 	lbsr excuse
 exit@	rts
 
@@ -1437,6 +1455,7 @@ excuse
 	leay reason0,pcr
 	leay d,y
 	lbsr prstatus1b
+	inc prior1b	; priority message
 	inc reason
 	rts
 
@@ -1454,7 +1473,7 @@ noshd	fcs /Oops! No more shield!/
 noswd	fcs /Oops! No more sword!/
 reason0 fcs /Gone in a poof of glitter! Unstable magic! Never order from Temu again!/
 reason1	fcs /"There it is!" An adventurer in another dimension yoinks it through a portal!/
-reason2	fcs /The gods misfiled it—-back it goes into the Vault of Misplaced Artifacts!/
+reason2	fcs /The gods misfiled it, back it goes into the Vault of Misplaced Artifacts!/
 reason3	fcs /Repossessed due to unpaid taxes to the Kingdom’s Bureau of Arbitrary Fees!/
 reason4	fcs /Sorry, manufacturer recall due to faulty airbags!/
 reason5	fcs /Repossessed by the bank! Should have kept up with the payments!/
