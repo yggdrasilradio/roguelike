@@ -849,8 +849,14 @@ loop@	ldd ,u
 potion@
 	leay gotptn,pcr
 	lbsr prstatus1a	; "Found a potion!"
-	leay better,pcr
-	lbsr prstatus1b	; "Drinking it, you feel much better!"
+	lda health
+	cmpa #100	; already at 100%?
+	blo healme@
+	leay noneed,pcr	; "But you don't need it!"
+	lbsr prstatus1b
+	lbra next@
+healme@	leay better,pcr	; "Drinking it, you feel much better!"
+	lbsr prstatus1b
 	lbsr delobj
 	lda health
 	adda #20	; increase health by 20%
@@ -928,8 +934,9 @@ gotkey	fcs /Found a key!/
 gotswd	fcs /Found a sword!/
 gotshd	fcs /Found a shield!/
 gotptn	fcs /Found a potion!/
-better	fcs /Drinking it, you feel much better!/
 notok	fcs /But you already have one!/
+better	fcs /Drinking it, you feel much better!/
+noneed	fcs /But you feel fine already!/
 
 * Read keyboard
 *
