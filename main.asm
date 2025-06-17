@@ -634,8 +634,6 @@ drawplayer
 door@
 	leay gotdoor,pcr
 	lbsr prstatus1a	; "Door unlocked!"
-	leay null,pcr
-	lbsr prstatus1b
 draw@
 	ldd #'O'*256+PLAYER
 	std ,x
@@ -864,8 +862,6 @@ health@	sta health
 sword@
 	leay gotswd,pcr
 	lbsr prstatus1a	; "Found a sword!"
-	leay null,pcr
-	lbsr prstatus1b
 	tst nsword
 	beq swdok@
 	leay notok,pcr	; "But you already have one!"
@@ -880,8 +876,6 @@ swdok@
 shield@
 	leay gotshd,pcr
 	lbsr prstatus1a	; "Found a shield!"
-	leay null,pcr
-	lbsr prstatus1b
 	tst nshield
 	beq shdok@
 	leay notok,pcr	; "But you already have one!"
@@ -896,8 +890,6 @@ shdok@
 key@
 	leay gotkey,pcr
 	lbsr prstatus1a	; "Found a key!"
-	leay null,pcr
-	lbsr prstatus1b
 	lbsr delobj
 	lda 3,u		; key type (KEY1, KEY2, KEY3, KEY4)
 	cmpa #KEY1
@@ -921,8 +913,6 @@ gold@
 	dec ngold
 	leay gotgold,pcr
 	lbsr prstatus1a	; "Found +50 gold!"
-	leay null,pcr
-	leay rich,pcr ; DEBUG
 	lbsr prstatus1b
 	bra next@
 draw@	ldd 2,u		; draw object
@@ -934,7 +924,6 @@ exit@	rts
 
 null	fcs / /
 gotgold fcs /Found +50 gold!/
-rich	fcs /You feel much richer!/
 gotkey	fcs /Found a key!/
 gotswd	fcs /Found a sword!/
 gotshd	fcs /Found a shield!/
@@ -1040,11 +1029,13 @@ loop@	incb		; how many chars?
 prstatus1a
 	leay ,y		; ignore null message
 	beq exit@
-	tst prior1a	; existing message has priority?
-	bne exit@
+	tst prior1a	; current message has priority?
+	bne exit@	; this message gets thrown away, then
 	sty pmsg1
 	lda #255	; status message will persist for 4 secs
 	sta timer1a
+	leay null,pcr	; erase 1b while we're at it
+	lbsr prstatus1b
 exit@	rts
 
 * Queue status message to display on second line of status area 1
@@ -1057,8 +1048,8 @@ exit@	rts
 prstatus1b
 	leay ,y		; ignore null message
 	beq exit@
-	tst prior1b	; existing message has priority?
-	bne exit@
+	tst prior1b	; current message has priority?
+	bne exit@	; this message gets thrown away, then
 	sty pmsg2
 	lda #255	; status message will persist for 4 secs
 	sta timer1b
@@ -1341,8 +1332,6 @@ nothit@
 	std ,x			; draw enemy
 nodraw@
 	lbsr prstatus1a		; update status line
-	leay null,pcr
-	lbsr prstatus1b
 next@	leau 6,u
 	bra loop@
 exit@	rts
