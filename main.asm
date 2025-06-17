@@ -838,7 +838,7 @@ loop@	ldd ,u
 	cmpa #$18	; is it gold?
 	lbeq gold@
 	cmpa #$5f	; is it a key?
-	beq key@
+	lbeq key@
 	cmpa #$5e	; is it a sword?
 	beq sword@
 	cmpa #$1a	; is it a shield?
@@ -1470,7 +1470,7 @@ noswd	fcs /Oops! No more sword!/
 reason0 fcs /Gone in a poof of glitter! Unstable magic! Never order from Temu again!/
 reason1	fcs /"There it is!" An adventurer in another dimension yoinks it through a portal!/
 reason2	fcs /The gods misfiled it, back it goes into the Vault of Misplaced Artifacts!/
-reason3	fcs /Repossessed due to unpaid taxes to the Kingdom’s Bureau of Arbitrary Fees!/
+reason3	fcs /Repossessed due to unpaid taxes to the Kingdom Bureau of Arbitrary Fees!/
 reason4	fcs /Sorry, manufacturer recall due to faulty airbags!/
 reason5	fcs /Repossessed by the bank! Should have kept up with the payments!/
 reason6	fcs /The sentient magic object sighs, "Sorry, just not into it today!"/
