@@ -1445,36 +1445,32 @@ exit@	rts
 excuse
 	ldb reason
 	andb #7
-	aslb
-	leay msgs,pcr
-	ldd b,y
-	leay reason0,pcr
-	leay d,y
+	leay reasons,pcr
+next@
+        tstb
+        beq done@
+loop@
+        tst ,y+
+        bpl loop@
+        decb
+        bra next@
+done@
 	lbsr prstatus1b
-	inc prior1b	; priority message
+	inc prior1b
 	inc reason
 	rts
-
-msgs	fdb reason0-reason0
-	fdb reason1-reason0
-	fdb reason2-reason0
-	fdb reason3-reason0
-	fdb reason4-reason0
-	fdb reason5-reason0
-	fdb reason6-reason0
-	fdb reason7-reason0
 
 * Whimsical text
 noshd	fcs /Oops! No more shield!/
 noswd	fcs /Oops! No more sword!/
-reason0 fcs /Gone in a poof of glitter! Unstable magic! Never order from Temu again!/
-reason1	fcs /"There it is!" An adventurer in another dimension yoinks it through a portal!/
-reason2	fcs /The gods misfiled it, back it goes into the Vault of Misplaced Artifacts!/
-reason3	fcs /Repossessed due to unpaid taxes to the Kingdom Bureau of Arbitrary Fees!/
-reason4	fcs /Sorry, manufacturer recall due to faulty airbags!/
-reason5	fcs /Repossessed by the bank! Should have kept up with the payments!/
-reason6	fcs /The sentient magic object sighs, "Sorry, just not into it today!"/
-reason7	fcs /I guess it was more sorely needed over in Dungeons of Daggorath!/
+reasons fcs /Gone in a poof of glitter! Unstable magic! Never order from Temu again!/
+	fcs /"There it is!" An adventurer in another dimension yoinks it through a portal!/
+	fcs /The gods misfiled it, back it goes into the Vault of Misplaced Artifacts!/
+	fcs /Repossessed due to unpaid taxes to the Kingdom Bureau of Arbitrary Fees!/
+	fcs /Sorry, manufacturer recall due to faulty airbags!/
+	fcs /Repossessed by the bank! Should have kept up with the payments!/
+	fcs /The sentient magic object sighs, "Sorry, just not into it today!"/
+	fcs /I guess it was more sorely needed over in Dungeons of Daggorath!/
 
 zprog
 
