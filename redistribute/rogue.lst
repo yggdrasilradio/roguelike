@@ -3633,7 +3633,7 @@
 3041 0A2E             (         main.asm):01425                 dec swdtmr      ; count down sword timer
 3043 260E             (         main.asm):01426                 bne shield@
 3045 0F22             (         main.asm):01427                 clr nsword      ; no more sword
-3047 318D005D         (         main.asm):01428                 leay noswd,pcr  ; "Oops! No more sword!"
+3047 318D004E         (         main.asm):01428                 leay noswd,pcr  ; "Oops! No more sword!"
 304B 17FD37           (         main.asm):01429                 lbsr prstatus1a
 304E 0C36             (         main.asm):01430                 inc prior1a     ; priority message
 3050 170017           (         main.asm):01431                 lbsr excuse
@@ -3643,7 +3643,7 @@
 3057 0A2F             (         main.asm):01435                 dec shdtmr      ; count down shield timer
 3059 260E             (         main.asm):01436                 bne exit@
 305B 0F21             (         main.asm):01437                 clr nshield     ; no more shield
-305D 318D0032         (         main.asm):01438                 leay noshd,pcr  ; "Oops! No more shield!"
+305D 318D0023         (         main.asm):01438                 leay noshd,pcr  ; "Oops! No more shield!"
 3061 17FD21           (         main.asm):01439                 lbsr prstatus1a
 3064 0C36             (         main.asm):01440                 inc prior1a     ; priority message
 3066 170001           (         main.asm):01441                 lbsr excuse
@@ -3653,33 +3653,29 @@
 306A                  (         main.asm):01445         excuse
 306A D635             (         main.asm):01446                 ldb reason
 306C C407             (         main.asm):01447                 andb #7
-306E 58               (         main.asm):01448                 aslb
-306F 318D0010         (         main.asm):01449                 leay msgs,pcr
-3073 ECA5             (         main.asm):01450                 ldd b,y
-3075 318D0043         (         main.asm):01451                 leay reason0,pcr
-3079 31AB             (         main.asm):01452                 leay d,y
-307B 17FD1E           (         main.asm):01453                 lbsr prstatus1b
-307E 0C37             (         main.asm):01454                 inc prior1b     ; priority message
-3080 0C35             (         main.asm):01455                 inc reason
-3082 39               (         main.asm):01456                 rts
-                      (         main.asm):01457         
-3083 0000             (         main.asm):01458         msgs    fdb reason0-reason0
-3085 0047             (         main.asm):01459                 fdb reason1-reason0
-3087 0094             (         main.asm):01460                 fdb reason2-reason0
-3089 00DD             (         main.asm):01461                 fdb reason3-reason0
-308B 0125             (         main.asm):01462                 fdb reason4-reason0
-308D 0156             (         main.asm):01463                 fdb reason5-reason0
-308F 0195             (         main.asm):01464                 fdb reason6-reason0
-3091 01D6             (         main.asm):01465                 fdb reason7-reason0
-                      (         main.asm):01466         
-                      (         main.asm):01467         * Whimsical text
-3093 4F6F707321204E6F (         main.asm):01468         noshd   fcs /Oops! No more shield!/
+306E 318D003B         (         main.asm):01448                 leay reasons,pcr
+3072                  (         main.asm):01449         next@
+3072 5D               (         main.asm):01450                 tstb
+3073 2707             (         main.asm):01451                 beq done@
+3075                  (         main.asm):01452         loop@
+3075 6DA0             (         main.asm):01453                 tst ,y+
+3077 2AFC             (         main.asm):01454                 bpl loop@
+3079 5A               (         main.asm):01455                 decb
+307A 20F6             (         main.asm):01456                 bra next@
+307C                  (         main.asm):01457         done@
+307C 17FD1D           (         main.asm):01458                 lbsr prstatus1b
+307F 0C37             (         main.asm):01459                 inc prior1b
+3081 0C35             (         main.asm):01460                 inc reason
+3083 39               (         main.asm):01461                 rts
+                      (         main.asm):01462         
+                      (         main.asm):01463         * Whimsical text
+3084 4F6F707321204E6F (         main.asm):01464         noshd   fcs /Oops! No more shield!/
      206D6F7265207368
      69656C64A1
-30A8 4F6F707321204E6F (         main.asm):01469         noswd   fcs /Oops! No more sword!/
+3099 4F6F707321204E6F (         main.asm):01465         noswd   fcs /Oops! No more sword!/
      206D6F7265207377
      6F7264A1
-30BC 476F6E6520696E20 (         main.asm):01470         reason0 fcs /Gone in a poof of glitter! Unstable magic! Never order from Temu again!/
+30AD 476F6E6520696E20 (         main.asm):01466         reasons fcs /Gone in a poof of glitter! Unstable magic! Never order from Temu again!/
      6120706F6F66206F
      6620676C69747465
      722120556E737461
@@ -3688,7 +3684,7 @@
      206F726465722066
      726F6D2054656D75
      20616761696EA1
-3103 2254686572652069 (         main.asm):01471         reason1 fcs /"There it is!" An adventurer in another dimension yoinks it through a portal!/
+30F4 2254686572652069 (         main.asm):01467                 fcs /"There it is!" An adventurer in another dimension yoinks it through a portal!/
      7420697321222041
      6E20616476656E74
      7572657220696E20
@@ -3698,7 +3694,7 @@
      206974207468726F
      756768206120706F
      7274616CA1
-3150 54686520676F6473 (         main.asm):01472         reason2 fcs /The gods misfiled it, back it goes into the Vault of Misplaced Artifacts!/
+3141 54686520676F6473 (         main.asm):01468                 fcs /The gods misfiled it, back it goes into the Vault of Misplaced Artifacts!/
      206D697366696C65
      642069742C206261
      636B20697420676F
@@ -3708,7 +3704,7 @@
      706C616365642041
      7274696661637473
      A1
-3199 5265706F73736573 (         main.asm):01473         reason3 fcs /Repossessed due to unpaid taxes to the Kingdom Bureau of Arbitrary Fees!/
+318A 5265706F73736573 (         main.asm):01469                 fcs /Repossessed due to unpaid taxes to the Kingdom Bureau of Arbitrary Fees!/
      7365642064756520
      746F20756E706169
      6420746178657320
@@ -3717,14 +3713,14 @@
      7572656175206F66
      2041726269747261
      72792046656573A1
-31E1 536F7272792C206D (         main.asm):01474         reason4 fcs /Sorry, manufacturer recall due to faulty airbags!/
+31D2 536F7272792C206D (         main.asm):01470                 fcs /Sorry, manufacturer recall due to faulty airbags!/
      616E756661637475
      7265722072656361
      6C6C206475652074
      6F206661756C7479
      2061697262616773
      A1
-3212 5265706F73736573 (         main.asm):01475         reason5 fcs /Repossessed by the bank! Should have kept up with the payments!/
+3203 5265706F73736573 (         main.asm):01471                 fcs /Repossessed by the bank! Should have kept up with the payments!/
      7365642062792074
      68652062616E6B21
      2053686F756C6420
@@ -3732,7 +3728,7 @@
      7420757020776974
      6820746865207061
      796D656E7473A1
-3251 5468652073656E74 (         main.asm):01476         reason6 fcs /The sentient magic object sighs, "Sorry, just not into it today!"/
+3242 5468652073656E74 (         main.asm):01472                 fcs /The sentient magic object sighs, "Sorry, just not into it today!"/
      69656E74206D6167
      6963206F626A6563
      742073696768732C
@@ -3741,7 +3737,7 @@
      7420696E746F2069
      7420746F64617921
      A2
-3292 4920677565737320 (         main.asm):01477         reason7 fcs /I guess it was more sorely needed over in Dungeons of Daggorath!/
+3283 4920677565737320 (         main.asm):01473                 fcs /I guess it was more sorely needed over in Dungeons of Daggorath!/
      697420776173206D
      6F726520736F7265
      6C79206E65656465
@@ -3749,11 +3745,11 @@
      6E2044756E67656F
      6E73206F66204461
      67676F72617468A1
-                      (         main.asm):01478         
-32D2                  (         main.asm):01479         zprog
+                      (         main.asm):01474         
+32C3                  (         main.asm):01475         zprog
+                      (         main.asm):01476         
+                      (         main.asm):01477                 * Intercept "Close File" hook to autostart program
+                      (         main.asm):01478                 org $a42e
+A42E 0E00             (         main.asm):01479                 fdb start
                       (         main.asm):01480         
-                      (         main.asm):01481                 * Intercept "Close File" hook to autostart program
-                      (         main.asm):01482                 org $a42e
-A42E 0E00             (         main.asm):01483                 fdb start
-                      (         main.asm):01484         
-                      (         main.asm):01485                 end start
+                      (         main.asm):01481                 end start
