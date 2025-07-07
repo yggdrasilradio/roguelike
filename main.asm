@@ -43,7 +43,8 @@ kbbusy	rmb 1 ; keyboard busy
 player	rmb 2 ; global player coordinates
 dead	rmb 1 ; player died flag
 health	rmb 1 ; player health
-reason	rmb 1 ; text index
+reason	rmb 1 ; index into whimsical object timeout excuses
+yayidx	rmb 1 ; index into smug gold acquisition messages
 prior1a	rmb 1 ; status1a priority flag
 prior1b	rmb 1 ; status1b priority flag
 
@@ -102,8 +103,9 @@ start
 	sta prior1a
 	sta prior1b
 
-	* Init text index
+	* Init text indexes
 	sta reason
+	sta yayidx
 
 	* Clear player died flag
 	sta dead
@@ -852,7 +854,7 @@ potion@
 	lda health
 	cmpa #100	; already at 100%?
 	blo healme@
-	leay noneed,pcr	; "But you don't need it!"
+	leay noneed,pcr	; "But you feel fine already!"
 	lbsr prstatus1b
 	lbra next@
 healme@	leay better,pcr	; "Drinking it, you feel much better!"
@@ -919,7 +921,7 @@ gold@
 	dec ngold
 	leay gotgold,pcr
 	lbsr prstatus1a	; "Found +50 gold!"
-	lbsr prstatus1b
+	lbsr yayness	; smug gold acquisition message
 	bra next@
 draw@	ldd 2,u		; draw object
 	ldx textptr
@@ -933,10 +935,35 @@ gotgold fcs /Found +50 gold!/
 gotkey	fcs /Found a key!/
 gotswd	fcs /Found a sword!/
 gotshd	fcs /Found a shield!/
-gotptn	fcs /Found a potion!/
 notok	fcs /But you already have one!/
+gotptn	fcs /Found a potion!/
 better	fcs /Drinking it, you feel much better!/
 noneed	fcs /But you feel fine already!/
+
+yay	fcs /Your grin gains +2 radiance./
+	fcs /You feel wealthier and vaguely heroic./
+	fcs /The coins jingle. So does your ambition./
+	fcs /Now you can tip the bard properly./
+	fcs /Somewhere, a merchant smiles./
+	fcs /The gold glitters. You do too./
+	fcs /Your pouch is now pleasantly lumpy./
+	fcs /Huzzah, gold! Victory tastes metallic./
+;fcs /Your pouch jiggles with newfound optimism./
+;fcs /Wealth acquired. Dramatic flourish optional./
+;fcs /You briefly consider a pet griffin fund./
+;fcs /Coins secured. Fortune nods approvingly./
+;fcs /Cha-ching! The road just got friendlier./
+;fcs /Your wallet sighs in golden contentment./
+;fcs /You add it to your ‘rainy troll day’ stash./
+;fcs /You resist the urge to somersault joyfully./
+;fcs /Your luck stat feels smug about this./
+;fcs /Greed says hi. You wink back./
+;fcs /You smirk. The economy is now slightly afraid of you./
+;fcs /Wealth acquired. Modesty optional./
+;fcs /You hear distant lute music. It sounds... richer somehow./
+;fcs /Congratulations: you've officially entered the jingle class./
+;fcs /Charm modifier increased by sheer audacity./
+;fcs /Even dragons would look on in envy./
 
 * Read keyboard
 *
@@ -1301,8 +1328,8 @@ noaggro@
 	ldd #$1b*256+$10	; No, draw without highlight
 	bra draw@
 aggro@
-	leay yousee,pcr		; "You see a dragon!"
 	ldd #$1b*256+$38	; Yes, draw with highlight
+	leay yousee,pcr		; "You see a dragon!"
 draw@
 	pshs d			; save text and attributes
         ldd ,u
@@ -1428,7 +1455,7 @@ timeout
 	leay noswd,pcr	; "Oops! No more sword!"
 	lbsr prstatus1a
 	inc prior1a	; priority message
-	lbsr excuse
+	lbsr excuse	; lame excuse for sword disappearing
 shield@
 	tst shdtmr
 	beq exit@
@@ -1438,14 +1465,32 @@ shield@
 	leay noshd,pcr	; "Oops! No more shield!"
 	lbsr prstatus1a
 	inc prior1a	; priority message
-	lbsr excuse
+	lbsr excuse	; lame excuse for shield disappearing
 exit@	rts
 
-* Come up with a whimsical excuse for an object timing out
-excuse
-	ldb reason
+* Generate a whimsically smug saying when you acquire gold
+*
+yayness
+	leay yay,pcr
+	ldb yayidx
 	andb #7
-	leay reasons,pcr
+*
+;next@
+;        tstb
+;        beq done@
+;loop@
+;        tst ,y+
+;        bpl loop@
+;        decb
+;        bra next@
+;done@
+;	lbsr prstatus1b
+*
+	bsr genmsg
+	inc yayidx
+	rts
+
+genmsg
 next@
         tstb
         beq done@
@@ -1456,13 +1501,34 @@ loop@
         bra next@
 done@
 	lbsr prstatus1b
+	rts
+
+* Come up with a whimsical excuse for an object timing out
+*
+excuse
+	leay reasons,pcr
+	clr prior1b
+	ldb reason
+	andb #7
+;next@
+;        tstb
+;        beq done@
+;loop@
+;        tst ,y+
+;        bpl loop@
+;        decb
+;        bra next@
+;done@
+;	lbsr prstatus1b
+	bsr genmsg
 	inc prior1b
 	inc reason
 	rts
 
-* Whimsical text
 noshd	fcs /Oops! No more shield!/
 noswd	fcs /Oops! No more sword!/
+
+* Whimsical lame excuses
 reasons fcs /Gone in a poof of glitter! Unstable magic! Never order from Temu again!/
 	fcs /"There it is!" An adventurer in another dimension yoinks it through a portal!/
 	fcs /The gods misfiled it, back it goes into the Vault of Misplaced Artifacts!/
