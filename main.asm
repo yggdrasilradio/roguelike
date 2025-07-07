@@ -921,7 +921,7 @@ gold@
 	dec ngold
 	leay gotgold,pcr
 	lbsr prstatus1a	; "Found +50 gold!"
-	lbsr yayness	; smug gold acquisition message
+	lbsr yayness	; whimsical flavor text
 	bra next@
 draw@	ldd 2,u		; draw object
 	ldx textptr
@@ -940,30 +940,23 @@ gotptn	fcs /Found a potion!/
 better	fcs /Drinking it, you feel much better!/
 noneed	fcs /But you feel fine already!/
 
-yay	fcs /Your grin gains +2 radiance./
-	fcs /You feel wealthier and vaguely heroic./
-	fcs /The coins jingle. So does your ambition./
-	fcs /Now you can tip the bard properly./
-	fcs /Somewhere, a merchant smiles./
-	fcs /The gold glitters. You do too./
-	fcs /Your pouch is now pleasantly lumpy./
-	fcs /Huzzah, gold! Victory tastes metallic./
-;fcs /Your pouch jiggles with newfound optimism./
-;fcs /Wealth acquired. Dramatic flourish optional./
-;fcs /You briefly consider a pet griffin fund./
-;fcs /Coins secured. Fortune nods approvingly./
-;fcs /Cha-ching! The road just got friendlier./
-;fcs /Your wallet sighs in golden contentment./
-;fcs /You add it to your ‘rainy troll day’ stash./
-;fcs /You resist the urge to somersault joyfully./
-;fcs /Your luck stat feels smug about this./
-;fcs /Greed says hi. You wink back./
-;fcs /You smirk. The economy is now slightly afraid of you./
-;fcs /Wealth acquired. Modesty optional./
-;fcs /You hear distant lute music. It sounds... richer somehow./
-;fcs /Congratulations: you've officially entered the jingle class./
-;fcs /Charm modifier increased by sheer audacity./
-;fcs /Even dragons would look on in envy./
+* Stupid smug "gold acquired!" messages
+yay	fcs /Your grin gains +2 radiance/
+	fcs /You feel wealthier and vaguely optimistic/
+	fcs /The coins jingle. So does your ambition/
+	fcs /Now you can tip the bard properly/
+	fcs /Somewhere, a merchant smiles/
+	fcs /The gold glitters. You do too/
+	fcs /Your pouch is now pleasantly lumpy/
+	fcs /Huzzah, gold! Victory tastes metallic/
+	fcs /Your pouch jiggles with newfound optimism/
+	fcs /Wealth acquired. Dramatic flourish optional/
+	fcs /You smirk. The economy is now slightly afraid of you/
+	fcs /Coins secured. Fortune nods approvingly/
+	fcs /Cha-ching! The road just got friendlier/
+	fcs /Your pouch sighs in golden contentment/
+	fcs /Your luck stat feels smug about this/
+	fcs /You resist the urge to somersault joyfully/
 
 * Read keyboard
 *
@@ -1473,23 +1466,20 @@ exit@	rts
 yayness
 	leay yay,pcr
 	ldb yayidx
-	andb #7
-*
-;next@
-;        tstb
-;        beq done@
-;loop@
-;        tst ,y+
-;        bpl loop@
-;        decb
-;        bra next@
-;done@
-;	lbsr prstatus1b
-*
+	andb #15
 	bsr genmsg
 	inc yayidx
 	rts
 
+* Generate message from list
+*
+* Entry:
+*	Y address of list
+*	B index into list
+*
+* Exit:
+*	Y address of message
+*
 genmsg
 next@
         tstb
@@ -1510,16 +1500,6 @@ excuse
 	clr prior1b
 	ldb reason
 	andb #7
-;next@
-;        tstb
-;        beq done@
-;loop@
-;        tst ,y+
-;        bpl loop@
-;        decb
-;        bra next@
-;done@
-;	lbsr prstatus1b
 	bsr genmsg
 	inc prior1b
 	inc reason
