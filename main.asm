@@ -7,6 +7,7 @@ OBJS	equ $6400
 * Tuning constants
 SWDTO	equ 255		; sword failure timeout
 SHDTO	equ 255		; shield failure timeout
+ORBTO	equ 255		; orb failure timeout
 
 	org $0000
 
@@ -28,6 +29,7 @@ key3	rmb 1
 key4	rmb 1
 nshield	rmb 1
 nsword	rmb 1
+norb	rmb 1
 nfound	rmb 1
 vcount	rmb 1
 secs	rmb 1
@@ -39,12 +41,14 @@ timer1a	rmb 1
 timer1b	rmb 1
 swdtmr	rmb 1
 shdtmr	rmb 1
+orbtmr	rmb 1
 kbbusy	rmb 1 ; keyboard busy
 player	rmb 2 ; global player coordinates
 dead	rmb 1 ; player died flag
 health	rmb 1 ; player health
 reason	rmb 1 ; index into whimsical object timeout excuses
 yayidx	rmb 1 ; index into smug gold acquisition messages
+orbidx	rmb 1 ; index into orb messages
 prior1a	rmb 1 ; status1a priority flag
 prior1b	rmb 1 ; status1b priority flag
 
@@ -106,6 +110,7 @@ start
 	* Init text indexes
 	sta reason
 	sta yayidx
+	sta orbidx
 
 	* Clear player died flag
 	sta dead
@@ -120,6 +125,7 @@ start
 	sta key4
 	sta nsword
 	sta nshield
+	sta norb
 
 	* Clear elapsed time
 	sta secs
@@ -129,12 +135,13 @@ start
 	* Init sword and shield failure timers
 	sta swdtmr
 	sta shdtmr
+	sta orbtmr
 
 	* Number of treasures
 	lda #NGOLD
 	sta ngold
 
-	* Initialize gold and key objects
+	* Initialize gold, orb, and key objects
 	leax objtable,pcr
 	ldy #OBJS
 	lbsr tfrxy
@@ -314,7 +321,7 @@ initgfx
 	stb $ffb9
 	ldb #63		; white	$10	player
 	stb $ffba
-	ldb #63		; white $18	gold
+	ldb #63		; white $18	gold, orb
 	stb $ffbb
 	ldb #52		; white $20	key1, door1
 	stb $ffbc
@@ -339,6 +346,7 @@ KEY3 equ $30
 DOOR3 equ $30
 KEY4 equ $38
 DOOR4 equ $38
+ORB equ $18
 
 * Clear screen
 cls
@@ -554,7 +562,7 @@ okay@
 	suba 1,u
 	ldb coords+1
 	bpl y1okay@
-	adda coords+1 ; negative amount already so add, not sub
+	adda coords+1	; negative amount already so add, not sub
 	beq xvline
 	clr coords+1
 y1okay@
@@ -724,7 +732,10 @@ status
 	* Count how many "Found:" icons to display
 	clra
 	sta nfound
-	tst key1
+	tst norb
+	beq noorb@
+	inc nfound
+noorb@	tst key1
 	beq nokey1@
 	inc nfound
 nokey1@	tst key2
@@ -788,7 +799,12 @@ noshd@	tst nsword
 	beq noswd@
 	ldd #$5e*256+$18
 	std ,x++
-noswd@
+	* Show orb
+noswd@	tst norb
+	beq noorb@
+	ldd #$1e*256+$18
+	std ,x++
+noorb@
 done@
 	* Status line two
 	clra
@@ -847,7 +863,24 @@ loop@	ldd ,u
 	beq shield@
 	cmpa #$1d	; is it a potion?
 	beq potion@
+	cmpa #$1e	; is it an orb?
+	beq orb@
 	lbra next@	; ignore
+orb@
+	leay gotorb,pcr
+	lbsr prstatus1a	; "Found a magic orb!"
+	tst norb
+	beq orbok@
+	leay notok,pcr	; "But you already have one!"
+	lbsr prstatus1b
+	lbra next@
+orbok@
+	lbsr orbmsg	; add enigmatic message
+	lbsr delobj	; get orb
+	inc norb
+	lda #ORBTO	; set orb timeout
+	sta orbtmr
+	lbra next@
 potion@
 	leay gotptn,pcr
 	lbsr prstatus1a	; "Found a potion!"
@@ -931,6 +964,7 @@ next@	leau 4,u
 exit@	rts
 
 null	fcs / /
+gotorb	fcs /Found a magic orb!/
 gotgold fcs /Found +50 gold!/
 gotkey	fcs /Found a key!/
 gotswd	fcs /Found a sword!/
@@ -1346,7 +1380,7 @@ draw@
 nosword@
 	leay gothurt,pcr	; "The dragon attacks you!"
 	dec health		; health = health - 1%
-	tst nshield
+	tst nshield		; if shielded, half damage
 	bne shielded@
 	dec health		; health = health - 1%
 shielded@
@@ -1382,6 +1416,8 @@ killed	fcs /You killed a dragon!/
 *	bcc notaggro
 *	bcs aggro
 isaggro
+	tst norb	; is there an orb?
+	bne notaggro@
 	ldd playerx	; local coordinates of player
 	adda origin
 	addb origin+1
@@ -1404,7 +1440,6 @@ isaggro
 	blo notaggro@
 	cmpb player+1	; is lower edge of aggro area above player?
 	blo notaggro@
-*
 aggro@
 	ldd player	; chase player
 	decb
@@ -1451,15 +1486,40 @@ timeout
 	lbsr excuse	; lame excuse for sword disappearing
 shield@
 	tst shdtmr
-	beq exit@
+	beq orb@
 	dec shdtmr	; count down shield timer
-	bne exit@
+	bne orb@
 	clr nshield	; no more shield
 	leay noshd,pcr	; "Oops! No more shield!"
 	lbsr prstatus1a
 	inc prior1a	; priority message
 	lbsr excuse	; lame excuse for shield disappearing
+orb@
+	tst orbtmr
+	beq exit@
+	dec orbtmr
+	bne exit@
+	clr norb	; no more orb
+	leay noorb,pcr	; "Oops! No more orb!"
+	lbsr prstatus1a
+	inc prior1a	; priority message
+	lbsr excuse	; lame excuse for orb disappearing
 exit@	rts
+
+* Generate an enigmatic message when you acquire an orb
+*
+orbmsg
+	leay orb,pcr
+	ldb orbidx
+	andb #3
+	bsr genmsg
+	inc orbidx
+	rts
+
+orb	fcs /You suddenly feel quite stealthy/
+	fcs /Huh, what happened to your shadow?/
+	fcs /Here we go again!/
+	fcs /Time for some magic!/
 
 * Generate a whimsically smug saying when you acquire gold
 *
@@ -1507,6 +1567,7 @@ excuse
 
 noshd	fcs /Oops! No more shield!/
 noswd	fcs /Oops! No more sword!/
+noorb	fcs /Oops! No more orb!/
 
 * Whimsical lame excuses
 reasons fcs /Gone in a poof of glitter! Unstable magic! Never order from Temu again!/
