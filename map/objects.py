@@ -27,6 +27,7 @@ ENEMY = pix[11, 0]	# crimson
 POTION = pix[12, 0]	# springgreen
 SWORD = pix[13, 0]	# mintcream
 SHIELD = pix[14, 0]	# silver
+ORB = pix[15, 0]	# steelblue
 
 # Remove color swatches
 for x in range(1, 15):
@@ -49,6 +50,7 @@ TENEMY = 0x10
 TPOTION = 0x18
 TSWORD = 0x18
 TSHIELD = 0x18
+TORB = 0x18
 
 width = img.size[0]
 height = img.size[1]
@@ -87,6 +89,9 @@ for y in range(0, height):
 	    nobjects += 1
         elif objtype == SHIELD:
 	    objects.append({"x": x, "y": y, "objtype": 0x1a*256+TSHIELD})
+	    nobjects += 1
+        elif objtype == ORB:
+	    objects.append({"x": x, "y": y, "objtype": 0x1e*256+TORB})
 	    nobjects += 1
 for obj in sorted(objects, key=lambda obj: (obj["x"], obj["y"])):
     x = obj["x"]

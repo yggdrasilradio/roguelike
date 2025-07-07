@@ -165,6 +165,7 @@ draw.point((11, 0), fill="crimson")	# MONSTER
 draw.point((12, 0), fill="springgreen")	# POTION
 draw.point((13, 0), fill="mintcream")	# SWORD
 draw.point((14, 0), fill="silver")	# SHIELD
+draw.point((15, 0), fill="steelblue")	# ORB
 
 # How many rooms will fit?
 ncolumns = 0
@@ -273,6 +274,16 @@ for _ in range(0, nshields):
     CreateObject(xcenter, ycenter, xdelta, ydelta, "silver")
     nobjects += 1
 print(str(nshields) + " shield objects generated")
+
+# Create orb objects
+norbs = int(nrooms / 10)
+rooms = list(roomlist)
+for _ in range(0, norbs):
+    xcenter, ycenter, xdelta, ydelta = random.choice(rooms)
+    rooms.remove((xcenter, ycenter, xdelta, ydelta))
+    CreateObject(xcenter, ycenter, xdelta, ydelta, "steelblue")
+    nobjects += 1
+print(str(norbs) + " orb objects generated")
 
 print(str(nobjects) + " objects generated")
 
