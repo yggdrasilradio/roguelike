@@ -1356,7 +1356,7 @@ noaggro@
 	bra draw@
 aggro@
 	ldd #$1b*256+$38	; Yes, draw with highlight
-	leay yousee,pcr		; "You see a dragon!"
+	leay seen,pcr		; "A dragon has spotted you!"
 draw@
 	pshs d			; save text and attributes
         ldd ,u
@@ -1398,7 +1398,7 @@ next@	leau 6,u
 exit@	rts
 
 gothurt	fcs /The dragon attacks you!/
-yousee	fcs /You see a dragon!/
+seen	fcs /A dragon has spotted you!/
 killed	fcs /You killed a dragon!/
 
 * Is player within aggro area?
