@@ -13,7 +13,7 @@ LMARGIN = 10
 
 def CreateBarrier(doorcolor, keycolor):
 
-	roomdeltas = {(xcenter, ycenter): (xdelta, ydelta) for xcenter, ycenter, xdelta, ydelta in roomlist}
+	#roomdeltas = {(xcenter, ycenter): (xdelta, ydelta) for xcenter, ycenter, xdelta, ydelta in roomlist}
 	border = random.randint(10, len(pathlist) - 10)
 	# Create door
 	for i in range(border, len(pathlist)):
@@ -225,13 +225,14 @@ for x in range(LMARGIN, WIDTH - XSPACING, XSPACING):
                 NorthExit(x, y)
 
 # Create doors and keys
+roomdeltas = {(xcenter, ycenter): (xdelta, ydelta) for xcenter, ycenter, xdelta, ydelta in roomlist}
 CreateBarrier("red", "green")
 CreateBarrier("blue", "cyan")
 CreateBarrier("magenta", "orange")
 CreateBarrier("gray", "maroon")
 
 nrooms = len(roomlist)
-print(str(nrooms) + " rooms generated")
+print("%d rooms generated" % nrooms)
 
 nobjects = 0
 
@@ -243,49 +244,57 @@ for _ in range(0, ngold):
     rooms.remove((xcenter, ycenter, xdelta, ydelta))
     CreateObject(xcenter, ycenter, xdelta, ydelta, "yellow")
     nobjects += 1
-print(str(ngold) + " gold objects generated")
+print("%d gold objects generated" % ngold)
 
 # Create potion objects
 npotions = int(nrooms / 10)
-rooms = list(roomlist)
+delta = int((nrooms) / npotions)
+start = 0
 for _ in range(0, npotions):
-    xcenter, ycenter, xdelta, ydelta = random.choice(rooms)
-    rooms.remove((xcenter, ycenter, xdelta, ydelta))
+    x, y, xcenter, ycenter = random.choice(pathlist[start + 1:start + delta - 1])
+    xdelta, ydelta = roomdeltas.get((xcenter, ycenter), None)
     CreateObject(xcenter, ycenter, xdelta, ydelta, "springgreen")
     nobjects += 1
-print(str(npotions) + " potion objects generated")
+    start += delta
+print("%d potion objects generated" % npotions)
 
 # Create sword objects
 nswords = int(nrooms / 10)
-rooms = list(roomlist)
+delta = int(nrooms / nswords)
+start = 0
 for _ in range(0, nswords):
-    xcenter, ycenter, xdelta, ydelta = random.choice(rooms)
-    rooms.remove((xcenter, ycenter, xdelta, ydelta))
+    x, y, xcenter, ycenter = random.choice(pathlist[start + 1:start + delta - 1])
+    xdelta, ydelta = roomdeltas.get((xcenter, ycenter), None)
     CreateObject(xcenter, ycenter, xdelta, ydelta, "mintcream")
     nobjects += 1
-print(str(nswords) + " sword objects generated")
+    start += delta
+print("%d sword objects generated" % nswords)
 
 # Create shield objects
 nshields = int(nrooms / 10)
-rooms = list(roomlist)
+delta = int(nrooms / nshields)
+start = 0
 for _ in range(0, nshields):
-    xcenter, ycenter, xdelta, ydelta = random.choice(rooms)
-    rooms.remove((xcenter, ycenter, xdelta, ydelta))
+    x, y, xcenter, ycenter = random.choice(pathlist[start + 1:start + delta - 1])
+    xdelta, ydelta = roomdeltas.get((xcenter, ycenter), None)
     CreateObject(xcenter, ycenter, xdelta, ydelta, "silver")
     nobjects += 1
-print(str(nshields) + " shield objects generated")
+    start += delta
+print("%d shield objects generated" % nshields)
 
 # Create orb objects
 norbs = int(nrooms / 10)
-rooms = list(roomlist)
+delta = int(nrooms / norbs)
+start = 0
 for _ in range(0, norbs):
-    xcenter, ycenter, xdelta, ydelta = random.choice(rooms)
-    rooms.remove((xcenter, ycenter, xdelta, ydelta))
+    x, y, xcenter, ycenter = random.choice(pathlist[start + 1:start + delta - 1])
+    xdelta, ydelta = roomdeltas.get((xcenter, ycenter), None)
     CreateObject(xcenter, ycenter, xdelta, ydelta, "steelblue")
     nobjects += 1
-print(str(norbs) + " orb objects generated")
+    start += delta
+print("%d orb objects generated" % norbs)
 
-print(str(nobjects) + " objects generated")
+print("%d objects generated" % nobjects)
 
 # Save map
 image.save(filename, "GIF")
