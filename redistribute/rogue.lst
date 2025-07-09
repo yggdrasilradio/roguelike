@@ -251,7 +251,7 @@
 0F3C CB14             (         main.asm):00251                 addb #20
 0F3E DD06             (         main.asm):00252                 std origin+2
 0F40 13               (         main.asm):00253                 sync
-0F41 1723B0           (         main.asm):00254                 lbsr timeout
+0F41 1723B8           (         main.asm):00254                 lbsr timeout
 0F44 1700A3           (         main.asm):00255                 lbsr cls
 0F47 170183           (         main.asm):00256                 lbsr vlines
 0F4A 17019A           (         main.asm):00257                 lbsr hlines
@@ -887,8 +887,8 @@
 13DA 171C72           (         main.asm):00875                 lbsr prstatus1b
 13DD 1600C2           (         main.asm):00876                 lbra next@
 13E0                  (         main.asm):00877         orbok@
-13E0 171F54           (         main.asm):00878                 lbsr orbmsg     ; add enigmatic message
-13E3 171F09           (         main.asm):00879                 lbsr delobj     ; get orb
+13E0 171F5C           (         main.asm):00878                 lbsr orbmsg     ; add enigmatic message
+13E3 171F11           (         main.asm):00879                 lbsr delobj     ; get orb
 13E6 0C23             (         main.asm):00880                 inc norb
 13E8 86FF             (         main.asm):00881                 lda #ORBTO      ; set orb timeout
 13EA 9731             (         main.asm):00882                 sta orbtmr
@@ -904,7 +904,7 @@
 1403 16009C           (         main.asm):00892                 lbra next@
 1406 318D0111         (         main.asm):00893         healme@ leay better,pcr ; "Drinking it, you feel much better!"
 140A 171C42           (         main.asm):00894                 lbsr prstatus1b
-140D 171EDF           (         main.asm):00895                 lbsr delobj
+140D 171EE7           (         main.asm):00895                 lbsr delobj
 1410 9636             (         main.asm):00896                 lda health
 1412 8B14             (         main.asm):00897                 adda #20        ; increase health by 20%
 1414 8164             (         main.asm):00898                 cmpa #100
@@ -921,7 +921,7 @@
 142E 171C1E           (         main.asm):00909                 lbsr prstatus1b
 1431 16006E           (         main.asm):00910                 lbra next@
 1434                  (         main.asm):00911         swdok@
-1434 171EB8           (         main.asm):00912                 lbsr delobj     ; get sword
+1434 171EC0           (         main.asm):00912                 lbsr delobj     ; get sword
 1437 0C22             (         main.asm):00913                 inc nsword
 1439 86FF             (         main.asm):00914                 lda #SWDTO      ; set sword timeout
 143B 972F             (         main.asm):00915                 sta swdtmr
@@ -935,7 +935,7 @@
 144E 171BFE           (         main.asm):00923                 lbsr prstatus1b
 1451 204F             (         main.asm):00924                 bra next@
 1453                  (         main.asm):00925         shdok@
-1453 171E99           (         main.asm):00926                 lbsr delobj     ; get shield
+1453 171EA1           (         main.asm):00926                 lbsr delobj     ; get shield
 1456 0C21             (         main.asm):00927                 inc nshield
 1458 86FF             (         main.asm):00928                 lda #SHDTO      ; set shield timeout
 145A 9730             (         main.asm):00929                 sta shdtmr
@@ -943,7 +943,7 @@
 145E                  (         main.asm):00931         key@
 145E 318D0068         (         main.asm):00932                 leay gotkey,pcr
 1462 171BD3           (         main.asm):00933                 lbsr prstatus1a ; "Found a key!"
-1465 171E87           (         main.asm):00934                 lbsr delobj
+1465 171E8F           (         main.asm):00934                 lbsr delobj
 1468 A643             (         main.asm):00935                 lda 3,u         ; key type (KEY1, KEY2, KEY3, KEY4)
 146A 8120             (         main.asm):00936                 cmpa #KEY1
 146C 2602             (         main.asm):00937                 bne key2@
@@ -962,11 +962,11 @@
 1484 DC15             (         main.asm):00950                 ldd score       ; add 50 to score
 1486 C30032           (         main.asm):00951                 addd #50
 1489 DD15             (         main.asm):00952                 std score
-148B 171E61           (         main.asm):00953                 lbsr delobj
+148B 171E69           (         main.asm):00953                 lbsr delobj
 148E 0A17             (         main.asm):00954                 dec ngold
 1490 318D0027         (         main.asm):00955                 leay gotgold,pcr
 1494 171BA1           (         main.asm):00956                 lbsr prstatus1a ; "Found +50 gold!"
-1497 171F11           (         main.asm):00957                 lbsr yayness    ; whimsical flavor text
+1497 171F19           (         main.asm):00957                 lbsr yayness    ; whimsical flavor text
 149A 2006             (         main.asm):00958                 bra next@
 149C EC42             (         main.asm):00959         draw@   ldd 2,u         ; draw object
 149E 9E00             (         main.asm):00960                 ldx textptr
@@ -3637,14 +3637,14 @@
 3206 5C               (         main.asm):01349                 incb
 3207 17DE7D           (         main.asm):01350                 lbsr curspos
 320A 9E00             (         main.asm):01351                 ldx textptr
-320C 17008F           (         main.asm):01352                 lbsr isaggro            ; Is player in enemy aggro area?
+320C 170097           (         main.asm):01352                 lbsr isaggro            ; Is player in enemy aggro area?
 320F 2505             (         main.asm):01353                 bcs aggro@
 3211                  (         main.asm):01354         noaggro@
 3211 CC1B10           (         main.asm):01355                 ldd #$1b*256+$10        ; No, draw without highlight
 3214 2007             (         main.asm):01356                 bra draw@
 3216                  (         main.asm):01357         aggro@
 3216 CC1B38           (         main.asm):01358                 ldd #$1b*256+$38        ; Yes, draw with highlight
-3219 318D005C         (         main.asm):01359                 leay yousee,pcr         ; "You see a dragon!"
+3219 318D005C         (         main.asm):01359                 leay seen,pcr           ; "A dragon has spotted you!"
 321D                  (         main.asm):01360         draw@
 321D 3406             (         main.asm):01361                 pshs d                  ; save text and attributes
 321F ECC4             (         main.asm):01362                 ldd ,u
@@ -3660,7 +3660,7 @@
                       (         main.asm):01372                 * Dragon hits player
 3232 0D22             (         main.asm):01373                 tst nsword              ; holding a sword?
 3234 270C             (         main.asm):01374                 beq nosword@
-3236 318D0050         (         main.asm):01375                 leay killed,pcr         ; "You killed a dragon!"
+3236 318D0058         (         main.asm):01375                 leay killed,pcr         ; "You killed a dragon!"
 323A 6FC4             (         main.asm):01376                 clr ,u                  ; kill dragon
 323C 6F41             (         main.asm):01377                 clr 1,u
 323E 3262             (         main.asm):01378                 leas 2,s                ; throw away text and attributes
@@ -3688,10 +3688,11 @@
 3262 5468652064726167 (         main.asm):01400         gothurt fcs /The dragon attacks you!/
      6F6E206174746163
      6B7320796F75A1
-3279 596F752073656520 (         main.asm):01401         yousee  fcs /You see a dragon!/
-     6120647261676F6E
+3279 4120647261676F6E (         main.asm):01401         seen    fcs /A dragon has spotted you!/
+     206861732073706F
+     7474656420796F75
      A1
-328A 596F75206B696C6C (         main.asm):01402         killed  fcs /You killed a dragon!/
+3292 596F75206B696C6C (         main.asm):01402         killed  fcs /You killed a dragon!/
      6564206120647261
      676F6EA1
                       (         main.asm):01403         
@@ -3709,132 +3710,132 @@
                       (         main.asm):01415         *       lbsr isaggro
                       (         main.asm):01416         *       bcc notaggro
                       (         main.asm):01417         *       bcs aggro
-329E                  (         main.asm):01418         isaggro
-329E 0D23             (         main.asm):01419                 tst norb        ; is there an orb?
-32A0 2631             (         main.asm):01420                 bne notaggro@
-32A2 DC11             (         main.asm):01421                 ldd playerx     ; local coordinates of player
-32A4 9B04             (         main.asm):01422                 adda origin
-32A6 DB05             (         main.asm):01423                 addb origin+1
-32A8 DD33             (         main.asm):01424                 std player      ; global coordinates of player
-32AA EC42             (         main.asm):01425                 ldd 2,u         ; xcenter, ycenter
-32AC A044             (         main.asm):01426                 suba 4,u        ; a = left edge of aggro area
-32AE E045             (         main.asm):01427                 subb 5,u        ; b = upper edge of aggro area
-32B0 5C               (         main.asm):01428                 incb
-32B1 5C               (         main.asm):01429                 incb
-32B2 9133             (         main.asm):01430                 cmpa player     ; is left edge of aggro area to right of player?
-32B4 221D             (         main.asm):01431                 bhi notaggro@
-32B6 D134             (         main.asm):01432                 cmpb player+1   ; is upper edge of aggro aread below player?
-32B8 2219             (         main.asm):01433                 bhi notaggro@
-32BA EC42             (         main.asm):01434                 ldd 2,u         ; xcenter, ycenter
-32BC AB44             (         main.asm):01435                 adda 4,u        ; a = right edge of aggro area
-32BE EB45             (         main.asm):01436                 addb 5,u        ; b = lower edge of aggro area
-32C0 5C               (         main.asm):01437                 incb
-32C1 5C               (         main.asm):01438                 incb
-32C2 9133             (         main.asm):01439                 cmpa player     ; is right edge of aggro area to left of player?
-32C4 250D             (         main.asm):01440                 blo notaggro@
-32C6 D134             (         main.asm):01441                 cmpb player+1   ; is lower edge of aggro area above player?
-32C8 2509             (         main.asm):01442                 blo notaggro@
-32CA                  (         main.asm):01443         aggro@
-32CA DC33             (         main.asm):01444                 ldd player      ; chase player
-32CC 5A               (         main.asm):01445                 decb
-32CD 5A               (         main.asm):01446                 decb
-32CE 170009           (         main.asm):01447                 lbsr chase
-32D1 43               (         main.asm):01448                 coma            ; set carry
-32D2 39               (         main.asm):01449                 rts
-32D3                  (         main.asm):01450         notaggro@
-32D3 EC42             (         main.asm):01451                 ldd 2,u         ; return to home position
-32D5 170002           (         main.asm):01452                 lbsr chase
-32D8 4F               (         main.asm):01453                 clra            ; clear carry
-32D9 39               (         main.asm):01454                 rts
+32A6                  (         main.asm):01418         isaggro
+32A6 0D23             (         main.asm):01419                 tst norb        ; is there an orb?
+32A8 2631             (         main.asm):01420                 bne notaggro@
+32AA DC11             (         main.asm):01421                 ldd playerx     ; local coordinates of player
+32AC 9B04             (         main.asm):01422                 adda origin
+32AE DB05             (         main.asm):01423                 addb origin+1
+32B0 DD33             (         main.asm):01424                 std player      ; global coordinates of player
+32B2 EC42             (         main.asm):01425                 ldd 2,u         ; xcenter, ycenter
+32B4 A044             (         main.asm):01426                 suba 4,u        ; a = left edge of aggro area
+32B6 E045             (         main.asm):01427                 subb 5,u        ; b = upper edge of aggro area
+32B8 5C               (         main.asm):01428                 incb
+32B9 5C               (         main.asm):01429                 incb
+32BA 9133             (         main.asm):01430                 cmpa player     ; is left edge of aggro area to right of player?
+32BC 221D             (         main.asm):01431                 bhi notaggro@
+32BE D134             (         main.asm):01432                 cmpb player+1   ; is upper edge of aggro aread below player?
+32C0 2219             (         main.asm):01433                 bhi notaggro@
+32C2 EC42             (         main.asm):01434                 ldd 2,u         ; xcenter, ycenter
+32C4 AB44             (         main.asm):01435                 adda 4,u        ; a = right edge of aggro area
+32C6 EB45             (         main.asm):01436                 addb 5,u        ; b = lower edge of aggro area
+32C8 5C               (         main.asm):01437                 incb
+32C9 5C               (         main.asm):01438                 incb
+32CA 9133             (         main.asm):01439                 cmpa player     ; is right edge of aggro area to left of player?
+32CC 250D             (         main.asm):01440                 blo notaggro@
+32CE D134             (         main.asm):01441                 cmpb player+1   ; is lower edge of aggro area above player?
+32D0 2509             (         main.asm):01442                 blo notaggro@
+32D2                  (         main.asm):01443         aggro@
+32D2 DC33             (         main.asm):01444                 ldd player      ; chase player
+32D4 5A               (         main.asm):01445                 decb
+32D5 5A               (         main.asm):01446                 decb
+32D6 170009           (         main.asm):01447                 lbsr chase
+32D9 43               (         main.asm):01448                 coma            ; set carry
+32DA 39               (         main.asm):01449                 rts
+32DB                  (         main.asm):01450         notaggro@
+32DB EC42             (         main.asm):01451                 ldd 2,u         ; return to home position
+32DD 170002           (         main.asm):01452                 lbsr chase
+32E0 4F               (         main.asm):01453                 clra            ; clear carry
+32E1 39               (         main.asm):01454                 rts
                       (         main.asm):01455         
                       (         main.asm):01456         * Seek after player
-32DA                  (         main.asm):01457         chase
-32DA A1C4             (         main.asm):01458                 cmpa ,u         ; compare target x with current x
-32DC 2302             (         main.asm):01459                 bls no1@
-32DE 6CC4             (         main.asm):01460                 inc ,u          ; chase right
-32E0 2402             (         main.asm):01461         no1@    bhs no2@
-32E2 6AC4             (         main.asm):01462                 dec ,u          ; chase left
-32E4 E141             (         main.asm):01463         no2@    cmpb 1,u        ; compare target y with current y
-32E6 2302             (         main.asm):01464                 bls no3@
-32E8 6C41             (         main.asm):01465                 inc 1,u         ; chase down
-32EA 2402             (         main.asm):01466         no3@    bhs no4@
-32EC 6A41             (         main.asm):01467                 dec 1,u         ; chase up
-32EE 39               (         main.asm):01468         no4@    rts
+32E2                  (         main.asm):01457         chase
+32E2 A1C4             (         main.asm):01458                 cmpa ,u         ; compare target x with current x
+32E4 2302             (         main.asm):01459                 bls no1@
+32E6 6CC4             (         main.asm):01460                 inc ,u          ; chase right
+32E8 2402             (         main.asm):01461         no1@    bhs no2@
+32EA 6AC4             (         main.asm):01462                 dec ,u          ; chase left
+32EC E141             (         main.asm):01463         no2@    cmpb 1,u        ; compare target y with current y
+32EE 2302             (         main.asm):01464                 bls no3@
+32F0 6C41             (         main.asm):01465                 inc 1,u         ; chase down
+32F2 2402             (         main.asm):01466         no3@    bhs no4@
+32F4 6A41             (         main.asm):01467                 dec 1,u         ; chase up
+32F6 39               (         main.asm):01468         no4@    rts
                       (         main.asm):01469         
                       (         main.asm):01470         * Delete object
-32EF                  (         main.asm):01471         delobj
-32EF 6FC4             (         main.asm):01472                 clr ,u          ; delete object
-32F1 6F41             (         main.asm):01473                 clr 1,u
-32F3 39               (         main.asm):01474                 rts
+32F7                  (         main.asm):01471         delobj
+32F7 6FC4             (         main.asm):01472                 clr ,u          ; delete object
+32F9 6F41             (         main.asm):01473                 clr 1,u
+32FB 39               (         main.asm):01474                 rts
                       (         main.asm):01475         
                       (         main.asm):01476         * Limit the use of shields, orbs, and swords
-32F4                  (         main.asm):01477         timeout
-32F4 0D2F             (         main.asm):01478                 tst swdtmr
-32F6 2712             (         main.asm):01479                 beq shield@
-32F8 0A2F             (         main.asm):01480                 dec swdtmr      ; count down sword timer
-32FA 260E             (         main.asm):01481                 bne shield@
-32FC 0F22             (         main.asm):01482                 clr nsword      ; no more sword
-32FE 318D00EA         (         main.asm):01483                 leay noswd,pcr  ; "Oops! No more sword!"
-3302 17FD33           (         main.asm):01484                 lbsr prstatus1a
-3305 0C3A             (         main.asm):01485                 inc prior1a     ; priority message
-3307 1700BC           (         main.asm):01486                 lbsr excuse     ; lame excuse for sword disappearing
-330A                  (         main.asm):01487         shield@
-330A 0D30             (         main.asm):01488                 tst shdtmr
-330C 2712             (         main.asm):01489                 beq orb@
-330E 0A30             (         main.asm):01490                 dec shdtmr      ; count down shield timer
-3310 260E             (         main.asm):01491                 bne orb@
-3312 0F21             (         main.asm):01492                 clr nshield     ; no more shield
-3314 318D00BF         (         main.asm):01493                 leay noshd,pcr  ; "Oops! No more shield!"
-3318 17FD1D           (         main.asm):01494                 lbsr prstatus1a
-331B 0C3A             (         main.asm):01495                 inc prior1a     ; priority message
-331D 1700A6           (         main.asm):01496                 lbsr excuse     ; lame excuse for shield disappearing
-3320                  (         main.asm):01497         orb@
-3320 0D31             (         main.asm):01498                 tst orbtmr
-3322 2712             (         main.asm):01499                 beq exit@
-3324 0A31             (         main.asm):01500                 dec orbtmr
-3326 260E             (         main.asm):01501                 bne exit@
-3328 0F23             (         main.asm):01502                 clr norb        ; no more orb
-332A 318D00D2         (         main.asm):01503                 leay noorb,pcr  ; "Oops! No more orb!"
-332E 17FD07           (         main.asm):01504                 lbsr prstatus1a
-3331 0C3A             (         main.asm):01505                 inc prior1a     ; priority message
-3333 170090           (         main.asm):01506                 lbsr excuse     ; lame excuse for orb disappearing
-3336 39               (         main.asm):01507         exit@   rts
+32FC                  (         main.asm):01477         timeout
+32FC 0D2F             (         main.asm):01478                 tst swdtmr
+32FE 2712             (         main.asm):01479                 beq shield@
+3300 0A2F             (         main.asm):01480                 dec swdtmr      ; count down sword timer
+3302 260E             (         main.asm):01481                 bne shield@
+3304 0F22             (         main.asm):01482                 clr nsword      ; no more sword
+3306 318D00EA         (         main.asm):01483                 leay noswd,pcr  ; "Oops! No more sword!"
+330A 17FD2B           (         main.asm):01484                 lbsr prstatus1a
+330D 0C3A             (         main.asm):01485                 inc prior1a     ; priority message
+330F 1700BC           (         main.asm):01486                 lbsr excuse     ; lame excuse for sword disappearing
+3312                  (         main.asm):01487         shield@
+3312 0D30             (         main.asm):01488                 tst shdtmr
+3314 2712             (         main.asm):01489                 beq orb@
+3316 0A30             (         main.asm):01490                 dec shdtmr      ; count down shield timer
+3318 260E             (         main.asm):01491                 bne orb@
+331A 0F21             (         main.asm):01492                 clr nshield     ; no more shield
+331C 318D00BF         (         main.asm):01493                 leay noshd,pcr  ; "Oops! No more shield!"
+3320 17FD15           (         main.asm):01494                 lbsr prstatus1a
+3323 0C3A             (         main.asm):01495                 inc prior1a     ; priority message
+3325 1700A6           (         main.asm):01496                 lbsr excuse     ; lame excuse for shield disappearing
+3328                  (         main.asm):01497         orb@
+3328 0D31             (         main.asm):01498                 tst orbtmr
+332A 2712             (         main.asm):01499                 beq exit@
+332C 0A31             (         main.asm):01500                 dec orbtmr
+332E 260E             (         main.asm):01501                 bne exit@
+3330 0F23             (         main.asm):01502                 clr norb        ; no more orb
+3332 318D00D2         (         main.asm):01503                 leay noorb,pcr  ; "Oops! No more orb!"
+3336 17FCFF           (         main.asm):01504                 lbsr prstatus1a
+3339 0C3A             (         main.asm):01505                 inc prior1a     ; priority message
+333B 170090           (         main.asm):01506                 lbsr excuse     ; lame excuse for orb disappearing
+333E 39               (         main.asm):01507         exit@   rts
                       (         main.asm):01508         
                       (         main.asm):01509         * Generate an enigmatic message when you acquire an orb
                       (         main.asm):01510         *
-3337                  (         main.asm):01511         orbmsg
-3337 318D0009         (         main.asm):01512                 leay orb,pcr
-333B D639             (         main.asm):01513                 ldb orbidx
-333D C403             (         main.asm):01514                 andb #3
-333F 8D77             (         main.asm):01515                 bsr genmsg
-3341 0C39             (         main.asm):01516                 inc orbidx
-3343 39               (         main.asm):01517                 rts
+333F                  (         main.asm):01511         orbmsg
+333F 318D0009         (         main.asm):01512                 leay orb,pcr
+3343 D639             (         main.asm):01513                 ldb orbidx
+3345 C403             (         main.asm):01514                 andb #3
+3347 8D77             (         main.asm):01515                 bsr genmsg
+3349 0C39             (         main.asm):01516                 inc orbidx
+334B 39               (         main.asm):01517                 rts
                       (         main.asm):01518         
-3344 596F752073756464 (         main.asm):01519         orb     fcs /You suddenly feel quite stealthy/
+334C 596F752073756464 (         main.asm):01519         orb     fcs /You suddenly feel quite stealthy/
      656E6C7920666565
      6C20717569746520
      737465616C7468F9
-3364 4875682C20776861 (         main.asm):01520                 fcs /Huh, what happened to your shadow?/
+336C 4875682C20776861 (         main.asm):01520                 fcs /Huh, what happened to your shadow?/
      742068617070656E
      656420746F20796F
      757220736861646F
      77BF
-3386 4865726520776520 (         main.asm):01521                 fcs /Here we go again!/
+338E 4865726520776520 (         main.asm):01521                 fcs /Here we go again!/
      676F20616761696E
      A1
-3397 54696D6520666F72 (         main.asm):01522                 fcs /Time for some magic!/
+339F 54696D6520666F72 (         main.asm):01522                 fcs /Time for some magic!/
      20736F6D65206D61
      676963A1
                       (         main.asm):01523         
                       (         main.asm):01524         * Generate a whimsically smug saying when you acquire gold
                       (         main.asm):01525         *
-33AB                  (         main.asm):01526         yayness
-33AB 318DE1A8         (         main.asm):01527                 leay yay,pcr
-33AF D638             (         main.asm):01528                 ldb yayidx
-33B1 C40F             (         main.asm):01529                 andb #15
-33B3 8D03             (         main.asm):01530                 bsr genmsg
-33B5 0C38             (         main.asm):01531                 inc yayidx
-33B7 39               (         main.asm):01532                 rts
+33B3                  (         main.asm):01526         yayness
+33B3 318DE1A0         (         main.asm):01527                 leay yay,pcr
+33B7 D638             (         main.asm):01528                 ldb yayidx
+33B9 C40F             (         main.asm):01529                 andb #15
+33BB 8D03             (         main.asm):01530                 bsr genmsg
+33BD 0C38             (         main.asm):01531                 inc yayidx
+33BF 39               (         main.asm):01532                 rts
                       (         main.asm):01533         
                       (         main.asm):01534         * Generate message from list
                       (         main.asm):01535         *
@@ -3845,43 +3846,43 @@
                       (         main.asm):01540         * Exit:
                       (         main.asm):01541         *       Y address of message
                       (         main.asm):01542         *
-33B8                  (         main.asm):01543         genmsg
-33B8                  (         main.asm):01544         next@
-33B8 5D               (         main.asm):01545                 tstb
-33B9 2707             (         main.asm):01546                 beq done@
-33BB                  (         main.asm):01547         loop@
-33BB 6DA0             (         main.asm):01548                 tst ,y+
-33BD 2AFC             (         main.asm):01549                 bpl loop@
-33BF 5A               (         main.asm):01550                 decb
-33C0 20F6             (         main.asm):01551                 bra next@
-33C2                  (         main.asm):01552         done@
-33C2 17FC8A           (         main.asm):01553                 lbsr prstatus1b
-33C5 39               (         main.asm):01554                 rts
+33C0                  (         main.asm):01543         genmsg
+33C0                  (         main.asm):01544         next@
+33C0 5D               (         main.asm):01545                 tstb
+33C1 2707             (         main.asm):01546                 beq done@
+33C3                  (         main.asm):01547         loop@
+33C3 6DA0             (         main.asm):01548                 tst ,y+
+33C5 2AFC             (         main.asm):01549                 bpl loop@
+33C7 5A               (         main.asm):01550                 decb
+33C8 20F6             (         main.asm):01551                 bra next@
+33CA                  (         main.asm):01552         done@
+33CA 17FC82           (         main.asm):01553                 lbsr prstatus1b
+33CD 39               (         main.asm):01554                 rts
                       (         main.asm):01555         
                       (         main.asm):01556         * Come up with a whimsical excuse for an object timing out
                       (         main.asm):01557         *
-33C6                  (         main.asm):01558         excuse
-33C6 318D0048         (         main.asm):01559                 leay reasons,pcr
-33CA 0F3B             (         main.asm):01560                 clr prior1b
-33CC D637             (         main.asm):01561                 ldb reason
-33CE C407             (         main.asm):01562                 andb #7
-33D0 8DE6             (         main.asm):01563                 bsr genmsg
-33D2 0C3B             (         main.asm):01564                 inc prior1b
-33D4 0C37             (         main.asm):01565                 inc reason
-33D6 39               (         main.asm):01566                 rts
+33CE                  (         main.asm):01558         excuse
+33CE 318D0048         (         main.asm):01559                 leay reasons,pcr
+33D2 0F3B             (         main.asm):01560                 clr prior1b
+33D4 D637             (         main.asm):01561                 ldb reason
+33D6 C407             (         main.asm):01562                 andb #7
+33D8 8DE6             (         main.asm):01563                 bsr genmsg
+33DA 0C3B             (         main.asm):01564                 inc prior1b
+33DC 0C37             (         main.asm):01565                 inc reason
+33DE 39               (         main.asm):01566                 rts
                       (         main.asm):01567         
-33D7 4F6F707321204E6F (         main.asm):01568         noshd   fcs /Oops! No more shield!/
+33DF 4F6F707321204E6F (         main.asm):01568         noshd   fcs /Oops! No more shield!/
      206D6F7265207368
      69656C64A1
-33EC 4F6F707321204E6F (         main.asm):01569         noswd   fcs /Oops! No more sword!/
+33F4 4F6F707321204E6F (         main.asm):01569         noswd   fcs /Oops! No more sword!/
      206D6F7265207377
      6F7264A1
-3400 4F6F707321204E6F (         main.asm):01570         noorb   fcs /Oops! No more orb!/
+3408 4F6F707321204E6F (         main.asm):01570         noorb   fcs /Oops! No more orb!/
      206D6F7265206F72
      62A1
                       (         main.asm):01571         
                       (         main.asm):01572         * Whimsical lame excuses
-3412 476F6E6520696E20 (         main.asm):01573         reasons fcs /Gone in a poof of glitter! Unstable magic! Never order from Temu again!/
+341A 476F6E6520696E20 (         main.asm):01573         reasons fcs /Gone in a poof of glitter! Unstable magic! Never order from Temu again!/
      6120706F6F66206F
      6620676C69747465
      722120556E737461
@@ -3890,7 +3891,7 @@
      206F726465722066
      726F6D2054656D75
      20616761696EA1
-3459 2254686572652069 (         main.asm):01574                 fcs /"There it is!" An adventurer in another dimension yoinks it through a portal!/
+3461 2254686572652069 (         main.asm):01574                 fcs /"There it is!" An adventurer in another dimension yoinks it through a portal!/
      7420697321222041
      6E20616476656E74
      7572657220696E20
@@ -3900,7 +3901,7 @@
      206974207468726F
      756768206120706F
      7274616CA1
-34A6 54686520676F6473 (         main.asm):01575                 fcs /The gods misfiled it, back it goes into the Vault of Misplaced Artifacts!/
+34AE 54686520676F6473 (         main.asm):01575                 fcs /The gods misfiled it, back it goes into the Vault of Misplaced Artifacts!/
      206D697366696C65
      642069742C206261
      636B20697420676F
@@ -3910,7 +3911,7 @@
      706C616365642041
      7274696661637473
      A1
-34EF 5265706F73736573 (         main.asm):01576                 fcs /Repossessed due to unpaid taxes to the Kingdom Bureau of Arbitrary Fees!/
+34F7 5265706F73736573 (         main.asm):01576                 fcs /Repossessed due to unpaid taxes to the Kingdom Bureau of Arbitrary Fees!/
      7365642064756520
      746F20756E706169
      6420746178657320
@@ -3919,14 +3920,14 @@
      7572656175206F66
      2041726269747261
      72792046656573A1
-3537 536F7272792C206D (         main.asm):01577                 fcs /Sorry, manufacturer recall due to faulty airbags!/
+353F 536F7272792C206D (         main.asm):01577                 fcs /Sorry, manufacturer recall due to faulty airbags!/
      616E756661637475
      7265722072656361
      6C6C206475652074
      6F206661756C7479
      2061697262616773
      A1
-3568 5265706F73736573 (         main.asm):01578                 fcs /Repossessed by the bank! Should have kept up with the payments!/
+3570 5265706F73736573 (         main.asm):01578                 fcs /Repossessed by the bank! Should have kept up with the payments!/
      7365642062792074
      68652062616E6B21
      2053686F756C6420
@@ -3934,7 +3935,7 @@
      7420757020776974
      6820746865207061
      796D656E7473A1
-35A7 5468652073656E74 (         main.asm):01579                 fcs /The sentient magic object sighs, "Sorry, just not into it today!"/
+35AF 5468652073656E74 (         main.asm):01579                 fcs /The sentient magic object sighs, "Sorry, just not into it today!"/
      69656E74206D6167
      6963206F626A6563
      742073696768732C
@@ -3943,7 +3944,7 @@
      7420696E746F2069
      7420746F64617921
      A2
-35E8 4920677565737320 (         main.asm):01580                 fcs /I guess it was more sorely needed over in Dungeons of Daggorath!/
+35F0 4920677565737320 (         main.asm):01580                 fcs /I guess it was more sorely needed over in Dungeons of Daggorath!/
      697420776173206D
      6F726520736F7265
      6C79206E65656465
@@ -3952,7 +3953,7 @@
      6E73206F66204461
      67676F72617468A1
                       (         main.asm):01581         
-3628                  (         main.asm):01582         zprog
+3630                  (         main.asm):01582         zprog
                       (         main.asm):01583         
                       (         main.asm):01584                 * Intercept "Close File" hook to autostart program
                       (         main.asm):01585                 org $a42e
