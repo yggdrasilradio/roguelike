@@ -1473,7 +1473,7 @@ delobj
 	clr 1,u
 	rts
 
-* Limit the use of shields and swords
+* Limit the use of shields, orbs, and swords
 timeout
 	tst swdtmr
 	beq shield@
