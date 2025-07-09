@@ -13,7 +13,6 @@ LMARGIN = 10
 
 def CreateBarrier(doorcolor, keycolor):
 
-	#roomdeltas = {(xcenter, ycenter): (xdelta, ydelta) for xcenter, ycenter, xdelta, ydelta in roomlist}
 	border = random.randint(10, len(pathlist) - 10)
 	# Create door
 	for i in range(border, len(pathlist)):
@@ -247,7 +246,7 @@ for _ in range(0, ngold):
 print("%d gold objects generated" % ngold)
 
 # Create potion objects
-npotions = int(nrooms / 10)
+npotions = 20
 delta = int((nrooms) / npotions)
 start = 0
 for _ in range(0, npotions):
@@ -259,7 +258,7 @@ for _ in range(0, npotions):
 print("%d potion objects generated" % npotions)
 
 # Create sword objects
-nswords = int(nrooms / 10)
+nswords = 20
 delta = int(nrooms / nswords)
 start = 0
 for _ in range(0, nswords):
@@ -271,7 +270,7 @@ for _ in range(0, nswords):
 print("%d sword objects generated" % nswords)
 
 # Create shield objects
-nshields = int(nrooms / 10)
+nshields = 20
 delta = int(nrooms / nshields)
 start = 0
 for _ in range(0, nshields):
@@ -283,7 +282,7 @@ for _ in range(0, nshields):
 print("%d shield objects generated" % nshields)
 
 # Create orb objects
-norbs = int(nrooms / 10)
+norbs = 20
 delta = int(nrooms / norbs)
 start = 0
 for _ in range(0, norbs):
