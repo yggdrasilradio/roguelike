@@ -15,4 +15,3 @@ endif
 
 create:
 	map/create.py map/map.gif
-	$(MAKE) rogue
