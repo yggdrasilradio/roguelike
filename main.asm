@@ -35,13 +35,17 @@ vcount	rmb 1
 secs	rmb 1
 mins	rmb 1
 hours	rmb 1
-pmsg1	rmb 2
-pmsg2	rmb 2
-timer1a	rmb 1
-timer1b	rmb 1
-swdtmr	rmb 1
-shdtmr	rmb 1
-orbtmr	rmb 1
+pmsg1	rmb 2 ; status message 1a
+pmsg2	rmb 2 ; status message 1b
+pmsg3	rmb 2 ; status message 1c
+pmsg4	rmb 2 ; status message 1d
+timer1a	rmb 1 ; TTL for status message 1a
+timer1b	rmb 1 ; TTL for status message 1b
+timer1c	rmb 1 ; TTL for status message 1c
+timer1d	rmb 1 ; TTL for status message 1d
+swdtmr	rmb 1 ; TTL for sword
+shdtmr	rmb 1 ; TTL for shield
+orbtmr	rmb 1 ; TTL for orb
 kbbusy	rmb 1 ; keyboard busy
 player	rmb 2 ; global player coordinates
 dead	rmb 1 ; player died flag
@@ -49,8 +53,6 @@ health	rmb 1 ; player health
 reason	rmb 1 ; index into whimsical object timeout excuses
 yayidx	rmb 1 ; index into smug gold acquisition messages
 orbidx	rmb 1 ; index into orb messages
-prior1a	rmb 1 ; status1a priority flag
-prior1b	rmb 1 ; status1b priority flag
 
 KEYBUF equ $152
 
@@ -59,7 +61,7 @@ start
 	* Disable interrupts
 	orcc #$50
 
-	* Restore "close file" hook and close file
+	* Restore "Close File" hook and close file
 	ldd #$176
 	std $a42e
 	jsr $a42d
@@ -102,10 +104,12 @@ start
 	* Clear status message timers and pointers
 	sta timer1a
 	sta timer1b
+	sta timer1c
+	sta timer1d
 	std pmsg1
 	std pmsg2
-	sta prior1a
-	sta prior1b
+	std pmsg3
+	std pmsg4
 
 	* Init text indexes
 	sta reason
@@ -262,6 +266,8 @@ drawframe
 	lbsr status
 	lbsr updstatus1a
 	lbsr updstatus1b
+	lbsr updstatus1c
+	lbsr updstatus1d
 	bsr flipscreen
 	rts
 
@@ -1090,8 +1096,6 @@ loop@	incb		; how many chars?
 prstatus1a
 	leay ,y		; ignore null message
 	beq exit@
-	tst prior1a	; current message has priority?
-	bne exit@	; this message gets thrown away, then
 	sty pmsg1
 	lda #255	; status message will persist for 4 secs
 	sta timer1a
@@ -1109,11 +1113,41 @@ exit@	rts
 prstatus1b
 	leay ,y		; ignore null message
 	beq exit@
-	tst prior1b	; current message has priority?
-	bne exit@	; this message gets thrown away, then
 	sty pmsg2
 	lda #255	; status message will persist for 4 secs
 	sta timer1b
+exit@	rts
+
+* Queue status message to display on third line of status area 1
+*
+* leay msg,pcr
+* lbsr prstatus1c
+*
+* msg  fcs /This is a test/
+*
+prstatus1c
+	leay ,y		; ignore null message
+	beq exit@
+	sty pmsg3
+	lda #255	; status message will persist for 4 secs
+	sta timer1c
+	leay null,pcr	; erase 1d while we're at it
+	lbsr prstatus1d
+exit@	rts
+
+* Queue status message to display on fourth line of status area 1
+*
+* leay msg,pcr
+* lbsr prstatus1d
+*
+* msg  fcs /This is a test/
+*
+prstatus1d
+	leay ,y		; ignore null message
+	beq exit@
+	sty pmsg4
+	lda #255	; status message will persist for 4 secs
+	sta timer1d
 exit@	rts
 
 * Update status message for first line of status area 1
@@ -1123,7 +1157,7 @@ updstatus1a
 	beq exit@
 	ldu pmsg1
 	tfr u,x
-	bsr strlen
+	lbsr strlen
 	lsrb
 	negb
 	addb #40
@@ -1142,7 +1176,7 @@ updstatus1b
 	beq exit@
 	ldu pmsg2
 	tfr u,x
-	bsr strlen
+	lbsr strlen
 	lsrb
 	negb
 	addb #40
@@ -1152,6 +1186,48 @@ updstatus1b
 	abx
 loop@	lda ,u+
 	sta ,x++
+	bpl loop@
+exit@	rts
+
+* Update status message for third line of status area 1
+*
+updstatus1c
+	ldd pmsg3	; ignore null message
+	beq exit@
+	ldu pmsg3
+	tfr u,x
+	lbsr strlen
+	lsrb
+	negb
+	addb #40
+	aslb
+	ldx screen	; center on third line
+	leax 3*160,x
+	abx
+	ldb #STATUS
+loop@	lda ,u+
+	std ,x++
+	bpl loop@
+exit@	rts
+
+* Update status message for fourth line of status area 1
+*
+updstatus1d
+	ldd pmsg4	; ignore null message
+	beq exit@
+	ldu pmsg4
+	tfr u,x
+	lbsr strlen
+	lsrb
+	negb
+	addb #40
+	aslb
+	ldx screen	; center on fourth line
+	leax 4*160,x
+	abx
+	ldb #STATUS
+loop@	lda ,u+
+	std ,x++
 	bpl loop@
 exit@	rts
 
@@ -1241,20 +1317,26 @@ next@	leau 4,u
 exit@	rts
 
 IRQ
-	dec timer1a	; has status message line 1 timed out?
+	dec timer1a	; has status message line 1a timed out?
 	bne irq0@
-	clr pmsg1	; yes, so clear status message line 1
+	clr pmsg1	; yes, so clear status message line 1a
 	clr pmsg1+1
-	clr prior1a	; and priority
-irq0@	dec timer1b	; has status message line 2 timed out?
+irq0@	dec timer1b	; has status message line 1b timed out?
 	bne irq1@
-	clr pmsg2	; yes, so clear status message line 2
+	clr pmsg2	; yes, so clear status message line 1b
 	clr pmsg2+1
-	clr prior1b	; and priority
-irq1@	tst kbbusy	; keyboard busy?
-	beq irq2@
+irq1@	dec timer1c	; has status message line 1c timed out?
+	bne irq2@
+	clr pmsg3	; yes, so clear status message line 1c
+	clr pmsg3+1
+irq2@	dec timer1d	; has status message line 1d timed out?
+	bne irq3@
+	clr pmsg4	; yes, so clear status message line 1c
+	clr pmsg4+1
+irq3@	tst kbbusy	; keyboard busy?
+	beq irq4@
 	dec kbbusy	; decrement keyboard busy timer
-irq2@	dec vcount	; decrement vsync counter
+irq4@	dec vcount	; decrement vsync counter
 	bne exit@
 	lda #60
 	sta vcount
@@ -1481,8 +1563,7 @@ timeout
 	bne shield@
 	clr nsword	; no more sword
 	leay noswd,pcr	; "Oops! No more sword!"
-	lbsr prstatus1a
-	inc prior1a	; priority message
+	lbsr prstatus1c
 	lbsr excuse	; lame excuse for sword disappearing
 shield@
 	tst shdtmr
@@ -1491,8 +1572,7 @@ shield@
 	bne orb@
 	clr nshield	; no more shield
 	leay noshd,pcr	; "Oops! No more shield!"
-	lbsr prstatus1a
-	inc prior1a	; priority message
+	lbsr prstatus1c
 	lbsr excuse	; lame excuse for shield disappearing
 orb@
 	tst orbtmr
@@ -1501,8 +1581,7 @@ orb@
 	bne exit@
 	clr norb	; no more orb
 	leay noorb,pcr	; "Oops! No more orb!"
-	lbsr prstatus1a
-	inc prior1a	; priority message
+	lbsr prstatus1c
 	lbsr excuse	; lame excuse for orb disappearing
 exit@	rts
 
@@ -1512,7 +1591,7 @@ orbmsg
 	leay orb,pcr
 	ldb orbidx
 	andb #3
-	bsr genmsg
+	bsr genmsg1b
 	inc orbidx
 	rts
 
@@ -1527,20 +1606,17 @@ yayness
 	leay yay,pcr
 	ldb yayidx
 	andb #15
-	bsr genmsg
+	bsr genmsg1b
 	inc yayidx
 	rts
 
-* Generate message from list
+* Generate message from list for status area 1b
 *
 * Entry:
 *	Y address of list
 *	B index into list
 *
-* Exit:
-*	Y address of message
-*
-genmsg
+genmsg1b
 next@
         tstb
         beq done@
@@ -1553,15 +1629,32 @@ done@
 	lbsr prstatus1b
 	rts
 
+* Generate message from list for status area 1d
+*
+* Entry:
+*	Y address of list
+*	B index into list
+*
+genmsg1d
+next@
+        tstb
+        beq done@
+loop@
+        tst ,y+
+        bpl loop@
+        decb
+        bra next@
+done@
+	lbsr prstatus1d
+	rts
+
 * Come up with a whimsical excuse for an object timing out
 *
 excuse
 	leay reasons,pcr
-	clr prior1b
 	ldb reason
 	andb #7
-	bsr genmsg
-	inc prior1b
+	bsr genmsg1d
 	inc reason
 	rts
 
