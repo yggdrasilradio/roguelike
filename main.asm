@@ -8,6 +8,7 @@ OBJS	equ $6400
 SWDTO	equ 255		; sword failure timeout
 SHDTO	equ 255		; shield failure timeout
 ORBTO	equ 255		; orb failure timeout
+MSGTO	equ 6		; status message timeout in seconds
 
 	org $0000
 
@@ -1097,7 +1098,7 @@ prstatus1a
 	leay ,y		; ignore null message
 	beq exit@
 	sty pmsg1
-	lda #255	; status message will persist for 4 secs
+	lda #MSGTO	; status message will persist for a few secs
 	sta timer1a
 	leay null,pcr	; erase 1b while we're at it
 	lbsr prstatus1b
@@ -1114,7 +1115,7 @@ prstatus1b
 	leay ,y		; ignore null message
 	beq exit@
 	sty pmsg2
-	lda #255	; status message will persist for 4 secs
+	lda #MSGTO	; status message will persist for a few secs
 	sta timer1b
 exit@	rts
 
@@ -1129,7 +1130,7 @@ prstatus1c
 	leay ,y		; ignore null message
 	beq exit@
 	sty pmsg3
-	lda #255	; status message will persist for 4 secs
+	lda #MSGTO	; status message will persist for a few secs
 	sta timer1c
 	leay null,pcr	; erase 1d while we're at it
 	lbsr prstatus1d
@@ -1146,7 +1147,7 @@ prstatus1d
 	leay ,y		; ignore null message
 	beq exit@
 	sty pmsg4
-	lda #255	; status message will persist for 4 secs
+	lda #MSGTO	; status message will persist for a few secs
 	sta timer1d
 exit@	rts
 
@@ -1317,26 +1318,10 @@ next@	leau 4,u
 exit@	rts
 
 IRQ
-	dec timer1a	; has status message line 1a timed out?
-	bne irq0@
-	clr pmsg1	; yes, so clear status message line 1a
-	clr pmsg1+1
-irq0@	dec timer1b	; has status message line 1b timed out?
-	bne irq1@
-	clr pmsg2	; yes, so clear status message line 1b
-	clr pmsg2+1
-irq1@	dec timer1c	; has status message line 1c timed out?
-	bne irq2@
-	clr pmsg3	; yes, so clear status message line 1c
-	clr pmsg3+1
-irq2@	dec timer1d	; has status message line 1d timed out?
-	bne irq3@
-	clr pmsg4	; yes, so clear status message line 1c
-	clr pmsg4+1
-irq3@	tst kbbusy	; keyboard busy?
-	beq irq4@
+	tst kbbusy	; keyboard busy?
+	beq irq0@
 	dec kbbusy	; decrement keyboard busy timer
-irq4@	dec vcount	; decrement vsync counter
+irq0@	dec vcount	; decrement vsync counter
 	bne exit@
 	lda #60
 	sta vcount
@@ -1344,7 +1329,23 @@ irq4@	dec vcount	; decrement vsync counter
 	beq exit@
 	tst dead
 	bne exit@
-	inc secs	; update seconds
+	dec timer1a	; has status message line 1a timed out?
+	bne irq1@
+	clr pmsg1	; yes, so clear status message line 1a
+	clr pmsg1+1
+irq1@	dec timer1b	; has status message line 1b timed out?
+	bne irq2@
+	clr pmsg2	; yes, so clear status message line 1b
+	clr pmsg2+1
+irq2@	dec timer1c	; has status message line 1c timed out?
+	bne irq3@
+	clr pmsg3	; yes, so clear status message line 1c
+	clr pmsg3+1
+irq3@	dec timer1d	; has status message line 1d timed out?
+	bne irq4@
+	clr pmsg4	; yes, so clear status message line 1c
+	clr pmsg4+1
+irq4@	inc secs	; update seconds
 	lda secs
 	cmpa #60
 	blo exit@
