@@ -28,25 +28,29 @@ key1	rmb 1
 key2	rmb 1
 key3	rmb 1
 key4	rmb 1
-nshield	rmb 1
-nsword	rmb 1
-norb	rmb 1
+nshield	rmb 1 ; number of shields in inventory
+nsword	rmb 1 ; number of swords in inventory
+norb	rmb 1 ; number of orbs in inventory
 nfound	rmb 1
 vcount	rmb 1
 secs	rmb 1
 mins	rmb 1
 hours	rmb 1
-pmsg1	rmb 2 ; status message 1a
-pmsg2	rmb 2 ; status message 1b
-pmsg3	rmb 2 ; status message 1c
-pmsg4	rmb 2 ; status message 1d
-timer1a	rmb 1 ; TTL for status message 1a
-timer1b	rmb 1 ; TTL for status message 1b
-timer1c	rmb 1 ; TTL for status message 1c
-timer1d	rmb 1 ; TTL for status message 1d
-swdtmr	rmb 1 ; TTL for sword
-shdtmr	rmb 1 ; TTL for shield
-orbtmr	rmb 1 ; TTL for orb
+pmsg1a	rmb 2 ; pointer to status message 1a
+pmsg1b	rmb 2 ; pointer to status message 1b
+pmsg1c	rmb 2 ; pointer to status message 1c
+pmsg1d	rmb 2 ; pointer to status message 1d
+lock1a	rmb 1 ; priority lock for status message 1a
+lock1b	rmb 1 ; priority lock for status message 1b
+lock1c	rmb 1 ; priority lock for status message 1c
+lock1d	rmb 1 ; priority lock for status message 1c
+timer1a	rmb 1 ; timeout for status message 1a
+timer1b	rmb 1 ; timeout for status message 1b
+timer1c	rmb 1 ; timeout for status message 1c
+timer1d	rmb 1 ; timeout for status message 1d
+swdtmr	rmb 1 ; timeout for sword
+shdtmr	rmb 1 ; timeout for shield
+orbtmr	rmb 1 ; timeout for orb
 kbbusy	rmb 1 ; keyboard busy
 player	rmb 2 ; global player coordinates
 dead	rmb 1 ; player died flag
@@ -107,10 +111,14 @@ start
 	sta timer1b
 	sta timer1c
 	sta timer1d
-	std pmsg1
-	std pmsg2
-	std pmsg3
-	std pmsg4
+	std pmsg1a
+	std pmsg1b
+	std pmsg1c
+	std pmsg1d
+	std lock1a
+	std lock1b
+	std lock1c
+	std lock1d
 
 	* Init text indexes
 	sta reason
@@ -709,7 +717,7 @@ line1a	fcs /Score: /
 line1b	fcs /  Health: /
 line1c	fcs /%/
 line1d	fcs /Found: /
-line1e	fcs /nothing/
+line1e	fcs /Nothing/
 line2a	fcs /Temple of Rogue/
 line2b	fcs /by Rick Adams/
 youwon	fcs /You have conquered the Temple of Rogue!/
@@ -768,7 +776,7 @@ nosword@
 	suba nfound
 	tst nfound
 	bne keys@
-	suba #7		; strlen("nothing")
+	suba #7		; strlen("Nothing")
 keys@	clrb
 	lbsr curspos
 	leau line1d,pcr
@@ -776,7 +784,7 @@ keys@	clrb
 	tst nfound
 	bne prkeys@
 	leau line1e,pcr
-	lbsr printline	; "nothing"
+	lbsr printline	; "Nothing"
 	bra done@
 prkeys@ ldx textptr
 	lda #$5f	; key icon
@@ -1097,7 +1105,10 @@ loop@	incb		; how many chars?
 prstatus1a
 	leay ,y		; ignore null message
 	beq exit@
-	sty pmsg1
+	tst lock1a	; ignore if priority message active
+	*beq exit@
+	bne exit@
+	sty pmsg1a
 	lda #MSGTO	; status message will persist for a few secs
 	sta timer1a
 	leay null,pcr	; erase 1b while we're at it
@@ -1114,7 +1125,10 @@ exit@	rts
 prstatus1b
 	leay ,y		; ignore null message
 	beq exit@
-	sty pmsg2
+	tst lock1b	; ignore if priority message active
+	*beq exit@
+	bne exit@
+	sty pmsg1b
 	lda #MSGTO	; status message will persist for a few secs
 	sta timer1b
 exit@	rts
@@ -1129,7 +1143,9 @@ exit@	rts
 prstatus1c
 	leay ,y		; ignore null message
 	beq exit@
-	sty pmsg3
+	tst lock1c	; ignore if priority message active
+	beq exit@
+	sty pmsg1c
 	lda #MSGTO	; status message will persist for a few secs
 	sta timer1c
 	leay null,pcr	; erase 1d while we're at it
@@ -1146,7 +1162,9 @@ exit@	rts
 prstatus1d
 	leay ,y		; ignore null message
 	beq exit@
-	sty pmsg4
+	tst lock1d	; ignore if priority message active
+	beq exit@
+	sty pmsg1d
 	lda #MSGTO	; status message will persist for a few secs
 	sta timer1d
 exit@	rts
@@ -1154,9 +1172,9 @@ exit@	rts
 * Update status message for first line of status area 1
 *
 updstatus1a
-	ldd pmsg1	; ignore null message
+	ldd pmsg1a	; ignore null message
 	beq exit@
-	ldu pmsg1
+	ldu pmsg1a
 	tfr u,x
 	lbsr strlen
 	lsrb
@@ -1173,9 +1191,9 @@ exit@	rts
 * Update status message for second line of status area 1
 *
 updstatus1b
-	ldd pmsg2	; ignore null message
+	ldd pmsg1b	; ignore null message
 	beq exit@
-	ldu pmsg2
+	ldu pmsg1b
 	tfr u,x
 	lbsr strlen
 	lsrb
@@ -1193,9 +1211,9 @@ exit@	rts
 * Update status message for third line of status area 1
 *
 updstatus1c
-	ldd pmsg3	; ignore null message
+	ldd pmsg1c	; ignore null message
 	beq exit@
-	ldu pmsg3
+	ldu pmsg1c
 	tfr u,x
 	lbsr strlen
 	lsrb
@@ -1214,9 +1232,9 @@ exit@	rts
 * Update status message for fourth line of status area 1
 *
 updstatus1d
-	ldd pmsg4	; ignore null message
+	ldd pmsg1d	; ignore null message
 	beq exit@
-	ldu pmsg4
+	ldu pmsg1d
 	tfr u,x
 	lbsr strlen
 	lsrb
@@ -1331,20 +1349,24 @@ irq0@	dec vcount	; decrement vsync counter
 	bne exit@
 	dec timer1a	; has status message line 1a timed out?
 	bne irq1@
-	clr pmsg1	; yes, so clear status message line 1a
-	clr pmsg1+1
+	clr pmsg1a	; yes, so clear status message line 1a
+	clr pmsg1a+1
+	clr lock1a
 irq1@	dec timer1b	; has status message line 1b timed out?
 	bne irq2@
-	clr pmsg2	; yes, so clear status message line 1b
-	clr pmsg2+1
+	clr pmsg1b	; yes, so clear status message line 1b
+	clr pmsg1b+1
+	clr lock1b
 irq2@	dec timer1c	; has status message line 1c timed out?
 	bne irq3@
-	clr pmsg3	; yes, so clear status message line 1c
-	clr pmsg3+1
+	clr pmsg1c	; yes, so clear status message line 1c
+	clr pmsg1c+1
+	clr lock1c
 irq3@	dec timer1d	; has status message line 1d timed out?
 	bne irq4@
-	clr pmsg4	; yes, so clear status message line 1c
-	clr pmsg4+1
+	clr pmsg1d	; yes, so clear status message line 1c
+	clr pmsg1d+1
+	clr lock1d
 irq4@	inc secs	; update seconds
 	lda secs
 	cmpa #60
